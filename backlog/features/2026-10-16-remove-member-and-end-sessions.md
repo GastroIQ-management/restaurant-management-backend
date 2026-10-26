@@ -33,6 +33,5 @@ user on 2026-10-16:
 - [ ] Identity and Organization matrices get rows with tests
 
 ## Related
-- backlog/improvements/session-redesign.md (the access token still works up to 15 min; ship close together so removal is immediate)
 - backlog/features/2026-10-16-member-role-change.md (same permission and Owner protection)
 - docs/specs/identity/2026-10-20-custom-roles.md
