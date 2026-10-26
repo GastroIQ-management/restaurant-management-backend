@@ -60,7 +60,7 @@ namespace RestaurantManagement.Modules.Identity.Tests
             var passStart = DateTime.UtcNow.AddHours(-1);
             using var database = await SeedAsync(passStart);
             DateTime? claimedUntilDuringSend = null;
-            _emailService.SendPasswordResetEmailAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<int>())
+            _emailService.SendPasswordResetEmailAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<int>(), Arg.Any<string>())
                 .Returns(_ =>
                 {
                     claimedUntilDuringSend ??= ReadQueueAsync(database).GetAwaiter().GetResult().First().ClaimedUntil;
@@ -84,7 +84,7 @@ namespace RestaurantManagement.Modules.Identity.Tests
             var passStart = DateTime.UtcNow;
             using var database = await SeedAsync(passStart);
             var sends = 0;
-            _emailService.SendPasswordResetEmailAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<int>())
+            _emailService.SendPasswordResetEmailAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<int>(), Arg.Any<string>())
                 .Returns(_ =>
                 {
                     if (sends++ == 0)

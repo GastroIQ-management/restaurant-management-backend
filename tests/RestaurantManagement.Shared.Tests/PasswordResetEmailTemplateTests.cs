@@ -20,7 +20,7 @@ namespace RestaurantManagement.Shared.Tests
             const string firstName = "<b>Maria</b>";
 
             // Act
-            var body = PasswordResetEmailTemplate.Build(Recipient, firstName, "482913", 15);
+            var body = PasswordResetEmailTemplate.Build(Recipient, firstName, "482913", 15, "en");
 
             // Assert
             body.ShouldContain("&lt;b&gt;Maria&lt;/b&gt;", customMessage: "a first name with HTML is shown as text in the reset email");
@@ -36,7 +36,7 @@ namespace RestaurantManagement.Shared.Tests
             const string firstName = "Maria";
 
             // Act
-            var body = PasswordResetEmailTemplate.Build(Recipient, firstName, "482913", 20);
+            var body = PasswordResetEmailTemplate.Build(Recipient, firstName, "482913", 20, "en");
 
             // Assert
             body.ShouldContain("Maria", customMessage: "the reset email greets the user by first name");

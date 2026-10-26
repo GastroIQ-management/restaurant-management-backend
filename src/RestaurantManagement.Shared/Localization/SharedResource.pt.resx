@@ -231,4 +231,7 @@
   <data name="RoleNameInvalid" xml:space="preserve">
     <value>O nome do cargo não pode ser vazio, ter mais de 100 caracteres nem ser "Owner".</value>
   </data>
+  <data name="LanguageUnsupported_ValidationError" xml:space="preserve">
+    <value>O idioma deve ser um destes: en, pt, fr.</value>
+  </data>
 </root>

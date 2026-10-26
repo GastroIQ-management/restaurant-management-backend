@@ -1,44 +1,17 @@
-using System.Net;
-using System.Reflection;
-
 namespace RestaurantManagement.Shared.Services.Email
 {
     public static class PasswordResetEmailTemplate
     {
-        public const string Subject = "Reset your password";
-
-        private const string ResourceName = "RestaurantManagement.Shared.Templates.password-reset-email.html";
-        private const string DefaultGreetingName = "there";
-
-        private const string FirstNameToken = "{{FIRST_NAME}}";
-        private const string CodeToken = "{{CODE}}";
-        private const string ExpiryMinutesToken = "{{EXPIRY_MINUTES}}";
-        private const string EmailToken = "{{EMAIL}}";
-
-        private static readonly string TemplateHtml = LoadTemplate();
-
-        public static string Build(string to, string firstName, string code, int expiryMinutes)
+        private static readonly LocalizedCodeEmail Email = new("password-reset-email", new()
         {
-            var greetingName = string.IsNullOrWhiteSpace(firstName) ? DefaultGreetingName : firstName.Trim();
-            var encodedGreetingName = WebUtility.HtmlEncode(greetingName);
-            var encodedTo = WebUtility.HtmlEncode(to);
+            ["en"] = "Reset your password",
+            ["pt"] = "Redefina sua senha",
+            ["fr"] = "Réinitialisez votre mot de passe"
+        });
 
-            return TemplateHtml
-                .Replace(FirstNameToken, encodedGreetingName)
-                .Replace(CodeToken, code)
-                .Replace(ExpiryMinutesToken, expiryMinutes.ToString())
-                .Replace(EmailToken, encodedTo);
-        }
+        public static string Subject(string language) => Email.Subject(language);
 
-        private static string LoadTemplate()
-        {
-            var assembly = Assembly.GetExecutingAssembly();
-            using var stream = assembly.GetManifestResourceStream(ResourceName);
-            if (stream is null)
-                throw new InvalidOperationException($"Embedded resource '{ResourceName}' was not found in assembly '{assembly.FullName}'.");
-
-            using var reader = new StreamReader(stream);
-            return reader.ReadToEnd();
-        }
+        public static string Build(string to, string firstName, string code, int expiryMinutes, string language)
+            => Email.Build(to, firstName, code, expiryMinutes, language);
     }
 }

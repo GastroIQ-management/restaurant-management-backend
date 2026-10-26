@@ -26,6 +26,7 @@ using RestaurantManagement.Web.RateLimiting;
 
 // Modules
 using RestaurantManagement.Modules.Identity.Data;
+using RestaurantManagement.Modules.Identity.Services.Languages;
 using RestaurantManagement.Modules.Identity.Services.Lockout;
 using RestaurantManagement.Modules.Identity.Services.Passwords;
 using RestaurantManagement.Modules.Identity.Services.Registration;
@@ -269,6 +270,7 @@ if (builder.Configuration.GetValue("PendingEmails:Enabled", true))
         pendingEmailInterval));
 }
 builder.Services.AddScoped<IPasswordChangeService, PasswordChangeService>();
+builder.Services.AddScoped<IUserLanguageService, UserLanguageService>();
 builder.Services.AddScoped<IPasswordAuditRecorder, PasswordAuditRecorder>();
 builder.Services.AddSingleton<IVerificationCodeHasher, VerificationCodeHasher>();
 builder.Services.AddSingleton<IPasswordHasher, BcryptPasswordHasher>();

@@ -73,7 +73,7 @@ namespace RestaurantManagement.Modules.Identity.Tests
             await ProcessAsync(database, now);
 
             // Assert
-            await _emailService.DidNotReceiveWithAnyArgs().SendPasswordResetEmailAsync(default!, default!, default!, default);
+            await _emailService.DidNotReceiveWithAnyArgs().SendPasswordResetEmailAsync(default!, default!, default!, default, default!);
             (await ReadQueueAsync(database)).ShouldBeEmpty("a request interrupted after its code was stored is finished, not sent again");
             _logger.Levels.ShouldContain(LogLevel.Warning, "dropping an interrupted request is logged");
             _logger.Messages.ShouldContain(m => m.Contains(RequestId.ToString()), "the warning names the request by its id");
@@ -89,7 +89,7 @@ namespace RestaurantManagement.Modules.Identity.Tests
             var now = DateTime.UtcNow;
             using var database = await SeedAsync(now, codeIssuedAt: null);
             DateTime? markDuringSend = null;
-            _emailService.SendPasswordResetEmailAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<int>())
+            _emailService.SendPasswordResetEmailAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<int>(), Arg.Any<string>())
                 .Returns(_ =>
                 {
                     markDuringSend = ReadQueueAsync(database).GetAwaiter().GetResult().Single().CodeIssuedAt;
@@ -103,7 +103,7 @@ namespace RestaurantManagement.Modules.Identity.Tests
 
             // Assert
             markDuringSend.ShouldNotBeNull("the code is marked as issued before the send starts");
-            await _emailService.ReceivedWithAnyArgs(1).SendPasswordResetEmailAsync(default!, default!, default!, default);
+            await _emailService.ReceivedWithAnyArgs(1).SendPasswordResetEmailAsync(default!, default!, default!, default, default!);
             (await ReadQueueAsync(database)).ShouldBeEmpty("the retry after a caught failure sends normally and finishes the request");
         }
     }

@@ -34,8 +34,10 @@ Registration swallows email-send failures and returns 200 with an unverified acc
 Resend never sends in the request, so a sending failure never reaches the requester either.
 Verification codes are generated with RandomNumberGenerator, never new Random().
 Codes are stored only as keyed fingerprints (CodeHash); the readable code goes only to the email.
-SendVerificationEmailAsync(to, firstName, code, expiryMinutes) takes three adjacent
+SendVerificationEmailAsync(to, firstName, code, expiryMinutes, language) takes four adjacent
 string parameters with no compiler protection against swapping them.
+Email language: the stored `User.PreferredLanguage` (en, pt or fr); background processors use English
+when none is stored, and registration follows the language of the request.
 UniqueEmailIndexTests run against a real Postgres via Testcontainers (IdentityPostgresFixture)
 because they prove constraint races and migration-on-existing-data; other tests stay on
 the SQLite in-memory database.

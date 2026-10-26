@@ -35,7 +35,7 @@ namespace RestaurantManagement.Modules.Identity.Tests
         private static IEmailService FailingEmailService()
         {
             var emailService = Substitute.For<IEmailService>();
-            emailService.SendVerificationEmailAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<int>())
+            emailService.SendVerificationEmailAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<int>(), Arg.Any<string>())
                 .Returns(Task.FromException(new Exception("SMTP unavailable")));
             return emailService;
         }

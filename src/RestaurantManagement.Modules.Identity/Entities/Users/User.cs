@@ -10,6 +10,8 @@ namespace RestaurantManagement.Modules.Identity.Entities.Users
         public string? PhoneNumber { get; set; }
         public bool IsActive { get; set; } = true;
         public bool IsVerified { get; set; } = false;
+        // "en", "pt" or "fr"; null until the user chooses, and then emails use the language of the request.
+        public string? PreferredLanguage { get; set; }
 
 
         // Security tracking

@@ -4,7 +4,7 @@ namespace RestaurantManagement.Modules.Identity.Services.Invitations
 {
     public interface IInvitationService
     {
-        /// <summary>Creates (or replaces the pending) invitation, audits it and emails the link. Language is "en" or "pt".</summary>
+        /// <summary>Creates (or replaces the pending) invitation, audits it and emails the link. Language is "en", "pt" or "fr"; an existing account's own language replaces it.</summary>
         Task<InvitationResponse> CreateAsync(CreateInvitationRequest request, string language);
 
         /// <summary>Cancels a pending invitation of the token organization (404 when not found or not pending).</summary>

@@ -86,7 +86,7 @@ public class VerificationResendEndpointTests : IClassFixture<PostgresDatabaseFix
     {
         // Arrange
         var emailService = Substitute.For<IEmailService>();
-        emailService.SendVerificationEmailAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<int>())
+        emailService.SendVerificationEmailAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<int>(), Arg.Any<string>())
             .Returns(Task.FromException(new InvalidOperationException("SMTP server unavailable")));
         await using var fixture = await CreateFactoryAsync(emailService);
         var client = fixture.Factory.CreateClient();

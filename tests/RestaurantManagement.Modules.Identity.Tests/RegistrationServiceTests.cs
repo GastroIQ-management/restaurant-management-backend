@@ -57,7 +57,7 @@ namespace RestaurantManagement.Modules.Identity.Tests
             // Assert
             var thrown = await act.Should().ThrowAsync<BusinessException>("registering an email that already exists is refused");
             thrown.Which.StatusCode.Should().Be(400, "a duplicate email is a 400");
-            await emailService.DidNotReceive().SendVerificationEmailAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<int>());
+            await emailService.DidNotReceive().SendVerificationEmailAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<int>(), Arg.Any<string>());
         }
 
         [Fact]
@@ -94,7 +94,7 @@ namespace RestaurantManagement.Modules.Identity.Tests
             var code = await verifyContext.UserVerificationCodes.SingleAsync(v => v.UserId == user.Id);
             code.ExpiresAt.Should().BeCloseTo(beforeRegistration.AddMinutes(15), TimeSpan.FromSeconds(5));
 
-            await emailService.Received(1).SendVerificationEmailAsync(user.Email, "New", Arg.Any<string>(), 15);
+            await emailService.Received(1).SendVerificationEmailAsync(user.Email, "New", Arg.Any<string>(), 15, Arg.Any<string>());
         }
 
         [Fact]
@@ -105,7 +105,7 @@ namespace RestaurantManagement.Modules.Identity.Tests
             // Arrange
             using var database = new IdentityTestDatabase();
             var emailService = Substitute.For<IEmailService>();
-            emailService.SendVerificationEmailAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<int>())
+            emailService.SendVerificationEmailAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<int>(), Arg.Any<string>())
                 .Returns(Task.FromException(new Exception("SMTP unavailable")));
             var logger = Substitute.For<ILogger<RegistrationService>>();
 
@@ -223,7 +223,7 @@ namespace RestaurantManagement.Modules.Identity.Tests
             using var database = new IdentityTestDatabase();
             var emailService = Substitute.For<IEmailService>();
             string? emailedCode = null;
-            emailService.SendVerificationEmailAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Do<string>(code => emailedCode = code), Arg.Any<int>()).Returns(Task.CompletedTask);
+            emailService.SendVerificationEmailAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Do<string>(code => emailedCode = code), Arg.Any<int>(), Arg.Any<string>()).Returns(Task.CompletedTask);
             var logger = Substitute.For<ILogger<RegistrationService>>();
             var hasher = TestVerificationCodeHasher.Create();
 

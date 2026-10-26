@@ -35,7 +35,7 @@ public class VerificationEmailWorkerEndpointTests : IClassFixture<PostgresDataba
         // Arrange
         string? emailedCode = null;
         var emailService = Substitute.For<IEmailService>();
-        emailService.SendVerificationEmailAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Do<string>(code => emailedCode = code), Arg.Any<int>())
+        emailService.SendVerificationEmailAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Do<string>(code => emailedCode = code), Arg.Any<int>(), Arg.Any<string>())
             .Returns(Task.CompletedTask);
         await using var tenantFactory = await TenantApiFactory.CreateAsync(_postgres);
         var factory = tenantFactory.WithWebHostBuilder(builder =>

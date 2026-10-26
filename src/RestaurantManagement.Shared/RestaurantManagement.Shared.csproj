@@ -19,5 +19,9 @@
   <ItemGroup>
     <EmbeddedResource Include="Templates\verification-email.html" />
     <EmbeddedResource Include="Templates\password-reset-email.html" />
+    <EmbeddedResource Include="Templates\verification-email-pt.html" />
+    <EmbeddedResource Include="Templates\verification-email-fr.html" />
+    <EmbeddedResource Include="Templates\password-reset-email-pt.html" />
+    <EmbeddedResource Include="Templates\password-reset-email-fr.html" />
   </ItemGroup>
 </Project>
