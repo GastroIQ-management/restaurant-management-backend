@@ -101,6 +101,7 @@ public class SharedResourceCatalogTests : IDisposable
     [InlineData("pt", "RequiredAttribute_ValidationError", "O campo {0} é obrigatório.")]
     [InlineData("en", "MaxLengthAttribute_ValidationError", "The field {0} must be a maximum of {1} characters.")]
     [InlineData("pt", "MaxLengthAttribute_ValidationError", "O campo {0} deve ter no máximo {1} caracteres.")]
+    [InlineData("fr", "InvalidRefreshToken", "Le jeton d'actualisation est invalide ou a expiré. Veuillez vous reconnecter.")]
     [Trait("Rule", "SH19")]
     public void Localizer_ExistingMessageKey_KeepsTodaysText(string culture, string key, string expected)
     {
