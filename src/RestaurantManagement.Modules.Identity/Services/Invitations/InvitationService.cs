@@ -90,7 +90,7 @@ namespace RestaurantManagement.Modules.Identity.Services.Invitations
                     && i.UsedAt == null && i.CancelledAt == null && i.ReplacedAt == null);
             var before = replaced is null ? null : await DescribeAsync(replaced);
             var token = InvitationTokens.Generate();
-            var invitation = NewInvitation(organizationId, email, language, token);
+            var invitation = NewInvitation(organizationId, email, await ChooseLanguageAsync(email, language), token);
             if (replaced is not null)
                 replaced.ReplacedAt = invitation.CreatedAt;
             _db.OrganizationInvitations.Add(invitation);
@@ -152,6 +152,14 @@ namespace RestaurantManagement.Modules.Identity.Services.Invitations
             }
 
             return grids;
+        }
+
+        // An existing account's own language wins; otherwise the inviter's request language is used.
+        private async Task<string> ChooseLanguageAsync(string email, string requestLanguage)
+        {
+            var accountLanguage = await _db.Users.Where(u => u.Email.ToLower() == email)
+                .Select(u => u.PreferredLanguage).FirstOrDefaultAsync();
+            return accountLanguage ?? requestLanguage;
         }
 
         private OrganizationInvitation NewInvitation(Guid organizationId, string email, string language, string token)

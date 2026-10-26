@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RestaurantManagement.Modules.Identity.Models.Invitations;
 using RestaurantManagement.Modules.Identity.Services.Invitations;
+using RestaurantManagement.Modules.Identity.Services.Languages;
 
 namespace RestaurantManagement.Modules.Identity.Controllers
 {
@@ -18,7 +19,7 @@ namespace RestaurantManagement.Modules.Identity.Controllers
         [Authorize]
         public async Task<ActionResult<InvitationResponse>> Create([FromBody] CreateInvitationRequest request)
         {
-            var language = Request.Headers.AcceptLanguage.ToString().TrimStart().StartsWith("pt", StringComparison.OrdinalIgnoreCase) ? "pt" : "en";
+            var language = SupportedLanguages.FromCurrentCulture();
             return Ok(await _invitationService.CreateAsync(request, language));
         }
 

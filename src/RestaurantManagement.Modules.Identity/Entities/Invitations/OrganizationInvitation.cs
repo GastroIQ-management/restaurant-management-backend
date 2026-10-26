@@ -14,7 +14,7 @@ namespace RestaurantManagement.Modules.Identity.Entities.Invitations
 
         public Guid InvitedByUserId { get; set; }
 
-        /// <summary>"en" or "pt": the language of the invitation email.</summary>
+        /// <summary>"en", "pt" or "fr": the language of the invitation email.</summary>
         public string Language { get; set; } = "en";
 
         public string TokenHash { get; set; } = string.Empty;
