@@ -231,6 +231,9 @@
   <data name="RoleNameInvalid" xml:space="preserve">
     <value>The role name must not be empty, longer than 100 characters, or "Owner".</value>
   </data>
+  <data name="LanguageUnsupported_ValidationError" xml:space="preserve">
+    <value>The language must be one of: en, pt, fr.</value>
+  </data>
 </root>
 
 

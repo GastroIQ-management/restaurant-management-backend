@@ -348,6 +348,11 @@ accented or non-Latin characters may not fit (R6, T7; bcrypt limit, ASVS V6.2.9)
 | T131 | An unknown module or level name when editing a role's levels | 400; the levels are unchanged | ✅ | `RoleServiceEditTests.UpdateLevelsAsync_UnknownModuleOrLevelName_Refuses400AndKeepsTheLevels` |
 | T132 | A member with no access anywhere (all-None grid) lists the roles | 403 | ✅ | `RoleReadAccessEndpointTests.ListRoles_MemberWithNoAccessAnywhere_ReturnsForbidden` |
 | T133 | A member with no access anywhere (all-None grid) reads one role | 403 | ✅ | `RoleReadAccessEndpointTests.GetRole_MemberWithNoAccessAnywhere_ReturnsForbidden` |
+| T134 | `PUT api/users/me/language` for a user who is missing, deactivated or unverified | 401 (invalid session); nothing stored | ✅ | `UserLanguageServiceTests.UpdateAsync_UnknownInactiveOrUnverifiedUser_RejectedAsInvalidSession` |
+| T135 | A signed-in user chooses English, Portuguese or French | Stored on that user only (204); can be changed again; other users are untouched | ✅ | `UserLanguageServiceTests.UpdateAsync_SupportedLanguage_StoresItForThatUserOnly`, `UserLanguageServiceTests.UpdateAsync_LanguageChangedTwice_KeepsTheLatest`, `UserLanguageEndpointTests.UpdateLanguage_SupportedLanguage_StoresItAndReturnsNoContent` |
+| T136 | A missing language, or one other than `en`, `pt`, `fr` (any other code, a regional code such as `pt-BR`, or capital letters) | 400 with the translated validation message; nothing stored | ✅ | `UpdateLanguageRequestValidationTests.Validate_MissingOrUnsupportedLanguage_ReturnsErrorOnLanguage`, `UpdateLanguageRequestValidationTests.Validate_SupportedLanguage_HasNoErrors`, `UserLanguageEndpointTests.UpdateLanguage_UnsupportedLanguage_ReturnsBadRequestAndStoresNothing` |
+| T137 | `PUT api/users/me/language` without an access token | 401 | ✅ | `UserLanguageEndpointTests.UpdateLanguage_NoAccessToken_ReturnsUnauthorized` |
+| T138 | The body names another user | Only the caller's language changes | ✅ | `UserLanguageEndpointTests.UpdateLanguage_BodyNamesAnotherUser_ChangesOnlyTheCaller` |
 
 ## 11. Schema, migration and wiring tests
 These protect the database and the app setup rather than a rule users meet. They are listed so
@@ -388,3 +393,4 @@ every Identity test maps somewhere; a new one goes here or in a row above.
 | D31 | `PendingEmailWorkerAccountLockedTests.RunOnceAsync_ResetAndVerificationProcessorsThrow_AccountLockedProcessorStillRuns`, `PendingEmailWorkerAccountLockedTests.RunOnceAsync_AccountLockedProcessorThrows_LogsWithoutEmailAndOtherProcessorsStillRun` | The worker also runs the account-locked processor; a failure in one processor is logged without the email address and does not stop the others |
 | D32 | `LoginFailuresFailedAtIndexTests.Migrate_CleanDatabase_CreatesAnIndexOnLoginFailuresFailedAt` | Index on login failures by failed-at created, for the cleanup of expired rows |
 | D33 | `PendingEmailSendStartedColumnTests.Migrate_CleanDatabase_PendingEmailsHasANullableSendStartedAtColumn` | Pending emails have their own nullable send-started column, separate from the code-issued column |
+| D34 | `UserLanguageColumnTests.Migrate_CleanDatabase_UsersHasANullablePreferredLanguageColumn` | Users have a nullable preferred-language column; no value means the user has not chosen one |

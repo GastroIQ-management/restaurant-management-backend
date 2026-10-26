@@ -789,6 +789,10 @@ namespace RestaurantManagement.Modules.Identity.Migrations
                         .HasColumnType("text")
                         .HasColumnName("phone_number");
 
+                    b.Property<string>("PreferredLanguage")
+                        .HasColumnType("text")
+                        .HasColumnName("preferred_language");
+
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_at");
