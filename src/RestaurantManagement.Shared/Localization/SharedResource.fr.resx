@@ -70,7 +70,7 @@
     <value>Le jeton est invalide ou a expiré. Veuillez vous reconnecter.</value>
   </data>
   <data name="InvalidRefreshToken" xml:space="preserve">
-    <value>Le jeton d'actualisation est invalide ou a expiré. Veuillez demander une nouvelle session de connexion.</value>
+    <value>Le jeton d'actualisation est invalide ou a expiré. Veuillez vous reconnecter.</value>
   </data>
   <data name="UserVerified" xml:space="preserve">
     <value>Votre compte a été vérifié avec succès.</value>
