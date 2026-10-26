@@ -9,3 +9,4 @@ One file per item, filed by type.
 | [improvements/](improvements/) | Existing capability that works but should work better |
 | [tech-debt/](tech-debt/) | Internal quality issues (outdated code, missing tests, fragile parts) |
 | [pre-production/](pre-production/) | Must be done before launch, outside the code (deployment, certificates, secrets, infrastructure) |
+| [offline/](offline/) | API contracts the frontend offline engine needs (offline from day one, decided 2026-10-26) |

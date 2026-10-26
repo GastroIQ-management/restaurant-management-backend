@@ -34,12 +34,11 @@ this protection. This blocks the frontend offline engine (offline from day one, 
       (tenant leak test in the matrix)
 - [ ] A crash between the write and the key row never leaves a write applied with no key, and
       never leaves a key with no write
-- [ ] Keys expire after a configurable time, longer than the longest a device may stay offline
-      (frontend offline-sync open decision 4, still undecided); 72 hours is a placeholder default
-      until that decision is made. Expired rows are purged
+- [ ] Keys expire after a configurable time, longer than the 7-day offline limit (sessions end
+      after 7 days unused, decided 2026-10-26). Assumption: default 8 days. Expired rows are purged
 
 ## Related
-- `backlog/improvements/2026-10-26-client-generated-ids-on-create.md`
-- `backlog/improvements/2026-10-26-optimistic-concurrency-versions.md`
-- `backlog/improvements/2026-10-26-changes-since-read-for-device-catch-up.md`
+- `backlog/offline/2026-10-26-client-generated-ids-on-create.md`
+- `backlog/offline/2026-10-26-optimistic-concurrency-versions.md`
+- `backlog/offline/2026-10-26-changes-since-read-for-device-catch-up.md`
 - `backlog/improvements/2026-10-16-audit-entries-through-outbox.md` (same cross-module transaction question)

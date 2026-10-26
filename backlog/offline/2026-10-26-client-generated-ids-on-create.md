@@ -32,6 +32,6 @@ create with no ID of its own also makes a second record. This blocks the fronten
 - [ ] The OpenAPI document shows the `id` field on each create request
 
 ## Related
-- `backlog/improvements/2026-10-26-idempotency-key-on-writes.md`
-- `backlog/improvements/2026-10-26-optimistic-concurrency-versions.md`
-- `backlog/improvements/2026-10-26-changes-since-read-for-device-catch-up.md`
+- `backlog/offline/2026-10-26-idempotency-key-on-writes.md`
+- `backlog/offline/2026-10-26-optimistic-concurrency-versions.md`
+- `backlog/offline/2026-10-26-changes-since-read-for-device-catch-up.md`
