@@ -75,6 +75,6 @@ public class PendingEmailWorkerEndpointTests : IClassFixture<PostgresDatabaseFix
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
         queued.ShouldBe(0, "the worker removes the request once it has handled it");
-        await emailService.Received(1).SendPasswordResetEmailAsync(MariaEmail, "Maria", Arg.Any<string>(), Arg.Any<int>());
+        await emailService.Received(1).SendPasswordResetEmailAsync(MariaEmail, "Maria", Arg.Any<string>(), Arg.Any<int>(), Arg.Any<string>());
     }
 }

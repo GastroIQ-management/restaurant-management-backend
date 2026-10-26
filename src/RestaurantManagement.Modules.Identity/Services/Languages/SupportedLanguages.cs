@@ -1,3 +1,5 @@
+using System.Globalization;
+
 namespace RestaurantManagement.Modules.Identity.Services.Languages
 {
     // The languages that have an email text and a message catalog (see RegionalCultureProvider in Shared).
@@ -10,15 +12,12 @@ namespace RestaurantManagement.Modules.Identity.Services.Languages
         // Used when no language is known: a background job has no request to read one from.
         public const string Default = English;
 
-        // Maps an Accept-Language header to a supported language; regional variants map to their base language.
-        public static string FromAcceptLanguage(string? header)
+        // The language of the current request: its culture is set from Accept-Language, and a regional
+        // variant such as pt-BR has already been mapped to its base language.
+        public static string FromCurrentCulture()
         {
-            var value = header?.TrimStart() ?? string.Empty;
-            if (value.StartsWith(Portuguese, StringComparison.OrdinalIgnoreCase))
-                return Portuguese;
-            if (value.StartsWith(French, StringComparison.OrdinalIgnoreCase))
-                return French;
-            return Default;
+            var language = CultureInfo.CurrentUICulture.TwoLetterISOLanguageName;
+            return language is Portuguese or French ? language : Default;
         }
     }
 }

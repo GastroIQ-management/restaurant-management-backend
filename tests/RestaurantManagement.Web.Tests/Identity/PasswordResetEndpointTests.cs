@@ -48,7 +48,7 @@ public class PasswordResetEndpointTests : IClassFixture<PostgresDatabaseFixture>
     public PasswordResetEndpointTests(PostgresDatabaseFixture postgres)
     {
         _postgres = postgres;
-        _emailService.SendPasswordResetEmailAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<int>())
+        _emailService.SendPasswordResetEmailAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<int>(), Arg.Any<string>())
             .Returns(call =>
             {
                 _lastEmailedCode = call.ArgAt<string>(2);
@@ -136,7 +136,7 @@ public class PasswordResetEndpointTests : IClassFixture<PostgresDatabaseFixture>
         known.StatusCode.ShouldBe(HttpStatusCode.OK, "asking for a reset always gets the same acknowledgement");
         unknown.StatusCode.ShouldBe(known.StatusCode, "an unknown email must look exactly like a real one, so nobody can discover who has an account");
         (await unknown.Content.ReadAsStringAsync()).ShouldBe(await known.Content.ReadAsStringAsync(), "the body must not reveal whether the email has an account");
-        await _emailService.DidNotReceiveWithAnyArgs().SendPasswordResetEmailAsync(default!, default!, default!, default);
+        await _emailService.DidNotReceiveWithAnyArgs().SendPasswordResetEmailAsync(default!, default!, default!, default, default!);
         using var scope = factory.Services.CreateScope();
         var queued = await scope.ServiceProvider.GetRequiredService<IdentityDbContext>().Set<PendingEmail>().CountAsync();
         queued.ShouldBe(2, "each request only queues its email; nothing is sent during the request");
@@ -159,7 +159,7 @@ public class PasswordResetEndpointTests : IClassFixture<PostgresDatabaseFixture>
         var reset = await client.PostAsJsonAsync(ResetUrl, new { email = MariaEmail, code = _lastEmailedCode, newPassword = NewPassword });
 
         // Assert
-        await _emailService.ReceivedWithAnyArgs(1).SendPasswordResetEmailAsync(default!, default!, default!, default);
+        await _emailService.ReceivedWithAnyArgs(1).SendPasswordResetEmailAsync(default!, default!, default!, default, default!);
         reset.StatusCode.ShouldBe(HttpStatusCode.OK, "the code emailed after the request resets the password");
     }
 

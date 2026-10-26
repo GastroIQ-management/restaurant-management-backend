@@ -35,7 +35,7 @@ public class PasswordResetEmailProcessorConcurrencyTests : IClassFixture<Postgre
         using var overlap = new Barrier(2);
         var sendCalls = 0;
         var passesOverlapped = true;
-        emailService.SendPasswordResetEmailAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<int>())
+        emailService.SendPasswordResetEmailAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<int>(), Arg.Any<string>())
             .Returns(_ =>
             {
                 if (Interlocked.Increment(ref sendCalls) <= 2 && !overlap.SignalAndWait(TimeSpan.FromSeconds(10)))
@@ -73,7 +73,7 @@ public class PasswordResetEmailProcessorConcurrencyTests : IClassFixture<Postgre
         // Assert
         passesOverlapped.ShouldBeTrue("both passes must be sending at the same time, or the claim is not tested under contention");
         handled.ShouldAllBe(count => count > 0, "each pass handles some requests, so the two really competed for them");
-        await emailService.ReceivedWithAnyArgs(RequestCount).SendPasswordResetEmailAsync(default!, default!, default!, default);
+        await emailService.ReceivedWithAnyArgs(RequestCount).SendPasswordResetEmailAsync(default!, default!, default!, default, default!);
         var sentTo = emailService.ReceivedCalls().Select(c => (string)c.GetArguments()[0]!).ToList();
         sentTo.Distinct().Count().ShouldBe(RequestCount, "each eligible request gets exactly one email, even when two instances run a pass together");
     }

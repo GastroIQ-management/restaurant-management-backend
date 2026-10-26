@@ -19,7 +19,7 @@ namespace RestaurantManagement.Shared.Tests
         public void Build_FirstNameIsBlank_UsesGenericGreeting(string? firstName)
         {
             // Act
-            var body = VerificationEmailTemplate.Build(ValidEmail, firstName!, ValidCode, ValidExpiryMinutes);
+            var body = VerificationEmailTemplate.Build(ValidEmail, firstName!, ValidCode, ValidExpiryMinutes, "en");
 
             // Assert
             body.Should().Contain("Hi there,", "a blank first name gets the generic greeting");
@@ -31,7 +31,7 @@ namespace RestaurantManagement.Shared.Tests
         public void Build_NonDefaultExpiryMinutes_StatesConfiguredMinutes()
         {
             // Act
-            var body = VerificationEmailTemplate.Build(ValidEmail, ValidFirstName, ValidCode, 30);
+            var body = VerificationEmailTemplate.Build(ValidEmail, ValidFirstName, ValidCode, 30, "en");
 
             // Assert
             body.Should().Contain("30 minutes", "the email states the configured code lifetime");
@@ -43,7 +43,7 @@ namespace RestaurantManagement.Shared.Tests
         public void Build_WithCode_BodyContainsTheCode()
         {
             // Act
-            var body = VerificationEmailTemplate.Build(ValidEmail, ValidFirstName, "482913", ValidExpiryMinutes);
+            var body = VerificationEmailTemplate.Build(ValidEmail, ValidFirstName, "482913", ValidExpiryMinutes, "en");
 
             // Assert
             body.Should().Contain("482913", "the email carries the code the user must type");
@@ -54,7 +54,7 @@ namespace RestaurantManagement.Shared.Tests
         public void Build_WithValidInput_LeavesNoUnsubstitutedTokens()
         {
             // Act
-            var body = VerificationEmailTemplate.Build(ValidEmail, ValidFirstName, ValidCode, ValidExpiryMinutes);
+            var body = VerificationEmailTemplate.Build(ValidEmail, ValidFirstName, ValidCode, ValidExpiryMinutes, "en");
 
             // Assert
             body.Should().NotContain("{{", "the email never shows unfilled template placeholders");
@@ -65,7 +65,7 @@ namespace RestaurantManagement.Shared.Tests
         public void Build_WithRecipient_FooterContainsRecipientAddress()
         {
             // Act
-            var body = VerificationEmailTemplate.Build("diner@example.com", ValidFirstName, ValidCode, ValidExpiryMinutes);
+            var body = VerificationEmailTemplate.Build("diner@example.com", ValidFirstName, ValidCode, ValidExpiryMinutes, "en");
 
             // Assert
             body.Should().Contain("This message was sent to diner@example.com", "the footer says which address the email was sent to");
@@ -76,7 +76,7 @@ namespace RestaurantManagement.Shared.Tests
         public void Build_WithFirstName_GreetingContainsFirstName()
         {
             // Act
-            var body = VerificationEmailTemplate.Build(ValidEmail, "Giulia", ValidCode, ValidExpiryMinutes);
+            var body = VerificationEmailTemplate.Build(ValidEmail, "Giulia", ValidCode, ValidExpiryMinutes, "en");
 
             // Assert
             body.Should().Contain("Hi Giulia,", "the greeting uses the user first name");
@@ -87,7 +87,7 @@ namespace RestaurantManagement.Shared.Tests
         public void Build_WithValidInput_ContainsAllDesignContentElements()
         {
             // Act
-            var body = VerificationEmailTemplate.Build(ValidEmail, ValidFirstName, ValidCode, ValidExpiryMinutes);
+            var body = VerificationEmailTemplate.Build(ValidEmail, ValidFirstName, ValidCode, ValidExpiryMinutes, "en");
 
             // Assert
             body.Should().Contain("RISTORANTE");
@@ -109,7 +109,7 @@ namespace RestaurantManagement.Shared.Tests
             const string recipient = "ana+\"x\"@cantina.com.br";
 
             // Act
-            var body = VerificationEmailTemplate.Build(recipient, firstName, ValidCode, ValidExpiryMinutes);
+            var body = VerificationEmailTemplate.Build(recipient, firstName, ValidCode, ValidExpiryMinutes, "en");
 
             // Assert
             body.ShouldContain("&lt;script&gt;", customMessage: "a name with HTML must be shown as text");
@@ -123,7 +123,7 @@ namespace RestaurantManagement.Shared.Tests
         public void Subject_IsUnchanged()
         {
             // Assert
-            VerificationEmailTemplate.Subject.Should().Be("Verify your email", "the email subject keeps its agreed wording");
+            VerificationEmailTemplate.Subject("en").Should().Be("Verify your email", "the email subject keeps its agreed wording");
         }
     }
 }

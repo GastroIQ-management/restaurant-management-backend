@@ -78,14 +78,14 @@ namespace RestaurantManagement.Shared.Services.Email
             }
         }
 
-        public async Task SendVerificationEmailAsync(string to, string firstName, string code, int expiryMinutes)
+        public async Task SendVerificationEmailAsync(string to, string firstName, string code, int expiryMinutes, string language)
         {
-            await SendEmailAsync(to, VerificationEmailTemplate.Subject, VerificationEmailTemplate.Build(to, firstName, code, expiryMinutes));
+            await SendEmailAsync(to, VerificationEmailTemplate.Subject(language), VerificationEmailTemplate.Build(to, firstName, code, expiryMinutes, language));
         }
 
-        public async Task SendPasswordResetEmailAsync(string to, string firstName, string code, int expiryMinutes)
+        public async Task SendPasswordResetEmailAsync(string to, string firstName, string code, int expiryMinutes, string language)
         {
-            await SendEmailAsync(to, PasswordResetEmailTemplate.Subject, PasswordResetEmailTemplate.Build(to, firstName, code, expiryMinutes));
+            await SendEmailAsync(to, PasswordResetEmailTemplate.Subject(language), PasswordResetEmailTemplate.Build(to, firstName, code, expiryMinutes, language));
         }
     }
 }

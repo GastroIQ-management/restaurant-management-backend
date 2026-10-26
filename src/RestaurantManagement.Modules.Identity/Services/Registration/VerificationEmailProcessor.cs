@@ -5,6 +5,7 @@ using Microsoft.Extensions.Options;
 using RestaurantManagement.Modules.Identity.Data;
 using RestaurantManagement.Modules.Identity.Entities.Registration;
 using RestaurantManagement.Modules.Identity.Entities.Users;
+using RestaurantManagement.Modules.Identity.Services.Languages;
 using RestaurantManagement.Shared.Options;
 using RestaurantManagement.Shared.Services.Email;
 using RestaurantManagement.Modules.Identity.Services.Passwords;
@@ -83,7 +84,7 @@ namespace RestaurantManagement.Modules.Identity.Services.Registration
 
             try
             {
-                await _emailService.SendVerificationEmailAsync(user.Email, user.FirstName, code, _securityOptions.VerificationCodeExpiryMinutes);
+                await _emailService.SendVerificationEmailAsync(user.Email, user.FirstName, code, _securityOptions.VerificationCodeExpiryMinutes, user.PreferredLanguage ?? SupportedLanguages.Default);
             }
             catch (Exception ex)
             {

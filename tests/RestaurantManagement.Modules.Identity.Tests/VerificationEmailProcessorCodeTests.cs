@@ -49,7 +49,7 @@ namespace RestaurantManagement.Modules.Identity.Tests
         {
             string? emailedCode = null;
             var emailService = Substitute.For<IEmailService>();
-            emailService.SendVerificationEmailAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Do<string>(code => emailedCode = code), Arg.Any<int>()).Returns(Task.CompletedTask);
+            emailService.SendVerificationEmailAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Do<string>(code => emailedCode = code), Arg.Any<int>(), Arg.Any<string>()).Returns(Task.CompletedTask);
             using var context = database.CreateContext();
             var processor = new VerificationEmailProcessor(context, TestSecurityOptions.Create(), emailService, Hasher, new CapturingLogger<VerificationEmailProcessor>());
             await processor.ProcessDueAsync(DateTime.UtcNow, CancellationToken.None);

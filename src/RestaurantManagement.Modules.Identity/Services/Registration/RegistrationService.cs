@@ -13,6 +13,7 @@ using RestaurantManagement.Shared.Options;
 using RestaurantManagement.Shared.Utils.Exceptions;
 using RestaurantManagement.Shared.Services.Email;
 using RestaurantManagement.Shared;
+using RestaurantManagement.Modules.Identity.Services.Languages;
 using RestaurantManagement.Modules.Identity.Services.Passwords;
 
 namespace RestaurantManagement.Modules.Identity.Services.Registration
@@ -96,7 +97,7 @@ namespace RestaurantManagement.Modules.Identity.Services.Registration
             // account already exists unverified and the user can request a resend.
             try
             {
-                await _emailService.SendVerificationEmailAsync(user.Email, user.FirstName, verificationCode, _securityOptions.VerificationCodeExpiryMinutes);
+                await _emailService.SendVerificationEmailAsync(user.Email, user.FirstName, verificationCode, _securityOptions.VerificationCodeExpiryMinutes, SupportedLanguages.FromCurrentCulture());
             }
             catch (Exception ex)
             {

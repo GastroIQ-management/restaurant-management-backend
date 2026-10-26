@@ -6,6 +6,7 @@ using RestaurantManagement.Modules.Identity.Data;
 using RestaurantManagement.Modules.Identity.Entities.Passwords;
 using RestaurantManagement.Modules.Identity.Entities.Registration;
 using RestaurantManagement.Modules.Identity.Entities.Users;
+using RestaurantManagement.Modules.Identity.Services.Languages;
 using RestaurantManagement.Shared.Options;
 using RestaurantManagement.Shared.Services.Email;
 using RestaurantManagement.Modules.Identity.Services.Registration;
@@ -82,7 +83,7 @@ namespace RestaurantManagement.Modules.Identity.Services.Passwords
 
             try
             {
-                await _emailService.SendPasswordResetEmailAsync(user.Email, user.FirstName, code, _securityOptions.VerificationCodeExpiryMinutes);
+                await _emailService.SendPasswordResetEmailAsync(user.Email, user.FirstName, code, _securityOptions.VerificationCodeExpiryMinutes, user.PreferredLanguage ?? SupportedLanguages.Default);
             }
             catch (Exception ex)
             {

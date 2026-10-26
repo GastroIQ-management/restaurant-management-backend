@@ -66,7 +66,7 @@ namespace RestaurantManagement.Modules.Identity.Tests
             var kept = (await context.Set<PendingEmail>().ToListAsync()).ShouldHaveSingleItem("the reset pass must not remove a verification request");
             kept.ClaimedUntil.ShouldBeNull("the reset pass must not claim a verification request");
             kept.Attempts.ShouldBe(0, "the reset pass must not try a verification request");
-            await emailService.DidNotReceiveWithAnyArgs().SendPasswordResetEmailAsync(default!, default!, default!, default);
+            await emailService.DidNotReceiveWithAnyArgs().SendPasswordResetEmailAsync(default!, default!, default!, default, default!);
             (await context.PasswordResetCodes.CountAsync()).ShouldBe(0, "a verification request never creates a reset code");
         }
 

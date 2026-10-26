@@ -34,7 +34,7 @@ namespace RestaurantManagement.Modules.Identity.Tests
 
         public VerificationEmailProcessorTests()
         {
-            _emailService.SendVerificationEmailAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<int>())
+            _emailService.SendVerificationEmailAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<int>(), Arg.Any<string>())
                 .Returns(call =>
                 {
                     _emailedCodes.Add(call.ArgAt<string>(2));
@@ -126,7 +126,7 @@ namespace RestaurantManagement.Modules.Identity.Tests
             await ProcessAsync(database, now);
 
             // Assert
-            await _emailService.DidNotReceiveWithAnyArgs().SendVerificationEmailAsync(default!, default!, default!, default);
+            await _emailService.DidNotReceiveWithAnyArgs().SendVerificationEmailAsync(default!, default!, default!, default, default!);
             (await CountCodesAsync(database)).ShouldBe(0, "no verification code is created for an unknown, verified or locked account");
             (await ReadQueueAsync(database)).ShouldBeEmpty("a request that gets no email is finished and removed, not retried");
         }
@@ -145,7 +145,7 @@ namespace RestaurantManagement.Modules.Identity.Tests
             await ProcessAsync(database, now);
 
             // Assert
-            await _emailService.DidNotReceiveWithAnyArgs().SendVerificationEmailAsync(default!, default!, default!, default);
+            await _emailService.DidNotReceiveWithAnyArgs().SendVerificationEmailAsync(default!, default!, default!, default, default!);
             (await CountCodesAsync(database)).ShouldBe(1, "a request within the 60-second wait creates no new code");
             (await ReadQueueAsync(database)).ShouldBeEmpty("a request inside the wait is finished and removed");
         }
@@ -203,7 +203,7 @@ namespace RestaurantManagement.Modules.Identity.Tests
             await ProcessAsync(database, now);
 
             // Assert
-            await _emailService.Received(1).SendVerificationEmailAsync(MariaEmail, "Maria", Arg.Any<string>(), ExpiryMinutes);
+            await _emailService.Received(1).SendVerificationEmailAsync(MariaEmail, "Maria", Arg.Any<string>(), ExpiryMinutes, "en");
             (await ReadQueueAsync(database)).ShouldBeEmpty("a retry that finally sends is finished and removed; the 60-second wait does not block a retry");
         }
 
@@ -239,7 +239,7 @@ namespace RestaurantManagement.Modules.Identity.Tests
             await ProcessAsync(database, now);
 
             // Assert
-            await _emailService.DidNotReceiveWithAnyArgs().SendVerificationEmailAsync(default!, default!, default!, default);
+            await _emailService.DidNotReceiveWithAnyArgs().SendVerificationEmailAsync(default!, default!, default!, default, default!);
             (await CountCodesAsync(database)).ShouldBe(0, "a second code would break the first, so none is created");
             (await ReadQueueAsync(database)).ShouldBeEmpty("at most one email after a crash: the request is dropped");
         }
@@ -257,7 +257,7 @@ namespace RestaurantManagement.Modules.Identity.Tests
             await ProcessAsync(database, now);
 
             // Assert
-            await _emailService.DidNotReceiveWithAnyArgs().SendVerificationEmailAsync(default!, default!, default!, default);
+            await _emailService.DidNotReceiveWithAnyArgs().SendVerificationEmailAsync(default!, default!, default!, default, default!);
             (await ReadQueueAsync(database)).ShouldHaveSingleItem("a request another pass is handling is left alone, so nobody gets two emails");
         }
 
@@ -275,7 +275,7 @@ namespace RestaurantManagement.Modules.Identity.Tests
 
             // Assert
             await _emailService.Received(1).SendVerificationEmailAsync(
-                MariaEmail, "Maria", Arg.Is<string>(code => Regex.IsMatch(code, "^[0-9]{6}$")), ExpiryMinutes);
+                MariaEmail, "Maria", Arg.Is<string>(code => Regex.IsMatch(code, "^[0-9]{6}$")), ExpiryMinutes, "en");
             (await ReadQueueAsync(database)).ShouldBeEmpty("a request that was emailed is finished and removed");
         }
 
@@ -318,6 +318,50 @@ namespace RestaurantManagement.Modules.Identity.Tests
             _emailedCodes.ShouldHaveSingleItem("an account whose lock has expired gets a new code");
             carlos.VerificationFailedAttempts.ShouldBe(0, "a new code resets the failed-attempt counter");
             carlos.VerificationLockedUntil.ShouldBeNull("the expired lock is cleared");
+        }
+
+        [Theory]
+        [InlineData("pt")]
+        [InlineData("fr")]
+        [InlineData("en")]
+        [Trait("Rule", "RS12")]
+        public async Task ProcessDueAsync_UserWithPreferredLanguage_EmailsInThatLanguage(string language)
+        {
+            // Arrange
+            using var database = await CreateDatabaseAsync();
+            await SetMariaLanguageAsync(database, language);
+            var now = DateTime.UtcNow;
+            await QueueAsync(database, MariaEmail, now);
+
+            // Act
+            await ProcessAsync(database, now);
+
+            // Assert
+            await _emailService.Received(1).SendVerificationEmailAsync(MariaEmail, "Maria", Arg.Any<string>(), ExpiryMinutes, language);
+        }
+
+        [Fact]
+        [Trait("Rule", "RS12")]
+        public async Task ProcessDueAsync_UserWithoutPreferredLanguage_EmailsInEnglish()
+        {
+            // Arrange
+            using var database = await CreateDatabaseAsync();
+            var now = DateTime.UtcNow;
+            await QueueAsync(database, MariaEmail, now);
+
+            // Act
+            await ProcessAsync(database, now);
+
+            // Assert
+            await _emailService.Received(1).SendVerificationEmailAsync(MariaEmail, "Maria", Arg.Any<string>(), ExpiryMinutes, "en");
+            await _emailService.DidNotReceive().SendVerificationEmailAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<int>(), Arg.Is<string>(l => l != "en"));
+        }
+
+        private static async Task SetMariaLanguageAsync(IdentityTestDatabase database, string language)
+        {
+            using var context = database.CreateContext();
+            (await context.Users.SingleAsync(u => u.Id == MariaId)).PreferredLanguage = language;
+            await context.SaveChangesAsync();
         }
     }
 }
