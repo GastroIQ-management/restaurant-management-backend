@@ -176,7 +176,7 @@ It is fixed (commit 9b7bcbc).
 | 2, 14 | Sessions end after 7 days unused or 30 days after login | `backlog/improvements/2026-10-16-session-inactivity-and-absolute-limit.md` |
 | 3, 4, 20 | Check breached passwords (register, reset, change) and product words | `backlog/improvements/breached-passwords.md` |
 | 5, 9, 13 | Log logins, refused access and lockouts | `backlog/features/audit-log.md` |
-| 6 | Access tokens revocable before expiry | `backlog/improvements/session-redesign.md` |
+| 6 | Accepted (2026-10-26): access tokens are not revoked early; they expire 15 minutes after issue, password change and reset revoke refresh tokens, and access grid changes apply at once | This report |
 | 8 | Emailed codes expire after 10 minutes | `backlog/improvements/2026-10-16-email-codes-expire-in-10-minutes.md` |
 | 10 | Owner or Admin removes a member or signs them out, per organization | `backlog/features/2026-10-16-remove-member-and-end-sessions.md` |
 | 11, 12, 16 | Accepted deviations: no session list, composition rules kept, 72-byte limit | Identity matrix header |

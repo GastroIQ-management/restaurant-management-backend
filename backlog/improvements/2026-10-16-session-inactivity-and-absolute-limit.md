@@ -24,6 +24,3 @@ is detected. Approved by the user on 2026-10-16:
 - [ ] Both limits come from configuration; the app refuses to start when either is not positive or inactivity exceeds the absolute limit
 - [ ] Identity matrix: header lists both limits with the reason (risk decision for ASVS V7.1.1), F1 no longer says "expiry renewed", new rows with tests, shipped values guarded like T17
 - [ ] Cleanup (T9) still keeps revoked tokens long enough for reuse detection
-
-## Related
-- backlog/improvements/session-redesign.md (access tokens still work up to 15 min after a session ends)

@@ -20,4 +20,4 @@ Changing a member's presets and grid is decided in docs/specs/shared/2026-10-20-
 - [ ] Each Owner change writes an audit entry; another organization's member returns not found
 
 ## Related
-backlog/features/audit-log.md, backlog/improvements/session-redesign.md (role change should invalidate older tokens)
+backlog/features/audit-log.md
