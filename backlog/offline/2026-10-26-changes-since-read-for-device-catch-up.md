@@ -27,8 +27,7 @@ Design notes:
 - `UpdatedAt` can miss rows when transactions commit out of order. If chosen, the design must
   handle it, for example with a short overlap window and the client deduplicating by ID
 - Deletes need tombstones (soft delete or a deleted-records table). Keep them longer than the
-  longest a device may stay offline. That limit is frontend offline-sync open decision 4, still
-  undecided
+  7-day offline limit (sessions end after 7 days unused, decided 2026-10-26)
 
 ## Acceptance criteria
 - [ ] Each offline-capable resource has a read that takes an opaque cursor and returns the records
@@ -43,9 +42,9 @@ Design notes:
 - [ ] A record the member has lost access to stops appearing
 
 ## Related
-- `backlog/improvements/2026-10-26-client-generated-ids-on-create.md`
-- `backlog/improvements/2026-10-26-idempotency-key-on-writes.md`
-- `backlog/improvements/2026-10-26-optimistic-concurrency-versions.md`
+- `backlog/offline/2026-10-26-client-generated-ids-on-create.md`
+- `backlog/offline/2026-10-26-idempotency-key-on-writes.md`
+- `backlog/offline/2026-10-26-optimistic-concurrency-versions.md`
 - `backlog/improvements/2026-10-15-menu-deactivate-instead-of-delete.md` (deactivate vs delete
   decides how menu tombstones work)
 - `backlog/features/2026-10-19-filter-lists-by-location-access.md` (same per-location access filter)

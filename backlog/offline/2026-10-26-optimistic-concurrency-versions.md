@@ -32,6 +32,6 @@ version to detect conflicts.
       picks them up
 
 ## Related
-- `backlog/improvements/2026-10-26-client-generated-ids-on-create.md`
-- `backlog/improvements/2026-10-26-idempotency-key-on-writes.md`
-- `backlog/improvements/2026-10-26-changes-since-read-for-device-catch-up.md`
+- `backlog/offline/2026-10-26-client-generated-ids-on-create.md`
+- `backlog/offline/2026-10-26-idempotency-key-on-writes.md`
+- `backlog/offline/2026-10-26-changes-since-read-for-device-catch-up.md`

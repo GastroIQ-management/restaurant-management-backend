@@ -39,6 +39,7 @@ Never write an item that proposes a new feature or capability: the user decides 
 | `improvements/` | Works as designed, should be more secure, faster, more scalable, clearer or more reusable |
 | `tech-debt/` | Internal quality: naming, missing tests, fragile design, docs |
 | `pre-production/` | Must be done before launch, outside the code: deployment, certificates, secrets, infrastructure |
+| `offline/` | API contracts the frontend offline engine needs (offline from day one, decided 2026-10-26) |
 
 `features/` holds only items the user writes. Agents never create one there.
 
