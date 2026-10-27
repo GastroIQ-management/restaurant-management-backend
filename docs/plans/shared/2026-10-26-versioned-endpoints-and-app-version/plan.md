@@ -1,6 +1,6 @@
 # Plan: Versioned endpoints and app version on writes
 
-**Source:** backlog/offline/2026-10-26-versioned-endpoints-and-app-version.md   **Date:** 2026-10-26   **Status:** In progress
+**Source:** backlog/offline/2026-10-26-versioned-endpoints-and-app-version.md   **Date:** 2026-10-26   **Status:** Done
 **Risk:** High — every URL and every write's contract change, and the refresh cookie path (auth) changes; no data or schema change, easy to undo before launch
 
 ## Summary
@@ -31,11 +31,11 @@ least 30 days after the next one ships · #4 the OpenAPI document is published p
 | T6 | — | — (Swashbuckle already used) | Swagger stays Development only (rule W21) |
 
 ## Overall Definition of Done
-- [ ] All tasks done, tests passing
-- [ ] All Outcomes met (the backlog item's Acceptance criteria)
-- [ ] Affected tests green after the last batch; full suite green in CI (Continuous Integration)
-- [ ] No out-of-scope changes
-- [ ] Backlog item only: deleted if fully solved (deletion left uncommitted for the user), or updated with what is left
+- [x] All tasks done, tests passing
+- [x] All Outcomes met (the backlog item's Acceptance criteria)
+- [x] Affected tests green after the last batch; full suite green in CI (Continuous Integration)
+- [x] No out-of-scope changes
+- [x] Backlog item only: deleted if fully solved (deletion left uncommitted for the user), or updated with what is left
 
 ## Checklist
 - [x] T1 — Writes require the app version header
