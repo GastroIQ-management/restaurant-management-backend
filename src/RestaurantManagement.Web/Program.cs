@@ -206,6 +206,15 @@ builder.Services.AddSwaggerGen(c =>
         BearerFormat = "JWT"
     });
 
+    // Every code of every catalog, read from the registered modules' assemblies
+    c.DocumentFilter<RestaurantManagement.Web.OpenApi.ErrorCodesDocumentFilter>(new object[] { new System.Reflection.Assembly[]
+    {
+        typeof(ErrorCodes).Assembly,
+        typeof(RestaurantManagement.Modules.Identity.Controllers.AuthController).Assembly,
+        typeof(RestaurantManagement.Modules.Menu.Controllers.MenuController).Assembly,
+        typeof(RestaurantManagement.Modules.Organization.Controllers.OrganizationController).Assembly
+    } });
+
     c.AddSecurityRequirement(new Microsoft.OpenApi.Models.OpenApiSecurityRequirement
     {
         {
