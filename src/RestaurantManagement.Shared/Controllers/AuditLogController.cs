@@ -7,7 +7,7 @@ using RestaurantManagement.Shared.Services.AuditLog;
 namespace RestaurantManagement.Shared.Controllers
 {
     [ApiController]
-    [Route("api/audit-log")]
+    [Route("api/v1/audit-log")]
     [Authorize(Policy = "reports.read")]
     public class AuditLogController : ControllerBase
     {
@@ -18,7 +18,7 @@ namespace RestaurantManagement.Shared.Controllers
             _reader = reader;
         }
 
-        // GET api/audit-log
+        // GET api/v1/audit-log
         [HttpGet]
         public async Task<ActionResult<AuditLogPageResponse>> GetAuditLog([FromQuery] AuditLogQuery query)
         {

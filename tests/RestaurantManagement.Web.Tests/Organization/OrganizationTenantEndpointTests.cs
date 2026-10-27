@@ -23,7 +23,7 @@ public class OrganizationTenantEndpointTests : IClassFixture<PostgresDatabaseFix
     private static readonly Guid CantinaBatelId = Guid.Parse("44444444-dddd-4ddd-8ddd-000000000001");
     private static readonly Guid TrattoriaCentroId = Guid.Parse("44444444-dddd-4ddd-8ddd-000000000003");
 
-    // Also carries the organization settings, so the same body passes validation on PUT api/organizations/edit.
+    // Also carries the organization settings, so the same body passes validation on PUT api/v1/organizations/edit.
     private static readonly object LocationBody = new
     {
         organizationId = TrattoriaId,
@@ -89,7 +89,7 @@ public class OrganizationTenantEndpointTests : IClassFixture<PostgresDatabaseFix
         var client = factory.ClientFor(AnaId, CantinaId);
 
         // Act
-        var response = await client.SendAsync(Request(method, $"/api/locations/{TrattoriaCentroId}", LocationBody));
+        var response = await client.SendAsync(Request(method, $"/api/v1/locations/{TrattoriaCentroId}", LocationBody));
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.NotFound, "another organization's location is answered as not found, as if it did not exist");
@@ -110,7 +110,7 @@ public class OrganizationTenantEndpointTests : IClassFixture<PostgresDatabaseFix
         var client = factory.ClientFor(AnaId, CantinaId);
 
         // Act
-        var response = await client.GetAsync("/api/locations");
+        var response = await client.GetAsync("/api/v1/locations");
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.OK, "a signed-in user may list locations");
@@ -128,7 +128,7 @@ public class OrganizationTenantEndpointTests : IClassFixture<PostgresDatabaseFix
         var client = factory.ClientFor(AnaId, CantinaId);
 
         // Act
-        var response = await client.PostAsJsonAsync("/api/locations", LocationBody);
+        var response = await client.PostAsJsonAsync("/api/v1/locations", LocationBody);
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.OK, "a location may be created even when the body names another organization");
@@ -145,7 +145,7 @@ public class OrganizationTenantEndpointTests : IClassFixture<PostgresDatabaseFix
         var client = factory.ClientFor(AnaId, CantinaId);
 
         // Act
-        var response = await client.PutAsJsonAsync("/api/organizations/edit", OrganizationBody);
+        var response = await client.PutAsJsonAsync("/api/v1/organizations/edit", OrganizationBody);
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.OK, "an Owner may edit the organization they are signed in to");
@@ -157,9 +157,9 @@ public class OrganizationTenantEndpointTests : IClassFixture<PostgresDatabaseFix
 
     // Scenario 25
     [Theory]
-    [InlineData("GET", "/api/locations/" + Cantina)]
-    [InlineData("POST", "/api/locations/" + Cantina)]
-    [InlineData("PUT", "/api/organizations/edit/" + Cantina)]
+    [InlineData("GET", "/api/v1/locations/" + Cantina)]
+    [InlineData("POST", "/api/v1/locations/" + Cantina)]
+    [InlineData("PUT", "/api/v1/organizations/edit/" + Cantina)]
     [Trait("Rule", "OR18")]
     public async Task OldOrganizationInUrlRoute_Called_IsNotRouted(string method, string url)
     {
@@ -176,9 +176,9 @@ public class OrganizationTenantEndpointTests : IClassFixture<PostgresDatabaseFix
 
     // Scenario 26
     [Theory]
-    [InlineData("GET", "/api/locations")]
-    [InlineData("POST", "/api/locations")]
-    [InlineData("PUT", "/api/organizations/edit")]
+    [InlineData("GET", "/api/v1/locations")]
+    [InlineData("POST", "/api/v1/locations")]
+    [InlineData("PUT", "/api/v1/organizations/edit")]
     [Trait("Rule", "OR12")]
     public async Task OrganizationEndpoints_NoOrganizationInToken_ReturnsForbiddenOrganizationRequired(string method, string url)
     {
@@ -204,8 +204,8 @@ public class OrganizationTenantEndpointTests : IClassFixture<PostgresDatabaseFix
         var missingLocationId = Guid.Parse("44444444-dddd-4ddd-8ddd-0000000000ff");
 
         // Act
-        var otherOrganization = await client.SendAsync(Request("PUT", $"/api/locations/{TrattoriaCentroId}", LocationBody));
-        var missing = await client.SendAsync(Request("PUT", $"/api/locations/{missingLocationId}", LocationBody));
+        var otherOrganization = await client.SendAsync(Request("PUT", $"/api/v1/locations/{TrattoriaCentroId}", LocationBody));
+        var missing = await client.SendAsync(Request("PUT", $"/api/v1/locations/{missingLocationId}", LocationBody));
 
         // Assert
         otherOrganization.StatusCode.ShouldBe(HttpStatusCode.NotFound, "another organization's location is answered as not found");

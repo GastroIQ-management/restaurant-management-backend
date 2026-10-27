@@ -15,13 +15,13 @@ using Xunit;
 namespace RestaurantManagement.Web.Tests;
 
 /// <summary>
-/// POST api/auth/login end to end on PostgreSQL with the real session service: the login lock is per IP
+/// POST api/v1/auth/login end to end on PostgreSQL with the real session service: the login lock is per IP
 /// address (taken with the same trusted-proxy rule as rate limiting) and every refusal looks the same.
 /// Maria owns Cantina da Nonna; Ana and Bruno are other accounts.
 /// </summary>
 public class LoginLockoutEndpointTests : IClassFixture<PostgresDatabaseFixture>
 {
-    private const string LoginUrl = "/api/auth/login";
+    private const string LoginUrl = "/api/v1/auth/login";
     private const string MariaEmail = "maria@cantinadanonna.com.br";
     private const string CorrectPassword = "Massa@Fresca2026";
     private const string WrongPassword = "Errada@Pizza2026";

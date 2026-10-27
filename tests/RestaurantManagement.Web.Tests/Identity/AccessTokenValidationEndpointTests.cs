@@ -15,11 +15,11 @@ namespace RestaurantManagement.Web.Tests;
 
 /// <summary>
 /// Access passes (JWT, JSON Web Token) that must be refused on a signed-in endpoint
-/// (POST api/auth/logout-all). The session service is substituted; only the pass check is under test.
+/// (POST api/v1/auth/logout-all). The session service is substituted; only the pass check is under test.
 /// </summary>
 public class AccessTokenValidationEndpointTests : IDisposable
 {
-    private const string LogoutAllUrl = "/api/auth/logout-all";
+    private const string LogoutAllUrl = "/api/v1/auth/logout-all";
 
     private static readonly Guid MariaId = Guid.Parse("11111111-aaaa-4aaa-8aaa-00000000000a");
 

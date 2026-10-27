@@ -24,16 +24,16 @@ using Xunit;
 namespace RestaurantManagement.Web.Tests;
 
 /// <summary>
-/// POST api/auth/forgot-password and POST api/auth/reset-password end to end on a real PostgreSQL
+/// POST api/v1/auth/forgot-password and POST api/v1/auth/reset-password end to end on a real PostgreSQL
 /// database (plan T9): the real reset service, refresh tokens and audit log; only the email is
 /// substituted so the test can read the code. Maria is Owner of Cantina da Nonna and signed in on
 /// two devices.
 /// </summary>
 public class PasswordResetEndpointTests : IClassFixture<PostgresDatabaseFixture>
 {
-    private const string ForgotUrl = "/api/auth/forgot-password";
-    private const string ResetUrl = "/api/auth/reset-password";
-    private const string AuditLogUrl = "/api/audit-log";
+    private const string ForgotUrl = "/api/v1/auth/forgot-password";
+    private const string ResetUrl = "/api/v1/auth/reset-password";
+    private const string AuditLogUrl = "/api/v1/audit-log";
     private const string MariaEmail = "maria@cantinadanonna.com.br";
     private const string OldPassword = "Massa@Fresca2026";
     private const string NewPassword = "Nhoque@Batata2027";

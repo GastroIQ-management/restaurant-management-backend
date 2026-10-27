@@ -19,8 +19,8 @@ namespace RestaurantManagement.Web.Tests;
 
 public class AuthRateLimitingTests : IDisposable
 {
-    private const string LoginUrl = "/api/auth/login";
-    private const string RegisterUrl = "/api/auth/register";
+    private const string LoginUrl = "/api/v1/auth/login";
+    private const string RegisterUrl = "/api/v1/auth/register";
     private const string IpA = "203.0.113.10";
     private const string IpB = "203.0.113.11";
     private const string ProxyIp = "10.0.0.1";
@@ -288,9 +288,9 @@ public class AuthRateLimitingTests : IDisposable
 
     // Password reset: Scenario 40
     [Theory]
-    [InlineData("/api/auth/forgot-password", "ForgotPassword")]
-    [InlineData("/api/auth/reset-password", "ResetPassword")]
-    [InlineData("/api/auth/change-password", "ChangePassword")]
+    [InlineData("/api/v1/auth/forgot-password", "ForgotPassword")]
+    [InlineData("/api/v1/auth/reset-password", "ResetPassword")]
+    [InlineData("/api/v1/auth/change-password", "ChangePassword")]
     [Trait("Rule", "C10")]
     [Trait("Rule", "P13")]
     public async Task PasswordEndpoint_LimitExceeded_ReturnsTooManyRequests(string url, string policy)
@@ -345,10 +345,10 @@ public class AuthRateLimitingTests : IDisposable
     }
 
     [Theory]
-    [InlineData("/api/auth/register", "Register")]
-    [InlineData("/api/auth/verify", "Verify")]
-    [InlineData("/api/auth/resend-verification", "ResendVerification")]
-    [InlineData("/api/auth/refresh", "Refresh")]
+    [InlineData("/api/v1/auth/register", "Register")]
+    [InlineData("/api/v1/auth/verify", "Verify")]
+    [InlineData("/api/v1/auth/resend-verification", "ResendVerification")]
+    [InlineData("/api/v1/auth/refresh", "Refresh")]
     [Trait("Rule", "F8")]
     [Trait("Rule", "R14")]
     [Trait("Rule", "RS5")]

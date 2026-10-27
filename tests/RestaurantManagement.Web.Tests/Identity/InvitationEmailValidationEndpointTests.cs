@@ -7,7 +7,7 @@ using static RestaurantManagement.Web.Tests.InvitationWebSupport;
 
 namespace RestaurantManagement.Web.Tests;
 
-/// <summary><c>POST api/invitations</c> refuses a missing, malformed or too long email before doing any work.</summary>
+/// <summary><c>POST api/v1/invitations</c> refuses a missing, malformed or too long email before doing any work.</summary>
 public class InvitationEmailValidationEndpointTests : IClassFixture<PostgresDatabaseFixture>
 {
     private readonly PostgresDatabaseFixture _postgres;
@@ -27,7 +27,7 @@ public class InvitationEmailValidationEndpointTests : IClassFixture<PostgresData
         var client = factory.ClientFor(AnaId, CantinaId);
 
         // Act
-        var response = await client.PostAsJsonAsync("/api/invitations", new
+        var response = await client.PostAsJsonAsync("/api/v1/invitations", new
         {
             email,
             locations = new[] { new { locationId = BatelId, roleNames = new[] { "Waiter" }, levels = new Dictionary<string, string>() } }
@@ -50,7 +50,7 @@ public class InvitationEmailValidationEndpointTests : IClassFixture<PostgresData
         var email = new string('a', 310) + "@exemplo.com.br";
 
         // Act
-        var response = await client.PostAsJsonAsync("/api/invitations", InviteBody(email, BatelId, new[] { "Waiter" }));
+        var response = await client.PostAsJsonAsync("/api/v1/invitations", InviteBody(email, BatelId, new[] { "Waiter" }));
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.BadRequest, "an email longer than 320 characters is refused, not a database error");

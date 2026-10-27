@@ -35,7 +35,7 @@ proof of something the code already does.
 | 14 | Low | V7.3.1, V7.1.1, V7.1.2 | Partial | Inactivity (7 days) and absolute (30 days) limits are decided and documented (user decision of 2026-10-16, shared restaurant tablets). Session count (unlimited devices) still has no decision | L15, T17, F11 |
 | 15 | Low | V7.2.4 | Covered | Proven by matrix row L20 | L20 |
 | 16 | Low | V6.2.9 | Partial | 64-character passwords are accepted only within 72 bytes (bcrypt limit). 64 accented or non-Latin characters are refused | R6, R9, T7 |
-| 17 | Low | V3.3.1, V3.3.3 | Partial | Refresh cookie is `Secure` but named `refresh_token`, with no `__Secure-` prefix. `__Host-` cannot be used with `Path=/api/auth`; that deviation is not recorded | L2, T10 |
+| 17 | Low | V3.3.1, V3.3.3 | Partial | Refresh cookie is `Secure` but named `refresh_token`, with no `__Secure-` prefix. `__Host-` cannot be used with `Path=/api/v1/auth`; that deviation is not recorded | L2, T10 |
 | 18 | Low | V9.1.2 | Covered | Proven by matrix row T26 | T26 |
 | 19 | Low | V16.2.5 | Partial | Email addresses are logged when a verification email fails to send (`RegistrationService.cs:100`, `VerificationService.cs:138`). Codes and lockouts are kept out of logs (P5, L18) | P5, L18 |
 | 20 | Low | V6.1.2, V6.2.11 | Missing | No list of context-specific words (product name, role names, "restaurant"…) blocked in passwords | — |

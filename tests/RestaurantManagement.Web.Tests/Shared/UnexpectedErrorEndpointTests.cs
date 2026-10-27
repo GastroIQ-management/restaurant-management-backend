@@ -43,7 +43,7 @@ public class UnexpectedErrorEndpointTests : IDisposable
         _factory.SessionService.LoginAsync(Arg.Any<LoginRequest>(), Arg.Any<ClientInfo>(), Arg.Any<string?>())
             .Returns(Task.FromException<SessionResult>(new InvalidOperationException("Session store unavailable")));
         var client = _factory.CreateClient();
-        var request = Request("POST", "/api/auth/login", "pt", new { email = "ana@cantinadanonna.com.br", password = "Massa@Fresca2026" });
+        var request = Request("POST", "/api/v1/auth/login", "pt", new { email = "ana@cantinadanonna.com.br", password = "Massa@Fresca2026" });
 
         // Act
         var response = await client.SendAsync(request);
@@ -62,7 +62,7 @@ public class UnexpectedErrorEndpointTests : IDisposable
             .Returns(Task.FromException<SessionResult>(new InvalidOperationException("Session store unavailable")));
         using var production = ProductionHost();
         var client = production.CreateClient(new WebApplicationFactoryClientOptions { BaseAddress = new Uri("https://localhost") });
-        var request = Request("POST", "/api/auth/login", "fr", new { email = "ana@cantinadanonna.com.br", password = "Massa@Fresca2026" });
+        var request = Request("POST", "/api/v1/auth/login", "fr", new { email = "ana@cantinadanonna.com.br", password = "Massa@Fresca2026" });
 
         // Act
         var response = await client.SendAsync(request);

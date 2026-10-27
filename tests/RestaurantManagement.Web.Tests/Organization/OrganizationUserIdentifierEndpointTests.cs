@@ -13,9 +13,9 @@ namespace RestaurantManagement.Web.Tests;
 /// </summary>
 public class OrganizationUserIdentifierEndpointTests : IClassFixture<PostgresDatabaseFixture>
 {
-    private const string OrganizationsUrl = "/api/organizations";
-    private const string CreateUrl = "/api/organizations/create";
-    private const string EditUrl = "/api/organizations/edit";
+    private const string OrganizationsUrl = "/api/v1/organizations";
+    private const string CreateUrl = "/api/v1/organizations/create";
+    private const string EditUrl = "/api/v1/organizations/edit";
 
     private const string CreateJson = """{ "name": "Trattoria do Sol", "currency": "BRL" }""";
 

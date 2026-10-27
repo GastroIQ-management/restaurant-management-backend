@@ -23,7 +23,7 @@ public class IdentityMessagesEndpointTests : IDisposable
     {
         // Arrange
         var client = _factory.CreateClient();
-        var request = Request("POST", "/api/auth/register", culture, new
+        var request = Request("POST", "/api/v1/auth/register", culture, new
         {
             email = "joana@padariasaojorge.com.br",
             password = "Pao@Queijo2026",
@@ -48,7 +48,7 @@ public class IdentityMessagesEndpointTests : IDisposable
     {
         // Arrange
         var client = _factory.CreateClient();
-        var request = Request("POST", "/api/auth/register", culture, new
+        var request = Request("POST", "/api/v1/auth/register", culture, new
         {
             email = "joana@padariasaojorge.com.br",
             password = "Massa@Fresca26" + new string('é', 29) + "x",
@@ -75,7 +75,7 @@ public class IdentityMessagesEndpointTests : IDisposable
     {
         // Arrange
         var client = _factory.CreateClient();
-        var request = Request("POST", "/api/auth/login", culture, body);
+        var request = Request("POST", "/api/v1/auth/login", culture, body);
 
         // Act
         var response = await client.SendAsync(request);
@@ -98,7 +98,7 @@ public class IdentityMessagesEndpointTests : IDisposable
     {
         // Arrange
         var client = _factory.CreateClient();
-        var request = Request("POST", "/api/auth/login", culture, new { email, password = LoginPassword72Bytes + "x" });
+        var request = Request("POST", "/api/v1/auth/login", culture, new { email, password = LoginPassword72Bytes + "x" });
 
         // Act
         var response = await client.SendAsync(request);
@@ -114,7 +114,7 @@ public class IdentityMessagesEndpointTests : IDisposable
     {
         // Arrange
         var client = _factory.CreateClient();
-        var request = Request("POST", "/api/auth/login", "en", new { email = "ninguem@cantinadanonna.com.br", password = LoginPassword72Bytes });
+        var request = Request("POST", "/api/v1/auth/login", "en", new { email = "ninguem@cantinadanonna.com.br", password = LoginPassword72Bytes });
 
         // Act
         var response = await client.SendAsync(request);
@@ -138,7 +138,7 @@ public class IdentityMessagesEndpointTests : IDisposable
     {
         // Arrange
         var client = _factory.CreateClient();
-        var request = Request("POST", "/api/auth/register", culture, new
+        var request = Request("POST", "/api/v1/auth/register", culture, new
         {
             email = "joana@padariasaojorge.com.br",
             password,

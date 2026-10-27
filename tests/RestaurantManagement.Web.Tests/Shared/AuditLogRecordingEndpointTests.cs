@@ -9,12 +9,12 @@ namespace RestaurantManagement.Web.Tests;
 
 /// <summary>
 /// End to end on a real PostgreSQL database (plan T3 and T4): a settings edit or a location close made
-/// through the API shows up in GET api/audit-log for the same organization.
+/// through the API shows up in GET api/v1/audit-log for the same organization.
 /// Ana is Owner of both Cantina da Nonna and Trattoria do Sol.
 /// </summary>
 public class AuditLogRecordingEndpointTests : IClassFixture<PostgresDatabaseFixture>
 {
-    private const string AuditLogUrl = "/api/audit-log";
+    private const string AuditLogUrl = "/api/v1/audit-log";
 
     private static readonly Guid AnaId = Guid.Parse("11111111-aaaa-4aaa-8aaa-00000000000a");
     private static readonly Guid CantinaId = Guid.Parse("a1a1a1a1-0000-4000-8000-000000000001");
@@ -68,7 +68,7 @@ public class AuditLogRecordingEndpointTests : IClassFixture<PostgresDatabaseFixt
         var trattoriaClient = factory.ClientFor(AnaId, TrattoriaId);
 
         // Act
-        var edit = await cantinaClient.PutAsJsonAsync("/api/organizations/edit", OrganizationBody);
+        var edit = await cantinaClient.PutAsJsonAsync("/api/v1/organizations/edit", OrganizationBody);
 
         // Assert
         edit.StatusCode.ShouldBe(HttpStatusCode.OK);
@@ -88,7 +88,7 @@ public class AuditLogRecordingEndpointTests : IClassFixture<PostgresDatabaseFixt
         var client = factory.ClientFor(AnaId, CantinaId);
 
         // Act
-        var delete = await client.DeleteAsync($"/api/locations/{CantinaBatelId}");
+        var delete = await client.DeleteAsync($"/api/v1/locations/{CantinaBatelId}");
 
         // Assert
         delete.IsSuccessStatusCode.ShouldBeTrue();

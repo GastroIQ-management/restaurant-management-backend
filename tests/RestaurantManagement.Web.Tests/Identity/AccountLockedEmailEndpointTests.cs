@@ -78,7 +78,7 @@ public class AccountLockedEmailEndpointTests : IClassFixture<PostgresDatabaseFix
 
     private static async Task WrongLoginAsync(HttpClient client, string remoteIp)
     {
-        var request = new HttpRequestMessage(HttpMethod.Post, "/api/auth/login")
+        var request = new HttpRequestMessage(HttpMethod.Post, "/api/v1/auth/login")
         {
             Content = JsonContent.Create(new { email = MariaEmail, password = "Errada@Pizza2026" })
         };

@@ -74,13 +74,13 @@ public class OrganizationGridEndpointTests : IClassFixture<PostgresDatabaseFixtu
     {
         // Arrange
         await using var factory = await CreateFactoryAsync();
-        var created = await factory.ClientFor(AnaId, CantinaId).PostAsJsonAsync("/api/locations", LocationBody("Unidade Barigui", "BARIGUI"));
+        var created = await factory.ClientFor(AnaId, CantinaId).PostAsJsonAsync("/api/v1/locations", LocationBody("Unidade Barigui", "BARIGUI"));
         var newLocationId = (await created.Content.ReadFromJsonAsync<LocationRow>())!.Id;
         var admin = factory.ClientFor(JoaoId, CantinaId);
 
         // Act
-        var editExisting = await admin.PutAsJsonAsync($"/api/locations/{BatelId}", LocationBody("Unidade Batel Reformada", "BATEL"));
-        var editNew = await admin.PutAsJsonAsync($"/api/locations/{newLocationId}", LocationBody("Unidade Barigui Nova", "BARIGUI"));
+        var editExisting = await admin.PutAsJsonAsync($"/api/v1/locations/{BatelId}", LocationBody("Unidade Batel Reformada", "BATEL"));
+        var editNew = await admin.PutAsJsonAsync($"/api/v1/locations/{newLocationId}", LocationBody("Unidade Barigui Nova", "BARIGUI"));
 
         // Assert
         created.StatusCode.ShouldBe(HttpStatusCode.OK, "the Owner creates a location");
@@ -91,9 +91,9 @@ public class OrganizationGridEndpointTests : IClassFixture<PostgresDatabaseFixtu
     private sealed record LocationRow(Guid Id);
 
     [Theory]
-    [InlineData("POST", "/api/locations")]
-    [InlineData("PUT", "/api/organizations/edit")]
-    [InlineData("DELETE", "/api/locations/44444444-dddd-4ddd-8ddd-000000000002")]
+    [InlineData("POST", "/api/v1/locations")]
+    [InlineData("PUT", "/api/v1/organizations/edit")]
+    [InlineData("DELETE", "/api/v1/locations/44444444-dddd-4ddd-8ddd-000000000002")]
     [Trait("Rule", "OR40")]
     public async Task OwnerOnlyEndpoints_OwnerWithNoStoredLevels_ReturnsSuccess(string method, string url)
     {
@@ -116,10 +116,10 @@ public class OrganizationGridEndpointTests : IClassFixture<PostgresDatabaseFixtu
         // Arrange
         await using var factory = await CreateFactoryAsync();
         var client = factory.ClientFor(EvaId, CantinaId);
-        var ownerHere = await factory.ClientFor(AnaId, CantinaId).PutAsJsonAsync("/api/organizations/edit", LocationBody("Cantina da Nonna", "X"));
+        var ownerHere = await factory.ClientFor(AnaId, CantinaId).PutAsJsonAsync("/api/v1/organizations/edit", LocationBody("Cantina da Nonna", "X"));
 
         // Act
-        var response = await client.PutAsJsonAsync("/api/organizations/edit", LocationBody("Cantina Invadida", "X"));
+        var response = await client.PutAsJsonAsync("/api/v1/organizations/edit", LocationBody("Cantina Invadida", "X"));
 
         // Assert
         ownerHere.StatusCode.ShouldBe(HttpStatusCode.OK, "the Owner of Cantina da Nonna may edit it");
@@ -139,7 +139,7 @@ public class OrganizationGridEndpointTests : IClassFixture<PostgresDatabaseFixtu
         var client = factory.ClientFor(RitaId, organizationId: null);
 
         // Act
-        var response = await client.PostAsJsonAsync("/api/organizations/create", new { name = "Pizzaria da Rita", currency = "BRL" });
+        var response = await client.PostAsJsonAsync("/api/v1/organizations/create", new { name = "Pizzaria da Rita", currency = "BRL" });
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.OK, "a user with no organization may create one");
@@ -160,7 +160,7 @@ public class OrganizationGridEndpointTests : IClassFixture<PostgresDatabaseFixtu
         var client = factory.ClientFor(CaioId, CantinaId);
 
         // Act
-        var response = await client.PutAsJsonAsync($"/api/locations/{BatelId}", LocationBody("Unidade Batel Reformada", "BATEL"));
+        var response = await client.PutAsJsonAsync($"/api/v1/locations/{BatelId}", LocationBody("Unidade Batel Reformada", "BATEL"));
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.Forbidden, "a new Admin has no access to Locations until the Owner grants it");

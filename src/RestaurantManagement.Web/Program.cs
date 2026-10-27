@@ -188,17 +188,26 @@ builder.AddSentryTracking();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
-    c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
+    foreach (var version in RestaurantManagement.Web.OpenApi.ApiVersions.Supported)
     {
-        Title = "Restaurant Management API",
-        Version = "v1",
-        Description = "Modular Monolith API for Restaurant Management"
-    });
+        c.SwaggerDoc(version, new Microsoft.OpenApi.Models.OpenApiInfo
+        {
+            Title = "Restaurant Management API",
+            Version = version,
+            Description = "Modular Monolith API for Restaurant Management. "
+                + "Inside a version, changes are additive only (new endpoints, new optional fields); a breaking change ships as a new version. "
+                + "An old version stays served for at least 30 days after the next one ships."
+        });
+    }
+
+    c.DocInclusionPredicate((version, api) =>
+        RestaurantManagement.Web.OpenApi.ApiVersions.IncludesRoute(version, api.RelativePath ?? string.Empty));
+    c.OperationFilter<RestaurantManagement.Web.OpenApi.AppVersionHeaderOperationFilter>();
 
     // Add JWT Authentication to Swagger
     c.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
     {
-        Description = "Paste the access token from /api/auth/login (without the 'Bearer' prefix).",
+        Description = "Paste the access token from /api/v1/auth/login (without the 'Bearer' prefix).",
         Name = "Authorization",
         In = Microsoft.OpenApi.Models.ParameterLocation.Header,
         Type = Microsoft.OpenApi.Models.SecuritySchemeType.Http,
@@ -319,7 +328,12 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     // Keep the token across page reloads so developers don't re-authorize every time
-    app.UseSwaggerUI(options => options.ConfigObject.PersistAuthorization = true);
+    app.UseSwaggerUI(options =>
+    {
+        foreach (var version in RestaurantManagement.Web.OpenApi.ApiVersions.Supported)
+            options.SwaggerEndpoint($"/swagger/{version}/swagger.json", $"Restaurant Management API {version}");
+        options.ConfigObject.PersistAuthorization = true;
+    });
 }
 
 app.UseForwardedHeaders();
@@ -328,6 +342,7 @@ app.UseMiddleware<ExceptionHandlingMiddleware>();
 app.UseStatusCodePages();
 app.UseHttpsRedirection();
 app.UseCors("DefaultCorsPolicy");
+app.UseMiddleware<AppVersionMiddleware>();
 app.UseRateLimiter();
 app.UseAuthentication();
 app.UseAuthorization();

@@ -9,7 +9,7 @@ using static RestaurantManagement.Web.Tests.RoleWebSupport;
 namespace RestaurantManagement.Web.Tests;
 
 /// <summary>
-/// <c>GET api/roles</c>, <c>GET api/roles/{roleId}</c> and <c>POST api/roles</c> on a real PostgreSQL database.
+/// <c>GET api/v1/roles</c>, <c>GET api/v1/roles/{roleId}</c> and <c>POST api/v1/roles</c> on a real PostgreSQL database.
 /// Ana is the Owner of Cantina da Nonna; Maria is an Admin with Members = Manage at Batel and Mercado but no
 /// Cashier level; Trattoria do Sol has its own Sommelier role.
 /// </summary>
@@ -30,7 +30,7 @@ public class RoleEndpointTests : IClassFixture<PostgresDatabaseFixture>
         var client = factory.ClientFor(AnaId, CantinaId);
 
         // Act
-        var response = await client.PostAsync("/api/roles", Json(MarketingBody));
+        var response = await client.PostAsync("/api/v1/roles", Json(MarketingBody));
         var roles = await ListRolesAsync(client);
 
         // Assert
@@ -47,10 +47,10 @@ public class RoleEndpointTests : IClassFixture<PostgresDatabaseFixture>
         // Arrange
         await using var factory = await CreateFactoryAsync(_postgres);
         var client = factory.ClientFor(AnaId, CantinaId);
-        (await client.PostAsync("/api/roles", Json(MarketingBody))).EnsureSuccessStatusCode();
+        (await client.PostAsync("/api/v1/roles", Json(MarketingBody))).EnsureSuccessStatusCode();
 
         // Act
-        var invitation = await client.PostAsJsonAsync("/api/invitations", InviteBody(BrunoEmail, BatelId, new[] { "Marketing" }));
+        var invitation = await client.PostAsJsonAsync("/api/v1/invitations", InviteBody(BrunoEmail, BatelId, new[] { "Marketing" }));
 
         // Assert
         invitation.StatusCode.ShouldBe(HttpStatusCode.OK, "a role created by the Owner can be chosen when inviting");
@@ -67,8 +67,8 @@ public class RoleEndpointTests : IClassFixture<PostgresDatabaseFixture>
 
         // Act
         var responses = await Task.WhenAll(
-            first.PostAsync("/api/roles", Json("""{"name":"Marketing"}""")),
-            second.PostAsync("/api/roles", Json("""{"name":"marketing"}""")));
+            first.PostAsync("/api/v1/roles", Json("""{"name":"Marketing"}""")),
+            second.PostAsync("/api/v1/roles", Json("""{"name":"marketing"}""")));
 
         // Assert
         responses.Select(r => (int)r.StatusCode).Order().ToList().ShouldBe(new List<int> { 200, 400 }, ignoreOrder: false, customMessage: "one request wins and the other gets the same 400 as a plain duplicate, never a 500");
@@ -86,7 +86,7 @@ public class RoleEndpointTests : IClassFixture<PostgresDatabaseFixture>
         var client = factory.ClientFor(MariaId, CantinaId);
 
         // Act
-        var response = await client.PostAsync("/api/roles", Json("""{"name":"Marketing","levels":{"Cashier":"Manage"}}"""));
+        var response = await client.PostAsync("/api/v1/roles", Json("""{"name":"Marketing","levels":{"Cashier":"Manage"}}"""));
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.Forbidden, "an Admin cannot create a role stronger than her own access");
@@ -103,7 +103,7 @@ public class RoleEndpointTests : IClassFixture<PostgresDatabaseFixture>
 
         // Act
         var response = await factory.ClientFor(MariaId, CantinaId)
-            .PostAsync("/api/roles", Json("""{"name":"Marketing","levels":{"Menus":"Manage","Orders":"Read"}}"""));
+            .PostAsync("/api/v1/roles", Json("""{"name":"Marketing","levels":{"Menus":"Manage","Orders":"Read"}}"""));
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.OK, "an Admin may create a role at or below her own levels");
@@ -123,7 +123,7 @@ public class RoleEndpointTests : IClassFixture<PostgresDatabaseFixture>
         await SeedCaioWithRoleAsync(factory, role);
 
         // Act
-        var response = await factory.ClientFor(CaioId, CantinaId).PostAsync("/api/roles", Json("""{"name":"Marketing"}"""));
+        var response = await factory.ClientFor(CaioId, CantinaId).PostAsync("/api/v1/roles", Json("""{"name":"Marketing"}"""));
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.Forbidden, $"a {role} has no Members = Manage, so she cannot create roles");
@@ -139,7 +139,7 @@ public class RoleEndpointTests : IClassFixture<PostgresDatabaseFixture>
         var sommelierId = await RoleIdAsync(factory, TrattoriaId, "Sommelier");
 
         // Act
-        var response = await factory.ClientFor(AnaId, CantinaId).GetAsync($"/api/roles/{sommelierId}");
+        var response = await factory.ClientFor(AnaId, CantinaId).GetAsync($"/api/v1/roles/{sommelierId}");
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.NotFound, "another organization's role is answered as if it did not exist");
@@ -169,7 +169,7 @@ public class RoleEndpointTests : IClassFixture<PostgresDatabaseFixture>
         var client = factory.ClientFor(AnaId, CantinaId);
 
         // Act
-        (await client.PostAsync("/api/roles", Json(MarketingBody))).EnsureSuccessStatusCode();
+        (await client.PostAsync("/api/v1/roles", Json(MarketingBody))).EnsureSuccessStatusCode();
 
         // Assert
         var entry = (await AuditEntriesAsync(factory, CantinaId, AuditActions.RoleCreated)).ShouldHaveSingleItem("one create writes exactly one audit entry");

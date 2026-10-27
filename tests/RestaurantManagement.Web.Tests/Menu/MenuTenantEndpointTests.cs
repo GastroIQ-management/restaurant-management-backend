@@ -65,7 +65,7 @@ public class MenuTenantEndpointTests : IClassFixture<PostgresDatabaseFixture>
         // Arrange
         await using var factory = await CreateFactoryWithTwoOrganizationsAsync();
         var client = factory.ClientFor(AnaId, CantinaId);
-        var request = Request(method, $"/api/menus/{TrattoriaLunchMenuId}{pathAfterMenuId}",
+        var request = Request(method, $"/api/v1/menus/{TrattoriaLunchMenuId}{pathAfterMenuId}",
             new { name = "Cardápio Invadido", description = "Alterado por outra organização", isActive = false });
 
         // Act
@@ -94,7 +94,7 @@ public class MenuTenantEndpointTests : IClassFixture<PostgresDatabaseFixture>
         var body = new { name = "Categoria Invadida", description = "Alterada", sortOrder = 9 };
 
         // Act
-        var response = await client.SendAsync(Request(method, $"/api/menu-categories/{TrattoriaPizzaCategoryId}", body));
+        var response = await client.SendAsync(Request(method, $"/api/v1/menu-categories/{TrattoriaPizzaCategoryId}", body));
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.NotFound, "another organization's category is answered as if it did not exist");
@@ -106,10 +106,10 @@ public class MenuTenantEndpointTests : IClassFixture<PostgresDatabaseFixture>
 
     // Scenario 12
     [Theory]
-    [InlineData("POST", "/api/menus/create")]
-    [InlineData("GET", "/api/menus")]
-    [InlineData("POST", "/api/menu-categories")]
-    [InlineData("GET", "/api/menu-categories")]
+    [InlineData("POST", "/api/v1/menus/create")]
+    [InlineData("GET", "/api/v1/menus")]
+    [InlineData("POST", "/api/v1/menu-categories")]
+    [InlineData("GET", "/api/v1/menu-categories")]
     [Trait("Rule", "M6")]
     public async Task MenuEndpoints_NoOrganizationInToken_ReturnsForbiddenOrganizationRequired(string method, string url)
     {
@@ -139,7 +139,7 @@ public class MenuTenantEndpointTests : IClassFixture<PostgresDatabaseFixture>
         var client = factory.ClientFor(AnaId, CantinaId);
 
         // Act
-        var response = await client.PostAsJsonAsync("/api/menus/create",
+        var response = await client.PostAsJsonAsync("/api/v1/menus/create",
             new { organizationId = TrattoriaId, name = "Almoço executivo", description = "Prato feito com arroz, feijão e bife" });
 
         // Assert
@@ -157,7 +157,7 @@ public class MenuTenantEndpointTests : IClassFixture<PostgresDatabaseFixture>
         var client = factory.ClientFor(AnaId, CantinaId);
 
         // Act
-        var response = await client.PostAsJsonAsync("/api/menu-categories",
+        var response = await client.PostAsJsonAsync("/api/v1/menu-categories",
             new { menuId = CantinaDinnerMenuId, organizationId = TrattoriaId, name = "Sobremesas", sortOrder = 2 });
 
         // Assert
@@ -175,7 +175,7 @@ public class MenuTenantEndpointTests : IClassFixture<PostgresDatabaseFixture>
         var client = factory.ClientFor(AnaId, CantinaId);
 
         // Act
-        var response = await client.GetAsync("/api/menus");
+        var response = await client.GetAsync("/api/v1/menus");
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.OK, "an Owner may list the organization's menus");
@@ -193,7 +193,7 @@ public class MenuTenantEndpointTests : IClassFixture<PostgresDatabaseFixture>
         var client = factory.ClientFor(AnaId, CantinaId);
 
         // Act
-        var response = await client.GetAsync("/api/menu-categories");
+        var response = await client.GetAsync("/api/v1/menu-categories");
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.OK, "an Owner may list the organization's categories");
@@ -203,8 +203,8 @@ public class MenuTenantEndpointTests : IClassFixture<PostgresDatabaseFixture>
 
     // Scenario 17
     [Theory]
-    [InlineData("/api/menus/organization/" + Cantina)]
-    [InlineData("/api/organizations/" + Cantina + "/menu-categories")]
+    [InlineData("/api/v1/menus/organization/" + Cantina)]
+    [InlineData("/api/v1/organizations/" + Cantina + "/menu-categories")]
     [Trait("Rule", "M14")]
     public async Task OldOrganizationInUrlRoute_Called_ReturnsNotFound(string url)
     {
@@ -220,8 +220,8 @@ public class MenuTenantEndpointTests : IClassFixture<PostgresDatabaseFixture>
     }
 
     [Theory]
-    [InlineData("PUT", "/api/menus/55555555-0000-4000-8000-000000000002", "/api/menus/55555555-0000-4000-8000-0000000000ff", "menu.not_found")]
-    [InlineData("PUT", "/api/menu-categories/66666666-0000-4000-8000-000000000002", "/api/menu-categories/66666666-0000-4000-8000-0000000000ff", "menu_category.not_found")]
+    [InlineData("PUT", "/api/v1/menus/55555555-0000-4000-8000-000000000002", "/api/v1/menus/55555555-0000-4000-8000-0000000000ff", "menu.not_found")]
+    [InlineData("PUT", "/api/v1/menu-categories/66666666-0000-4000-8000-000000000002", "/api/v1/menu-categories/66666666-0000-4000-8000-0000000000ff", "menu_category.not_found")]
     [Trait("Rule", "M46")]
     public async Task MenuOrCategory_OfAnotherOrganization_AnswersTheSameStatusTitleAndCodeAsAMissingOne(string method, string otherOrganizationUrl, string missingUrl, string expectedCode)
     {

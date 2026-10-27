@@ -8,7 +8,7 @@ namespace RestaurantManagement.Modules.Identity.Controllers
     internal static class RefreshTokenCookie
     {
         public const string Name = "__Secure-refresh_token";
-        private const string CookiePath = "/api/auth";
+        private const string CookiePath = "/api/v1/auth";
 
         public static string? Read(HttpRequest request)
             => request.Cookies.TryGetValue(Name, out var token) ? token : null;

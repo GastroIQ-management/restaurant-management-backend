@@ -14,7 +14,7 @@ namespace RestaurantManagement.Web.Tests;
 /// </summary>
 public class CorsRetryAfterTests : IDisposable
 {
-    private const string RegisterUrl = "/api/auth/register";
+    private const string RegisterUrl = "/api/v1/auth/register";
     private const string AllowedOrigin = "http://localhost:5173";
     private const string ClientIp = "203.0.113.20";
 

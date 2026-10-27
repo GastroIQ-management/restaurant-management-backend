@@ -13,7 +13,7 @@ using static RestaurantManagement.Web.Tests.InvitationWebSupport;
 namespace RestaurantManagement.Web.Tests;
 
 /// <summary>
-/// <c>POST api/invitations</c> on a real PostgreSQL database. Ana (Owner of Cantina da Nonna) invites
+/// <c>POST api/v1/invitations</c> on a real PostgreSQL database. Ana (Owner of Cantina da Nonna) invites
 /// bruno@exemplo.com.br; Trattoria do Sol is the other organization.
 /// </summary>
 public class InvitationEndpointTests : IClassFixture<PostgresDatabaseFixture>
@@ -31,7 +31,7 @@ public class InvitationEndpointTests : IClassFixture<PostgresDatabaseFixture>
         var client = factory.ClientFor(AnaId, CantinaId);
 
         // Act
-        var response = await client.PostAsJsonAsync("/api/invitations", InviteBody("Bruno@Exemplo.com.br", BatelId, new[] { "Waiter" }));
+        var response = await client.PostAsJsonAsync("/api/v1/invitations", InviteBody("Bruno@Exemplo.com.br", BatelId, new[] { "Waiter" }));
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
@@ -55,7 +55,7 @@ public class InvitationEndpointTests : IClassFixture<PostgresDatabaseFixture>
         var client = factory.ClientFor(AnaId, CantinaId);
 
         // Act
-        var response = await client.PostAsJsonAsync("/api/invitations", InviteBody(BrunoEmail, BatelId, new[] { "Waiter" }));
+        var response = await client.PostAsJsonAsync("/api/v1/invitations", InviteBody(BrunoEmail, BatelId, new[] { "Waiter" }));
 
         // Assert
         var token = LatestTokenSentTo(factory, BrunoEmail);
@@ -98,7 +98,7 @@ public class InvitationEndpointTests : IClassFixture<PostgresDatabaseFixture>
             : InviteBody(BrunoEmail, BatelId, new[] { "Sommelier" });
 
         // Act
-        var response = await client.PostAsJsonAsync("/api/invitations", body);
+        var response = await client.PostAsJsonAsync("/api/v1/invitations", body);
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.NotFound, "another organization's location or role is answered as if it did not exist");

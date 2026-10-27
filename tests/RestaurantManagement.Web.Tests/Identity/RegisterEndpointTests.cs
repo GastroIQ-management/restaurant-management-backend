@@ -17,7 +17,7 @@ using Xunit;
 namespace RestaurantManagement.Web.Tests;
 
 /// <summary>
-/// POST api/auth/register end to end on a real PostgreSQL database: the real registration service
+/// POST api/v1/auth/register end to end on a real PostgreSQL database: the real registration service
 /// answers; only the email is substituted so no message is sent.
 /// </summary>
 public class RegisterEndpointTests : IClassFixture<PostgresDatabaseFixture>
@@ -43,7 +43,7 @@ public class RegisterEndpointTests : IClassFixture<PostgresDatabaseFixture>
         const string password = "Massa@Fresca2026";
 
         // Act
-        var response = await client.PostAsJsonAsync("/api/auth/register", new
+        var response = await client.PostAsJsonAsync("/api/v1/auth/register", new
         {
             email = "ana@cantinadanonna.com.br",
             password,
@@ -78,7 +78,7 @@ public class RegisterEndpointTests : IClassFixture<PostgresDatabaseFixture>
         var forgedId = Guid.Parse("99999999-aaaa-4aaa-8aaa-00000000000f");
 
         // Act
-        var response = await client.PostAsJsonAsync("/api/auth/register", new
+        var response = await client.PostAsJsonAsync("/api/v1/auth/register", new
         {
             email = "bruno@cantinadanonna.com.br",
             password = "Massa@Fresca2026",

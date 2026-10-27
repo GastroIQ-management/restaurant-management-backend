@@ -22,7 +22,7 @@ namespace RestaurantManagement.Web.Tests;
 public class VerificationResendEndpointTests : IClassFixture<PostgresDatabaseFixture>
 {
     private const string MariaEmail = "maria@cantinadanonna.com.br";
-    private const string ResendUrl = "/api/auth/resend-verification";
+    private const string ResendUrl = "/api/v1/auth/resend-verification";
 
     private readonly PostgresDatabaseFixture _postgres;
 

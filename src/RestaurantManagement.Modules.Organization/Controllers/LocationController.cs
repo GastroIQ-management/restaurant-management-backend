@@ -10,7 +10,7 @@ using RestaurantManagement.Modules.Organization.Services;
 namespace RestaurantManagement.Modules.Organization.Controllers
 {
     [ApiController]
-    [Route("api/locations")]
+    [Route("api/v1/locations")]
     [Authorize]
     public class LocationController : ControllerBase
     {
@@ -24,7 +24,7 @@ namespace RestaurantManagement.Modules.Organization.Controllers
             _localizer = localizer;
         }
 
-        // GET api/locations
+        // GET api/v1/locations
         [HttpGet]
         public async Task<ActionResult<List<LocationResponse>>> GetLocations()
         {
@@ -33,7 +33,7 @@ namespace RestaurantManagement.Modules.Organization.Controllers
             return Ok(response);
         }
 
-        // POST api/locations
+        // POST api/v1/locations
         [HttpPost]
         public async Task<ActionResult<LocationResponse>> CreateLocation([FromBody] CreateLocationRequest request)
         {
@@ -42,7 +42,7 @@ namespace RestaurantManagement.Modules.Organization.Controllers
             return Ok(response);
         }
 
-        // PUT api/locations/{locationId}
+        // PUT api/v1/locations/{locationId}
         [HttpPut("{locationId:guid}")]
         public async Task<ActionResult<LocationResponse>> EditLocation(Guid locationId, [FromBody] EditLocationRequest request)
         {
@@ -51,7 +51,7 @@ namespace RestaurantManagement.Modules.Organization.Controllers
             return Ok(response);
         }
 
-        // DELETE api/locations/{locationId}
+        // DELETE api/v1/locations/{locationId}
         [HttpDelete("{locationId:guid}")]
         public async Task<IActionResult> DeleteLocation(Guid locationId)
         {

@@ -12,7 +12,7 @@ using RestaurantManagement.Modules.Organization.Services;
 namespace RestaurantManagement.Modules.Organization.Controllers
 {
     [ApiController]
-    [Route("api/organizations")]
+    [Route("api/v1/organizations")]
     public class OrganizationController : ControllerBase
     {
         private readonly IOrganizationService _organizationService;
@@ -24,7 +24,7 @@ namespace RestaurantManagement.Modules.Organization.Controllers
             _localizer = localizer;
         }
 
-        // POST api/organizations/create
+        // POST api/v1/organizations/create
         [HttpPost("create")]
         [Authorize]
         public async Task<ActionResult<OrganizationResponse>> Create([FromBody] CreateOrganizationRequest request)
@@ -35,7 +35,7 @@ namespace RestaurantManagement.Modules.Organization.Controllers
             return Ok(response);
         }
 
-        // PUT api/organizations/edit
+        // PUT api/v1/organizations/edit
         [HttpPut("edit")]
         [Authorize]
         public async Task<ActionResult<OrganizationResponse>> Edit([FromBody] EditOrganizationRequest request)
@@ -46,7 +46,7 @@ namespace RestaurantManagement.Modules.Organization.Controllers
             return Ok(response);
         }
 
-        // GET api/organizations
+        // GET api/v1/organizations
         [HttpGet]
         [Authorize]
         public async Task<ActionResult<List<OrganizationResponse>>> GetAll()

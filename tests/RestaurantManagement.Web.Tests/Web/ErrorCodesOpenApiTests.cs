@@ -78,7 +78,7 @@ public class ErrorCodesOpenApiTests : IDisposable
         var document = await ReadDocumentAsync();
 
         // Assert
-        var reference = document["paths"]!["/api/menus"]!["get"]!["responses"]![statusRange]!["content"]!["application/problem+json"]!["schema"]!["$ref"]!.GetValue<string>();
+        var reference = document["paths"]!["/api/v1/menus"]!["get"]!["responses"]![statusRange]!["content"]!["application/problem+json"]!["schema"]!["$ref"]!.GetValue<string>();
         reference.ShouldBe($"#/components/schemas/{SchemaName}", "an operation shows the one Problem Details schema on its client and server error answers");
     }
 }

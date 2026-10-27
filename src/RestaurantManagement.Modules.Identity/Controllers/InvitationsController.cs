@@ -7,14 +7,14 @@ using RestaurantManagement.Modules.Identity.Services.Languages;
 namespace RestaurantManagement.Modules.Identity.Controllers
 {
     [ApiController]
-    [Route("api/invitations")]
+    [Route("api/v1/invitations")]
     public class InvitationsController : ControllerBase
     {
         private readonly IInvitationService _invitationService;
 
         public InvitationsController(IInvitationService invitationService) => _invitationService = invitationService;
 
-        // POST api/invitations
+        // POST api/v1/invitations
         [HttpPost]
         [Authorize]
         public async Task<ActionResult<InvitationResponse>> Create([FromBody] CreateInvitationRequest request)
@@ -23,7 +23,7 @@ namespace RestaurantManagement.Modules.Identity.Controllers
             return Ok(await _invitationService.CreateAsync(request, language));
         }
 
-        // DELETE api/invitations/{invitationId}
+        // DELETE api/v1/invitations/{invitationId}
         [HttpDelete("{invitationId:guid}")]
         [Authorize]
         public async Task<IActionResult> Cancel(Guid invitationId)
@@ -32,7 +32,7 @@ namespace RestaurantManagement.Modules.Identity.Controllers
             return NoContent();
         }
 
-        // POST api/invitations/accept
+        // POST api/v1/invitations/accept
         [HttpPost("accept")]
         [Authorize]
         public async Task<IActionResult> Accept([FromBody] AcceptInvitationRequest request)

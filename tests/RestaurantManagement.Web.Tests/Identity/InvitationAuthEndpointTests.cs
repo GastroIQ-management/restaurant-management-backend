@@ -8,15 +8,15 @@ namespace RestaurantManagement.Web.Tests;
 /// <summary>Sign-in, rate limit and password rules of the member access and invitation endpoints (no database needed).</summary>
 public class InvitationAuthEndpointTests
 {
-    private const string AcceptWithAccountUrl = "/api/auth/accept-invitation";
+    private const string AcceptWithAccountUrl = "/api/v1/auth/accept-invitation";
     private const string BatelId = "44444444-dddd-4ddd-8ddd-000000000001";
     private const string BiaId = "22222222-bbbb-4bbb-8bbb-00000000000b";
 
     [Theory]
-    [InlineData("PUT", "/api/members/" + BiaId + "/access/" + BatelId)]
-    [InlineData("POST", "/api/invitations")]
-    [InlineData("DELETE", "/api/invitations/" + BiaId)]
-    [InlineData("POST", "/api/invitations/accept")]
+    [InlineData("PUT", "/api/v1/members/" + BiaId + "/access/" + BatelId)]
+    [InlineData("POST", "/api/v1/invitations")]
+    [InlineData("DELETE", "/api/v1/invitations/" + BiaId)]
+    [InlineData("POST", "/api/v1/invitations/accept")]
     [Trait("Rule", "T80")]
     public async Task SignedInInvitationEndpoints_NoAccessToken_ReturnUnauthorized(string method, string url)
     {

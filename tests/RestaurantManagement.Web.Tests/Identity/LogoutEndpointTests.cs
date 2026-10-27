@@ -9,15 +9,15 @@ using Shouldly;
 namespace RestaurantManagement.Web.Tests;
 
 /// <summary>
-/// POST api/auth/logout (public, cookie only) and POST api/auth/logout-all (signed in).
+/// POST api/v1/auth/logout (public, cookie only) and POST api/v1/auth/logout-all (signed in).
 /// The session service is substituted; revocation rules are covered by the Identity unit tests.
 /// </summary>
 public class LogoutEndpointTests : IDisposable
 {
-    private const string LogoutUrl = "/api/auth/logout";
-    private const string LogoutAllUrl = "/api/auth/logout-all";
+    private const string LogoutUrl = "/api/v1/auth/logout";
+    private const string LogoutAllUrl = "/api/v1/auth/logout-all";
     private const string CookieName = "__Secure-refresh_token";
-    private const string CookiePath = "/api/auth";
+    private const string CookiePath = "/api/v1/auth";
     private const string TabletCookieToken = "a2l0Y2hlbi10YWJsZXQtcmVmcmVzaC10b2tlbi0wMDAx";
 
     private static readonly Guid MariaId = Guid.Parse("11111111-aaaa-4aaa-8aaa-00000000000a");

@@ -9,7 +9,7 @@ namespace RestaurantManagement.Web.Tests;
 /// </summary>
 public class CorsUnknownOriginTests : IDisposable
 {
-    private const string RefreshUrl = "/api/auth/refresh";
+    private const string RefreshUrl = "/api/v1/auth/refresh";
     private const string AllowedOrigin = "https://app.cantinadanonna.com.br";
     private const string UnknownOrigin = "https://evil.example.com";
 

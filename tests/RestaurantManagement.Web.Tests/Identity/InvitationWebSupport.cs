@@ -141,7 +141,7 @@ internal static class InvitationWebSupport
     public static async Task<Guid> InviteAsync(TenantApiFactory factory, Guid callerId, string email, Guid locationId, string[] roleNames,
         Dictionary<string, string>? levels = null)
     {
-        var response = await factory.ClientFor(callerId, CantinaId).PostAsJsonAsync("/api/invitations", InviteBody(email, locationId, roleNames, levels));
+        var response = await factory.ClientFor(callerId, CantinaId).PostAsJsonAsync("/api/v1/invitations", InviteBody(email, locationId, roleNames, levels));
         response.EnsureSuccessStatusCode();
         return (await response.Content.ReadFromJsonAsync<InvitationReply>())!.Id;
     }

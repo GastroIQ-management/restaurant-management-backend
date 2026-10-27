@@ -7,7 +7,7 @@ using RestaurantManagement.Modules.Identity.Services.Languages;
 namespace RestaurantManagement.Modules.Identity.Controllers
 {
     [ApiController]
-    [Route("api/users/me")]
+    [Route("api/v1/users/me")]
     [Authorize]
     public class UsersController : ControllerBase
     {
@@ -18,7 +18,7 @@ namespace RestaurantManagement.Modules.Identity.Controllers
             _languageService = languageService;
         }
 
-        // PUT api/users/me/language
+        // PUT api/v1/users/me/language
         [HttpPut("language")]
         public async Task<IActionResult> UpdateLanguage([FromBody] UpdateLanguageRequest request)
         {

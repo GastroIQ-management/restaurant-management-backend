@@ -66,6 +66,9 @@ for one module (rate limits on sign-in endpoints, the refresh cookie) are in tha
 | W25 | Rate-limited (429) answer to an allowed origin | The page may read `Retry-After`, so it knows how long to wait | ✅ | `CorsRetryAfterTests.Register_RateLimitedFromAllowedOrigin_ExposesRetryAfter` |
 | W27 | Rate-limited request | 429 `rate_limit.exceeded` as Problem Details with `Retry-After` kept | ✅ | `CorsRetryAfterTests.Register_RateLimited_AnswersProblemDetailsWithRateLimitCodeAndRetryAfter` |
 | W28 | Error made by the framework: bodiless error result, unknown route, wrong method, wrong content type | Problem Details with the fallback code of the status (`http.conflict`, `http.not_found`, `http.method_not_allowed`, `http.unsupported_media_type`) and a title in the caller's language; status unchanged | ✅ | `FallbackProblemDetailsTests.FrameworkError_UnknownRouteWrongMethodBodilessResultWrongContentType_AnswersFallbackCodeWithATitlePerLanguage` |
+| W29 | Any endpoint route of the app | Starts with `api/v<n>/` of a supported API version (today `v1`); an endpoint outside every supported version fails the build | ✅ | `ApiVersionRoutesTests.EveryEndpoint_RouteTemplate_StartsWithASupportedApiVersion` |
+| W30 | The OpenAPI document of a version | Holds only that version's paths and every one of its operations | ✅ | `ApiVersionDocumentsTests.V1Document_InDevelopment_ListsOnlyV1PathsAndEveryV1Operation` |
+| W31 | The OpenAPI document of a version that is not supported | Not served (404) | ✅ | `ApiVersionDocumentsTests.Document_VersionThatIsNotSupported_IsNotServed` |
 
 ## 6. Wiring tests
 These protect the app setup rather than a rule users meet.
@@ -76,3 +79,9 @@ These protect the app setup rather than a rule users meet.
 | WD2 | `StartupConfigurationTests.Startup_DefaultConfiguration_RegistersVerificationCodeHasher` | The code fingerprint service is registered |
 | WD3 | `StartupConfigurationTests.Startup_DefaultConfiguration_JwtExpireMinutesIs15` | The access token lifetime binds from configuration (rule: Identity L19) |
 | WD4 | `ErrorCodesOpenApiTests.SwaggerDocument_InDevelopment_CodeEnumEqualsTheUnionOfEveryCatalog`, `ErrorCodesOpenApiTests.SwaggerDocument_InDevelopment_SchemaDescriptionStatesTheRetryRuleAndListsTheRetryCodes`, `ErrorCodesOpenApiTests.SwaggerDocument_InDevelopment_EveryOperationDeclaresItsErrorAnswersWithTheProblemDetailsSchema` | The OpenAPI document lists every catalog code, states the retry rule and shows the Problem Details schema on every operation |
+| WD5 | `ApiVersionsTests.IncludesRoute_RouteAndVersion_IncludesOnlyRoutesWithThatVersionPrefix` | A version includes only routes under its own `api/<version>/` prefix (v1 never takes v10) |
+| WD6 | `ApiVersionDocumentsTests.V1Document_InDevelopment_BearerDescriptionPointsToTheVersionedLogin` | The sign-in help names `/api/v1/auth/login` |
+| WD7 | `ApiVersionDocumentsTests.V1Document_InDevelopment_DescriptionStatesTheAdditiveOnlyAndThirtyDayRules` | The document states the additive-only and 30-day rules |
+| WD8 | `AppVersionHeaderOpenApiTests.V1Document_EveryWriteOperation_DeclaresTheRequiredAppVersionHeader` | Generated clients send `X-App-Version` on every write |
+| WD9 | `AppVersionHeaderOpenApiTests.V1Document_ReadOperations_DoNotDeclareTheAppVersionHeader` | Reads do not ask for it |
+| WD10 | `AppVersionHeaderOpenApiTests.V1Document_AppVersionHeader_DeclaresItsFormatLengthAndPurpose` | The header shows its format, 32-character limit and purpose |

@@ -37,7 +37,7 @@ public class OrganizationPlanEndpointTests : IClassFixture<PostgresDatabaseFixtu
             """;
 
         // Act
-        var response = await client.PostAsync("/api/organizations/create", new StringContent(body, Encoding.UTF8, "application/json"));
+        var response = await client.PostAsync("/api/v1/organizations/create", new StringContent(body, Encoding.UTF8, "application/json"));
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.OK);

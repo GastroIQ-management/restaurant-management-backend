@@ -64,5 +64,5 @@ internal static class RoleWebSupport
     };
 
     public static async Task<List<RoleReply>> ListRolesAsync(HttpClient client)
-        => (await client.GetFromJsonAsync<List<RoleReply>>("/api/roles"))!;
+        => (await client.GetFromJsonAsync<List<RoleReply>>("/api/v1/roles"))!;
 }

@@ -11,12 +11,12 @@ using Xunit;
 namespace RestaurantManagement.Web.Tests;
 
 /// <summary>
-/// PUT api/users/me/language (signed in, no organization needed) end to end on a real PostgreSQL
+/// PUT api/v1/users/me/language (signed in, no organization needed) end to end on a real PostgreSQL
 /// database. The user comes only from the access token. Maria and João are both verified users.
 /// </summary>
 public class UserLanguageEndpointTests : IClassFixture<PostgresDatabaseFixture>
 {
-    private const string LanguageUrl = "/api/users/me/language";
+    private const string LanguageUrl = "/api/v1/users/me/language";
 
     private static readonly Guid MariaId = Guid.Parse("11111111-aaaa-4aaa-8aaa-00000000000a");
     private static readonly Guid JoaoId = Guid.Parse("22222222-bbbb-4bbb-8bbb-00000000000b");

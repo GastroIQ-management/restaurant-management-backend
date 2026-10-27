@@ -5,7 +5,7 @@ using static RestaurantManagement.Web.Tests.InvitationWebSupport;
 
 namespace RestaurantManagement.Web.Tests;
 
-/// <summary><c>POST api/invitations</c> refuses an empty location grid and a null location, and survives two requests for one address at once.</summary>
+/// <summary><c>POST api/v1/invitations</c> refuses an empty location grid and a null location, and survives two requests for one address at once.</summary>
 public class InvitationCreateRefusalEndpointTests : IClassFixture<PostgresDatabaseFixture>
 {
     private readonly PostgresDatabaseFixture _postgres;
@@ -21,7 +21,7 @@ public class InvitationCreateRefusalEndpointTests : IClassFixture<PostgresDataba
         var client = factory.ClientFor(AnaId, CantinaId);
 
         // Act
-        var response = await client.PostAsJsonAsync("/api/invitations", InviteBody(BrunoEmail, BatelId, Array.Empty<string>()));
+        var response = await client.PostAsJsonAsync("/api/v1/invitations", InviteBody(BrunoEmail, BatelId, Array.Empty<string>()));
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.BadRequest, "an invitation location must grant something, or a cancel could not find it");
@@ -37,7 +37,7 @@ public class InvitationCreateRefusalEndpointTests : IClassFixture<PostgresDataba
         var client = factory.ClientFor(AnaId, CantinaId);
 
         // Act
-        var response = await client.PostAsJsonAsync("/api/invitations", new { email = BrunoEmail, locations = new object?[] { null } });
+        var response = await client.PostAsJsonAsync("/api/v1/invitations", new { email = BrunoEmail, locations = new object?[] { null } });
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.BadRequest, "a null location is refused, not a server error");
@@ -54,7 +54,7 @@ public class InvitationCreateRefusalEndpointTests : IClassFixture<PostgresDataba
 
         // Act
         var responses = await Task.WhenAll(Enumerable.Range(0, 8)
-            .Select(_ => factory.ClientFor(AnaId, CantinaId).PostAsJsonAsync("/api/invitations", body)));
+            .Select(_ => factory.ClientFor(AnaId, CantinaId).PostAsJsonAsync("/api/v1/invitations", body)));
 
         // Assert
         responses.ShouldAllBe(r => r.IsSuccessStatusCode || r.StatusCode == HttpStatusCode.Conflict, "the loser of the race gets a refusal, not a server error");
@@ -73,7 +73,7 @@ public class InvitationCreateRefusalEndpointTests : IClassFixture<PostgresDataba
 
         // Act
         var responses = await Task.WhenAll(Enumerable.Range(0, 8)
-            .Select(_ => factory.ClientFor(AnaId, CantinaId).PostAsJsonAsync("/api/invitations", body)));
+            .Select(_ => factory.ClientFor(AnaId, CantinaId).PostAsJsonAsync("/api/v1/invitations", body)));
 
         // Assert
         var losers = responses.Where(r => !r.IsSuccessStatusCode).ToList();

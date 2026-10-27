@@ -120,7 +120,7 @@ public class MenuGridEndpointTests : IClassFixture<PostgresDatabaseFixture>
         var client = factory.ClientFor(BiaId, CantinaId);
 
         // Act
-        var response = await client.GetAsync($"/api/menus/location/{location}");
+        var response = await client.GetAsync($"/api/v1/menus/location/{location}");
 
         // Assert
         response.StatusCode.ShouldBe(expected, "a Waiter with Menus Read at Batel reads Batel's menus, and is refused at a location where she has no level");
@@ -137,7 +137,7 @@ public class MenuGridEndpointTests : IClassFixture<PostgresDatabaseFixture>
         var client = factory.ClientFor(Guid.Parse(member), CantinaId);
 
         // Act
-        var response = await client.GetAsync($"/api/locations/{Batel}/menu-categories");
+        var response = await client.GetAsync($"/api/v1/locations/{Batel}/menu-categories");
 
         // Assert
         response.StatusCode.ShouldBe(expected, "a member with Menus Read at the location sees its categories; one with Menus None does not");
@@ -154,20 +154,20 @@ public class MenuGridEndpointTests : IClassFixture<PostgresDatabaseFixture>
         var client = factory.ClientFor(Guid.Parse(member), CantinaId);
 
         // Act
-        var response = await client.PutAsJsonAsync($"/api/menus/{DinnerMenuId}", MenuBody);
+        var response = await client.PutAsJsonAsync($"/api/v1/menus/{DinnerMenuId}", MenuBody);
 
         // Assert
         response.StatusCode.ShouldBe(expected, "Manage on Menus allows editing a menu; Read only does not");
     }
 
     [Theory]
-    [InlineData("POST", "/api/menus/create")]
-    [InlineData("PUT", "/api/menus/55555555-0000-4000-8000-000000000001")]
-    [InlineData("DELETE", "/api/menus/55555555-0000-4000-8000-000000000001")]
-    [InlineData("POST", "/api/menus/55555555-0000-4000-8000-000000000001/locations/" + MercadoMunicipal)]
-    [InlineData("POST", "/api/menu-categories")]
-    [InlineData("PUT", "/api/menu-categories/66666666-0000-4000-8000-000000000001")]
-    [InlineData("DELETE", "/api/menu-categories/66666666-0000-4000-8000-000000000001")]
+    [InlineData("POST", "/api/v1/menus/create")]
+    [InlineData("PUT", "/api/v1/menus/55555555-0000-4000-8000-000000000001")]
+    [InlineData("DELETE", "/api/v1/menus/55555555-0000-4000-8000-000000000001")]
+    [InlineData("POST", "/api/v1/menus/55555555-0000-4000-8000-000000000001/locations/" + MercadoMunicipal)]
+    [InlineData("POST", "/api/v1/menu-categories")]
+    [InlineData("PUT", "/api/v1/menu-categories/66666666-0000-4000-8000-000000000001")]
+    [InlineData("DELETE", "/api/v1/menu-categories/66666666-0000-4000-8000-000000000001")]
     [Trait("Rule", "M35")]
     public async Task MenuAndCategoryWrites_MemberWithMenusReadOnly_ReturnsForbiddenAndChangesNothing(string method, string url)
     {
@@ -198,9 +198,9 @@ public class MenuGridEndpointTests : IClassFixture<PostgresDatabaseFixture>
         var client = factory.ClientFor(MariaId, CantinaId);
 
         // Act
-        var editBatelMenu = await client.PutAsJsonAsync($"/api/menus/{DinnerMenuId}", MenuBody);
-        var readMercadoMenus = await client.GetAsync($"/api/menus/location/{MercadoMunicipal}");
-        var editMercadoMenu = await client.PutAsJsonAsync($"/api/menus/{LunchMenuId}", MenuBody);
+        var editBatelMenu = await client.PutAsJsonAsync($"/api/v1/menus/{DinnerMenuId}", MenuBody);
+        var readMercadoMenus = await client.GetAsync($"/api/v1/menus/location/{MercadoMunicipal}");
+        var editMercadoMenu = await client.PutAsJsonAsync($"/api/v1/menus/{LunchMenuId}", MenuBody);
 
         // Assert
         editBatelMenu.StatusCode.ShouldBe(HttpStatusCode.OK, "Maria manages Menus at Batel, so she edits Batel's menu");
@@ -215,11 +215,11 @@ public class MenuGridEndpointTests : IClassFixture<PostgresDatabaseFixture>
         // Arrange
         await using var factory = await CreateFactoryAsync();
         var client = factory.ClientFor(CaioId, CantinaId);
-        var first = await client.PutAsJsonAsync($"/api/menus/{DinnerMenuId}", MenuBody);
+        var first = await client.PutAsJsonAsync($"/api/v1/menus/{DinnerMenuId}", MenuBody);
         await factory.SetLevelAsync(CaioId, CantinaId, BatelId, AccessModule.Menus, AccessLevel.Read);
 
         // Act
-        var second = await client.PutAsJsonAsync($"/api/menus/{DinnerMenuId}", MenuBody);
+        var second = await client.PutAsJsonAsync($"/api/v1/menus/{DinnerMenuId}", MenuBody);
 
         // Assert
         first.StatusCode.ShouldBe(HttpStatusCode.OK, "the Manager may edit while the stored level is Manage");
@@ -235,7 +235,7 @@ public class MenuGridEndpointTests : IClassFixture<PostgresDatabaseFixture>
         var client = factory.ClientFor(AnaId, CantinaId);
 
         // Act
-        var response = await client.PostAsJsonAsync("/api/menus/create", MenuBody);
+        var response = await client.PostAsJsonAsync("/api/v1/menus/create", MenuBody);
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.OK, "the Owner has Manage on everything at every location with no stored level");
@@ -249,12 +249,12 @@ public class MenuGridEndpointTests : IClassFixture<PostgresDatabaseFixture>
         // Arrange
         await using var factory = await CreateFactoryAsync();
         var client = factory.ClientFor(EvaId, CantinaId);
-        var otherOrganizationOnly = await client.PostAsJsonAsync("/api/menus/create", MenuBody);
+        var otherOrganizationOnly = await client.PostAsJsonAsync("/api/v1/menus/create", MenuBody);
         await factory.GrantAsync(EvaId, CantinaId, BatelId, (AccessModule.Menus, AccessLevel.Manage));
         await factory.GrantAsync(EvaId, CantinaId, MercadoId, (AccessModule.Menus, AccessLevel.Manage));
 
         // Act
-        var afterGrantHere = await client.PostAsJsonAsync("/api/menus/create", MenuBody);
+        var afterGrantHere = await client.PostAsJsonAsync("/api/v1/menus/create", MenuBody);
 
         // Assert
         otherOrganizationOnly.StatusCode.ShouldBe(HttpStatusCode.Forbidden, "Manage everywhere in Trattoria do Sol gives nothing in Cantina da Nonna");
@@ -270,7 +270,7 @@ public class MenuGridEndpointTests : IClassFixture<PostgresDatabaseFixture>
         var client = factory.ClientFor(DoraId, CantinaId);
 
         // Act
-        var response = await client.PutAsJsonAsync($"/api/menus/{DinnerMenuId}", MenuBody);
+        var response = await client.PutAsJsonAsync($"/api/v1/menus/{DinnerMenuId}", MenuBody);
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.Forbidden, "Read never lets a member change a menu");

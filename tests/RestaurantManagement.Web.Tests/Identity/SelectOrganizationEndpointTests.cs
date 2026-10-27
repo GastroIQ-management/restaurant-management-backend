@@ -12,7 +12,7 @@ namespace RestaurantManagement.Web.Tests;
 
 public class SelectOrganizationEndpointTests : IClassFixture<PostgresDatabaseFixture>, IDisposable
 {
-    private const string SelectOrganizationUrl = "/api/auth/select-organization";
+    private const string SelectOrganizationUrl = "/api/v1/auth/select-organization";
     private static readonly Guid CantinaId = Guid.Parse("a1a1a1a1-0000-4000-8000-000000000001");
     private static readonly Guid MariaId = Guid.Parse("11111111-aaaa-4aaa-8aaa-00000000000a");
 

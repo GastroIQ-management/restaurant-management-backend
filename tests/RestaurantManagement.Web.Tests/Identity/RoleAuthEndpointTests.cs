@@ -10,11 +10,11 @@ public class RoleAuthEndpointTests
     private const string RoleId = "22222222-bbbb-4bbb-8bbb-00000000000b";
 
     [Theory]
-    [InlineData("GET", "/api/roles")]
-    [InlineData("GET", "/api/roles/" + RoleId)]
-    [InlineData("POST", "/api/roles")]
-    [InlineData("PUT", "/api/roles/" + RoleId + "/levels")]
-    [InlineData("PUT", "/api/roles/" + RoleId + "/name")]
+    [InlineData("GET", "/api/v1/roles")]
+    [InlineData("GET", "/api/v1/roles/" + RoleId)]
+    [InlineData("POST", "/api/v1/roles")]
+    [InlineData("PUT", "/api/v1/roles/" + RoleId + "/levels")]
+    [InlineData("PUT", "/api/v1/roles/" + RoleId + "/name")]
     [Trait("Rule", "T120")]
     public async Task RoleEndpoints_NoAccessToken_ReturnUnauthorized(string method, string url)
     {

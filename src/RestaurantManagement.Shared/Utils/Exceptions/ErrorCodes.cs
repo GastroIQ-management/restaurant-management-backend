@@ -36,6 +36,12 @@ namespace RestaurantManagement.Shared.Utils.Exceptions
         // "request.in_progress", 409, retry
         public static ErrorCode RequestInProgress { get; } = new("request.in_progress", 409, true);
 
+        // "app_version.required", 400
+        public static ErrorCode AppVersionRequired { get; } = new("app_version.required", 400);
+
+        // "app_version.invalid", 400
+        public static ErrorCode AppVersionInvalid { get; } = new("app_version.invalid", 400);
+
         // "location.invalid_id", 400
         public static ErrorCode LocationInvalidId { get; } = new("location.invalid_id", 400);
 

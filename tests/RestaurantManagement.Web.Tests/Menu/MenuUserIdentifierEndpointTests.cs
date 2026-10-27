@@ -29,25 +29,25 @@ public class MenuUserIdentifierEndpointTests : IClassFixture<PostgresDatabaseFix
     public MenuUserIdentifierEndpointTests(PostgresDatabaseFixture postgres) => _postgres = postgres;
 
     [Theory]
-    [InlineData("POST", "/api/menus/create", MenuJson, "pt", "Usuário não autorizado!")]
-    [InlineData("PUT", $"/api/menus/{MenuId}", MenuJson, "en", "Unauthorized user.")]
-    [InlineData("DELETE", $"/api/menus/{MenuId}", null, "pt", "Usuário não autorizado!")]
-    [InlineData("POST", $"/api/menus/{MenuId}/locations/{LocationId}", null, "en", "Unauthorized user.")]
-    [InlineData("DELETE", $"/api/menus/{MenuId}/locations/{LocationId}", null, "pt", "Usuário não autorizado!")]
-    [InlineData("GET", "/api/menus", null, "en", "Unauthorized user.")]
-    [InlineData("GET", $"/api/menus/location/{LocationId}", null, "pt", "Usuário não autorizado!")]
+    [InlineData("POST", "/api/v1/menus/create", MenuJson, "pt", "Usuário não autorizado!")]
+    [InlineData("PUT", $"/api/v1/menus/{MenuId}", MenuJson, "en", "Unauthorized user.")]
+    [InlineData("DELETE", $"/api/v1/menus/{MenuId}", null, "pt", "Usuário não autorizado!")]
+    [InlineData("POST", $"/api/v1/menus/{MenuId}/locations/{LocationId}", null, "en", "Unauthorized user.")]
+    [InlineData("DELETE", $"/api/v1/menus/{MenuId}/locations/{LocationId}", null, "pt", "Usuário não autorizado!")]
+    [InlineData("GET", "/api/v1/menus", null, "en", "Unauthorized user.")]
+    [InlineData("GET", $"/api/v1/menus/location/{LocationId}", null, "pt", "Usuário não autorizado!")]
     [Trait("Rule", "M44")]
     public async Task MenuEndpoints_UserIdentifierNotAUserId_ReturnsUnauthorizedWithLocalizedMessage(string method, string url, string? body, string culture, string expected)
         => await AssertUnauthorizedAsync(method, url, body, culture, expected);
 
     [Theory]
-    [InlineData("POST", "/api/menu-categories", CategoryJson, "en", "Unauthorized user.")]
-    [InlineData("GET", $"/api/menu-categories/{CategoryId}", null, "pt", "Usuário não autorizado!")]
-    [InlineData("GET", $"/api/menus/{MenuId}/categories", null, "en", "Unauthorized user.")]
-    [InlineData("GET", "/api/menu-categories", null, "pt", "Usuário não autorizado!")]
-    [InlineData("GET", $"/api/locations/{LocationId}/menu-categories", null, "en", "Unauthorized user.")]
-    [InlineData("PUT", $"/api/menu-categories/{CategoryId}", CategoryUpdateJson, "pt", "Usuário não autorizado!")]
-    [InlineData("DELETE", $"/api/menu-categories/{CategoryId}", null, "en", "Unauthorized user.")]
+    [InlineData("POST", "/api/v1/menu-categories", CategoryJson, "en", "Unauthorized user.")]
+    [InlineData("GET", $"/api/v1/menu-categories/{CategoryId}", null, "pt", "Usuário não autorizado!")]
+    [InlineData("GET", $"/api/v1/menus/{MenuId}/categories", null, "en", "Unauthorized user.")]
+    [InlineData("GET", "/api/v1/menu-categories", null, "pt", "Usuário não autorizado!")]
+    [InlineData("GET", $"/api/v1/locations/{LocationId}/menu-categories", null, "en", "Unauthorized user.")]
+    [InlineData("PUT", $"/api/v1/menu-categories/{CategoryId}", CategoryUpdateJson, "pt", "Usuário não autorizado!")]
+    [InlineData("DELETE", $"/api/v1/menu-categories/{CategoryId}", null, "en", "Unauthorized user.")]
     [Trait("Rule", "M44")]
     public async Task MenuCategoryEndpoints_UserIdentifierNotAUserId_ReturnsUnauthorizedWithLocalizedMessage(string method, string url, string? body, string culture, string expected)
         => await AssertUnauthorizedAsync(method, url, body, culture, expected);

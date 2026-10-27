@@ -50,15 +50,15 @@ public class LocationCodeEndpointTests : IClassFixture<PostgresDatabaseFixture>
 
     private static async Task<Guid> CreateLocationAsync(HttpClient client, string name, string code)
     {
-        var response = await client.PostAsJsonAsync("/api/locations", LocationBody(name, code));
+        var response = await client.PostAsJsonAsync("/api/v1/locations", LocationBody(name, code));
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
         return JsonNode.Parse(await response.Content.ReadAsStringAsync())!["id"]!.GetValue<Guid>();
     }
 
-    /// <summary>GET api/locations, as location name to code.</summary>
+    /// <summary>GET api/v1/locations, as location name to code.</summary>
     private static async Task<Dictionary<string, string?>> ListCodesAsync(HttpClient client)
     {
-        var locations = JsonNode.Parse(await client.GetStringAsync("/api/locations"))!.AsArray();
+        var locations = JsonNode.Parse(await client.GetStringAsync("/api/v1/locations"))!.AsArray();
         return locations.ToDictionary(l => l!["name"]!.GetValue<string>(), l => l!["code"]?.ToString());
     }
 
@@ -75,10 +75,10 @@ public class LocationCodeEndpointTests : IClassFixture<PostgresDatabaseFixture>
         var client = factory.ClientFor(AnaId, CantinaId);
         await CreateLocationAsync(client, "Unidade Mercado Municipal", "MM");
         var batelId = await CreateLocationAsync(client, "Unidade Batel", "BT");
-        (await client.DeleteAsync($"/api/locations/{batelId}")).StatusCode.ShouldBe(HttpStatusCode.NoContent);
+        (await client.DeleteAsync($"/api/v1/locations/{batelId}")).StatusCode.ShouldBe(HttpStatusCode.NoContent);
 
         // Act
-        var response = await client.PostAsJsonAsync("/api/locations", LocationBody("Unidade Moema", code));
+        var response = await client.PostAsJsonAsync("/api/v1/locations", LocationBody("Unidade Moema", code));
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.BadRequest, "a location code already used in the organization is refused, even by a closed location");
@@ -96,7 +96,7 @@ public class LocationCodeEndpointTests : IClassFixture<PostgresDatabaseFixture>
         var cantinaClient = factory.ClientFor(AnaId, CantinaId);
 
         // Act
-        var response = await cantinaClient.PostAsJsonAsync("/api/locations", LocationBody("Unidade Mercado Municipal", "MM"));
+        var response = await cantinaClient.PostAsJsonAsync("/api/v1/locations", LocationBody("Unidade Mercado Municipal", "MM"));
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.OK, "a code used only by another organization is free to use");
@@ -116,7 +116,7 @@ public class LocationCodeEndpointTests : IClassFixture<PostgresDatabaseFixture>
         var batelId = await CreateLocationAsync(client, "Unidade Batel", "BT");
 
         // Act
-        var response = await client.PutAsJsonAsync($"/api/locations/{batelId}", LocationBody("Unidade Batel", "MM"));
+        var response = await client.PutAsJsonAsync($"/api/v1/locations/{batelId}", LocationBody("Unidade Batel", "MM"));
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.BadRequest, "a location cannot take a code another location of the organization uses");
@@ -134,7 +134,7 @@ public class LocationCodeEndpointTests : IClassFixture<PostgresDatabaseFixture>
 
         // Act
         var responses = await Task.WhenAll(clients.Select((client, i) =>
-            client.PostAsJsonAsync("/api/locations", LocationBody($"Unidade Moema {i + 1}", "MOE"))));
+            client.PostAsJsonAsync("/api/v1/locations", LocationBody($"Unidade Moema {i + 1}", "MOE"))));
 
         // Assert
         var statuses = responses.Select(r => r.StatusCode).ToList();
@@ -152,7 +152,7 @@ public class LocationCodeEndpointTests : IClassFixture<PostgresDatabaseFixture>
         await using var factory = await CreateFactoryAsync();
         var client = factory.ClientFor(AnaId, CantinaId);
         var batelId = await CreateLocationAsync(client, "Unidade Batel", "BT");
-        (await client.DeleteAsync($"/api/locations/{batelId}")).StatusCode.ShouldBe(HttpStatusCode.NoContent);
+        (await client.DeleteAsync($"/api/v1/locations/{batelId}")).StatusCode.ShouldBe(HttpStatusCode.NoContent);
         var bodyWithoutStatus = new
         {
             name = "Unidade Batel",
@@ -167,11 +167,11 @@ public class LocationCodeEndpointTests : IClassFixture<PostgresDatabaseFixture>
         };
 
         // Act
-        var response = await client.PutAsJsonAsync($"/api/locations/{batelId}", bodyWithoutStatus);
+        var response = await client.PutAsJsonAsync($"/api/v1/locations/{batelId}", bodyWithoutStatus);
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.OK, "an edit that leaves the status out is accepted");
-        var locations = JsonNode.Parse(await client.GetStringAsync("/api/locations"))!.AsArray();
+        var locations = JsonNode.Parse(await client.GetStringAsync("/api/v1/locations"))!.AsArray();
         var status = locations.Single(l => l!["id"]!.GetValue<Guid>() == batelId)!["status"]?.ToString();
         status.ShouldBe("Closed", "an edit that leaves the status out keeps the status the location already had");
     }
@@ -186,7 +186,7 @@ public class LocationCodeEndpointTests : IClassFixture<PostgresDatabaseFixture>
         await CreateLocationAsync(client, "Unidade Mercado Municipal", "MM");
 
         // Act
-        var response = await client.PostAsJsonAsync("/api/locations", LocationBody("Unidade Moema", "MM"));
+        var response = await client.PostAsJsonAsync("/api/v1/locations", LocationBody("Unidade Moema", "MM"));
 
         // Assert
         (await LocalizedResponses.CodeAsync(response)).ShouldBe("location.code_already_used", "a used location code has its own code the form can show on the code field");

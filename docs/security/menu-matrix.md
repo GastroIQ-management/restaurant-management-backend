@@ -63,6 +63,7 @@ endpoint and database tests in `tests/RestaurantManagement.Web.Tests/Menu/`.
 | M19 | A member who is allowed creates, reads, changes and deletes a category | Allowed; the location is kept when it belongs to the organization | ✅ | `MenuCategoryServiceTests.CreateAsync_WhenAccessIsAllowed_CreatesCategory`, `MenuCategoryServiceTests.CreateAsync_WhenLocationBelongsToOrganization_StoresLocationId`, `MenuCategoryServiceTests.GetByIdAsync_WhenAccessIsAllowed_ReturnsCategory`, `MenuCategoryServiceTests.UpdateAsync_WhenAccessIsAllowed_UpdatesCategory`, `MenuCategoryServiceTests.DeleteAsync_WhenAccessIsAllowed_DeletesCategory` |
 | M20 | Category lists | Ordered by sort order, then name | ✅ | `MenuCategoryOrderTests.GetAllAsync_SortOrdersTieAndDiffer_ReturnsBySortOrderThenName`, `MenuCategoryOrderTests.GetByMenuIdAsync_SortOrdersTieAndDiffer_ReturnsBySortOrderThenName` |
 | M45 | A menu or location that does not exist (edit a menu, create a category in a menu, link a menu to a location) | 404 with `menu.not_found` or `location.not_found` | ✅ | `MenuGridAccessTests.MenuAndCategoryServices_MenuOrLocationDoesNotExist_ThrowNotFoundWithTheirOwnCode` |
+| M48 | Menu or category endpoints at their unversioned paths (`/api/menus`, `/api/menu-categories`) | 404; they answer only under `/api/v1/` | ✅ | `MenuVersionedRouteTests.UnversionedPath_MenuEndpoints_Answer404` |
 
 ## 4. Input rules
 | ID | Case | Expected | Status | Test |

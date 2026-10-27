@@ -132,6 +132,12 @@
   <data name="OrganizationRequired" xml:space="preserve">
     <value>Uma organização é necessária para salvar este registro.</value>
   </data>
+  <data name="AppVersionRequired" xml:space="preserve">
+    <value>A versão do aplicativo é obrigatória nesta requisição.</value>
+  </data>
+  <data name="AppVersionInvalid" xml:space="preserve">
+    <value>A versão do aplicativo não é válida.</value>
+  </data>
   <data name="InvalidLocationId" xml:space="preserve">
     <value>O local selecionado não é válido.</value>
   </data>

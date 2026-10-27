@@ -68,7 +68,7 @@ public class MenuLocationEndpointTests : IClassFixture<PostgresDatabaseFixture>
         var client = factory.ClientFor(JoaoId, TrattoriaId);
 
         // Act
-        var response = await client.GetAsync($"/api/menus/location/{CantinaCentroId}");
+        var response = await client.GetAsync($"/api/v1/menus/location/{CantinaCentroId}");
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.NotFound, "another organization's location is answered as if it did not exist, never 403");
@@ -87,7 +87,7 @@ public class MenuLocationEndpointTests : IClassFixture<PostgresDatabaseFixture>
         var client = factory.ClientFor(AnaId, CantinaId);
 
         // Act
-        var response = await client.PostAsync($"/api/menus/{CantinaDinnerMenuId}/locations/{TrattoriaCentroId}", null);
+        var response = await client.PostAsync($"/api/v1/menus/{CantinaDinnerMenuId}/locations/{TrattoriaCentroId}", null);
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.NotFound, "another organization's location is answered as if it did not exist");
@@ -106,7 +106,7 @@ public class MenuLocationEndpointTests : IClassFixture<PostgresDatabaseFixture>
         var client = factory.ClientFor(AnaId, CantinaId);
 
         // Act
-        var response = await client.PostAsJsonAsync("/api/menus/create", new
+        var response = await client.PostAsJsonAsync("/api/v1/menus/create", new
         {
             name = "Almoço executivo",
             description = "Prato feito com arroz, feijão e bife",

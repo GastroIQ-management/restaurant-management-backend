@@ -62,7 +62,7 @@ public class VerificationEmailWorkerEndpointTests : IClassFixture<PostgresDataba
         var deadline = DateTime.UtcNow + WaitLimit;
         while (emailedCode == null && DateTime.UtcNow < deadline)
             await Task.Delay(200);
-        var response = await factory.CreateClient().PostAsJsonAsync("/api/auth/verify", new { email = MariaEmail, code = emailedCode ?? "000000" });
+        var response = await factory.CreateClient().PostAsJsonAsync("/api/v1/auth/verify", new { email = MariaEmail, code = emailedCode ?? "000000" });
 
         // Assert
         emailedCode.ShouldNotBeNull("the worker emails the queued verification request without anyone calling the processor");

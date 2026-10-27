@@ -8,7 +8,7 @@ using static RestaurantManagement.Web.Tests.InvitationWebSupport;
 namespace RestaurantManagement.Web.Tests;
 
 /// <summary>
-/// <c>PUT api/members/{userId}/access/{locationId}</c> on a real PostgreSQL database. Ana (Owner) edits Bia, a
+/// <c>PUT api/v1/members/{userId}/access/{locationId}</c> on a real PostgreSQL database. Ana (Owner) edits Bia, a
 /// Waiter at Batel; Maria is an Admin with Members = Manage at Batel and no Cashier level.
 /// </summary>
 public class MemberAccessEndpointTests : IClassFixture<PostgresDatabaseFixture>
@@ -17,7 +17,7 @@ public class MemberAccessEndpointTests : IClassFixture<PostgresDatabaseFixture>
 
     public MemberAccessEndpointTests(PostgresDatabaseFixture postgres) => _postgres = postgres;
 
-    private static string AccessUrl(Guid userId, Guid locationId) => $"/api/members/{userId}/access/{locationId}";
+    private static string AccessUrl(Guid userId, Guid locationId) => $"/api/v1/members/{userId}/access/{locationId}";
 
     [Fact]
     [Trait("Rule", "T51")]
@@ -46,13 +46,13 @@ public class MemberAccessEndpointTests : IClassFixture<PostgresDatabaseFixture>
         // Arrange
         await using var factory = await CreateFactoryAsync(_postgres);
         var bia = factory.ClientFor(BiaId, CantinaId);
-        var before = await bia.GetAsync($"/api/menus/location/{BatelId}");
+        var before = await bia.GetAsync($"/api/v1/menus/location/{BatelId}");
         var ana = factory.ClientFor(AnaId, CantinaId);
 
         // Act
         var change = await ana.PutAsJsonAsync(AccessUrl(BiaId, BatelId),
             new { roleNames = new[] { "Waiter" }, levels = new Dictionary<string, string> { ["Menus"] = "None" } });
-        var after = await bia.GetAsync($"/api/menus/location/{BatelId}");
+        var after = await bia.GetAsync($"/api/v1/menus/location/{BatelId}");
 
         // Assert
         before.StatusCode.ShouldBe(HttpStatusCode.OK);

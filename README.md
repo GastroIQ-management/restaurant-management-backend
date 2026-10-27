@@ -66,7 +66,7 @@ dotnet run --project src/RestaurantManagement.Web
 
 ```bash
 # Register
-POST /api/auth/register
+POST /api/v1/auth/register
 {
   "email": "user@example.com",
   "password": "SecurePass123!",
@@ -75,7 +75,7 @@ POST /api/auth/register
 }
 
 # Login (returns JWT token)
-POST /api/auth/login
+POST /api/v1/auth/login
 {
   "email": "user@example.com",
   "password": "SecurePass123!"
@@ -85,7 +85,7 @@ POST /api/auth/login
 ### Create Organization (Authenticated)
 
 ```bash
-POST /api/organizations/create
+POST /api/v1/organizations/create
 Authorization: Bearer <your-token>
 
 {

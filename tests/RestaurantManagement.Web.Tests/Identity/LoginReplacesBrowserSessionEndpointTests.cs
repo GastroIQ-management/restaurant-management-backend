@@ -13,7 +13,7 @@ using Xunit;
 namespace RestaurantManagement.Web.Tests;
 
 /// <summary>
-/// POST api/auth/login end to end on a real PostgreSQL database with the real session service:
+/// POST api/v1/auth/login end to end on a real PostgreSQL database with the real session service:
 /// the refresh cookie the browser already holds is revoked once the new login succeeds.
 /// </summary>
 public class LoginReplacesBrowserSessionEndpointTests : IClassFixture<PostgresDatabaseFixture>
@@ -68,7 +68,7 @@ public class LoginReplacesBrowserSessionEndpointTests : IClassFixture<PostgresDa
 
     private static HttpRequestMessage LoginWithCookie(string cookieToken)
     {
-        var request = new HttpRequestMessage(HttpMethod.Post, "/api/auth/login")
+        var request = new HttpRequestMessage(HttpMethod.Post, "/api/v1/auth/login")
         {
             Content = JsonContent.Create(new { email = Email, password = Password })
         };
