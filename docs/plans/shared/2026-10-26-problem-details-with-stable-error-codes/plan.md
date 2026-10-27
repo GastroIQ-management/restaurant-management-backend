@@ -46,7 +46,7 @@ errors 500–599), 409 "in progress" and 429 · #5 the codes appear in the OpenA
 
 ## Checklist
 - [x] T1 — Shared Problem Details answer and code catalog
-- [ ] T2 — Shared refusals name their codes
+- [x] T2 — Shared refusals name their codes
 - [ ] T3 — Host answers as Problem Details
 - [ ] T4 — Menu refusals name their codes
 - [ ] T5 — Organization refusals name their codes

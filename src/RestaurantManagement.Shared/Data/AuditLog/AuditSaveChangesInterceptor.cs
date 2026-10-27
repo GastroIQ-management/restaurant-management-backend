@@ -11,7 +11,6 @@ namespace RestaurantManagement.Shared.Data.AuditLog
 {
     public sealed class AuditSaveChangesInterceptor : SaveChangesInterceptor
     {
-        private const int ForbiddenStatusCode = 403;
         private const string TenantMismatchKey = "TenantMismatch";
         private const string OrganizationRequiredKey = "OrganizationRequired";
 
@@ -99,10 +98,10 @@ namespace RestaurantManagement.Shared.Data.AuditLog
         private void AssignOrganization(TenantEntity entity, Guid? organizationId)
         {
             if (organizationId is null)
-                throw Forbidden(OrganizationRequiredKey);
+                throw Forbidden(ErrorCodes.OrganizationRequired, OrganizationRequiredKey);
 
             if (entity.OrganizationId != Guid.Empty && entity.OrganizationId != organizationId)
-                throw Forbidden(TenantMismatchKey);
+                throw Forbidden(ErrorCodes.TenantMismatch, TenantMismatchKey);
 
             entity.OrganizationId = organizationId.Value;
         }
@@ -112,14 +111,14 @@ namespace RestaurantManagement.Shared.Data.AuditLog
         private void RequireOwnOrganization(EntityEntry<BaseEntity> entry, Guid? organizationId)
         {
             if (organizationId is null)
-                throw Forbidden(OrganizationRequiredKey);
+                throw Forbidden(ErrorCodes.OrganizationRequired, OrganizationRequiredKey);
 
             var property = entry.Property(nameof(TenantEntity.OrganizationId));
             if (!Equals(property.OriginalValue, organizationId.Value) || !Equals(property.CurrentValue, organizationId.Value))
-                throw Forbidden(TenantMismatchKey);
+                throw Forbidden(ErrorCodes.TenantMismatch, TenantMismatchKey);
         }
 
-        private BusinessException Forbidden(string messageKey)
-            => new(_localizer[messageKey].Value, ForbiddenStatusCode);
+        private BusinessException Forbidden(ErrorCode code, string messageKey)
+            => new(code, _localizer[messageKey].Value);
     }
 }

@@ -56,9 +56,9 @@ namespace RestaurantManagement.Shared.Services.AuditLog
         private void Validate(AuditLogQuery query)
         {
             if (query.From > query.To)
-                throw new BusinessException(_localizer["AuditLogInvalidDateRange"].Value, 400);
+                throw new BusinessException(ErrorCodes.AuditLogInvalidDateRange, _localizer["AuditLogInvalidDateRange"].Value);
             if (!string.IsNullOrEmpty(query.Action) && !AuditActions.All.Contains(query.Action))
-                throw new BusinessException(_localizer["AuditLogUnknownAction"].Value, 400);
+                throw new BusinessException(ErrorCodes.AuditLogUnknownAction, _localizer["AuditLogUnknownAction"].Value);
         }
 
         private static AuditLogEntryResponse MapToResponse(AuditLogEntry entry) => new()
