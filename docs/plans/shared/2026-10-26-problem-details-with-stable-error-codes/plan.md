@@ -37,12 +37,12 @@ errors 500–599), 409 "in progress" and 429 · #5 the codes appear in the OpenA
 | T8 | — | — (Swashbuckle already used) | — |
 
 ## Overall Definition of Done
-- [ ] All tasks done, tests passing
-- [ ] All Outcomes met (the backlog item's Acceptance criteria)
-- [ ] Affected tests green after the last batch; full suite green in CI (Continuous Integration)
-- [ ] No out-of-scope changes; findings in the backlog
-- [ ] Every touched module's matrix updated; `python3 .claude/scripts/check-security-matrices.py` passes
-- [ ] Backlog item only: deleted if fully solved (deletion left uncommitted for the user), or updated with what is left
+- [x] All tasks done, tests passing
+- [x] All Outcomes met (the backlog item's Acceptance criteria)
+- [x] Affected tests green after the last batch; full suite green in CI (Continuous Integration)
+- [x] No out-of-scope changes; findings in the backlog
+- [x] Every touched module's matrix updated; `python3 .claude/scripts/check-security-matrices.py` passes
+- [x] Backlog item only: deleted if fully solved (deletion left uncommitted for the user), or updated with what is left
 
 ## Checklist
 - [x] T1 — Shared Problem Details answer and code catalog
