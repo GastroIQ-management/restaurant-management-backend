@@ -327,7 +327,8 @@ namespace RestaurantManagement.Modules.Identity.Tests
             var lookup = CreateLookup(Cantina(), Trattoria());
 
             // Act
-            var response = await SelectAsync(database, lookup, userId, TrattoriaId);
+            var login = await LoginAsync(database, lookup);
+            var response = await SelectAsync(database, lookup, userId, TrattoriaId, login.RefreshToken);
 
             // Assert
             OrganizationClaimOf(response.Auth.Token).ShouldBe(TrattoriaId.ToString(), "the new token carries the organization the user chose");
@@ -344,7 +345,8 @@ namespace RestaurantManagement.Modules.Identity.Tests
             var lookup = CreateLookup(Cantina(), Trattoria());
 
             // Act
-            var response = await SelectAsync(database, lookup, userId, TrattoriaId);
+            var login = await LoginAsync(database, lookup);
+            var response = await SelectAsync(database, lookup, userId, TrattoriaId, login.RefreshToken);
 
             // Assert
             OrganizationClaimOf(response.Auth.Token).ShouldBe(TrattoriaId.ToString(), "the token carries the organization the user chose");
@@ -362,7 +364,8 @@ namespace RestaurantManagement.Modules.Identity.Tests
             var lookup = CreateLookup(Cantina());
 
             // Act
-            var response = await SelectAsync(database, lookup, userId, CantinaId);
+            var login = await LoginAsync(database, lookup);
+            var response = await SelectAsync(database, lookup, userId, CantinaId, login.RefreshToken);
 
             // Assert
             OrganizationClaimOf(response.Auth.Token).ShouldBe(CantinaId.ToString(), "a user with a single organization can choose it and gets it in the token");
@@ -377,7 +380,8 @@ namespace RestaurantManagement.Modules.Identity.Tests
             using var database = new IdentityTestDatabase();
             var userId = await SeedUserAsync(database, RolesInBothOrganizations());
             var lookup = CreateLookup(Cantina(), Trattoria());
-            var selected = await SelectAsync(database, lookup, userId, CantinaId);
+            var login = await LoginAsync(database, lookup);
+            var selected = await SelectAsync(database, lookup, userId, CantinaId, login.RefreshToken);
 
             // Act
             var refreshed = await RefreshAsync(database, lookup, selected.RefreshToken);
@@ -415,7 +419,8 @@ namespace RestaurantManagement.Modules.Identity.Tests
             using var database = new IdentityTestDatabase();
             var userId = await SeedUserAsync(database, RolesInBothOrganizations());
             var lookup = CreateLookup(Cantina(), Trattoria());
-            var first = await SelectAsync(database, lookup, userId, CantinaId);
+            var login = await LoginAsync(database, lookup);
+            var first = await SelectAsync(database, lookup, userId, CantinaId, login.RefreshToken);
             var switched = await SelectAsync(database, lookup, userId, TrattoriaId, first.RefreshToken);
 
             // Act
@@ -435,7 +440,8 @@ namespace RestaurantManagement.Modules.Identity.Tests
             using var database = new IdentityTestDatabase();
             var userId = await SeedUserAsync(database, RolesInBothOrganizations());
             var lookup = CreateLookup(Cantina(), Trattoria());
-            var selected = await SelectAsync(database, lookup, userId, TrattoriaId);
+            var login = await LoginAsync(database, lookup);
+            var selected = await SelectAsync(database, lookup, userId, TrattoriaId, login.RefreshToken);
 
             // Act
             var refreshed = await RefreshAsync(database, lookup, selected.RefreshToken);
@@ -454,7 +460,8 @@ namespace RestaurantManagement.Modules.Identity.Tests
             using var database = new IdentityTestDatabase();
             var userId = await SeedUserAsync(database, RolesInBothOrganizations());
             var lookup = CreateLookup(Cantina(), Trattoria());
-            var selected = await SelectAsync(database, lookup, userId, TrattoriaId);
+            var login = await LoginAsync(database, lookup);
+            var selected = await SelectAsync(database, lookup, userId, TrattoriaId, login.RefreshToken);
             using (var context = database.CreateContext())
             {
                 var membership = context.Set<OrganizationMember>().Single(m => m.UserId == userId && m.OrganizationId == TrattoriaId);
@@ -557,7 +564,8 @@ namespace RestaurantManagement.Modules.Identity.Tests
             using var database = new IdentityTestDatabase();
             var userId = await SeedUserAsync(database, RolesInBothOrganizations());
             var lookup = CreateLookup(Cantina(), Trattoria());
-            await SelectAsync(database, lookup, userId, CantinaId);
+            var login = await LoginAsync(database, lookup);
+            await SelectAsync(database, lookup, userId, CantinaId, login.RefreshToken);
 
             // Act
             var response = await LoginAsync(database, lookup);
@@ -575,7 +583,8 @@ namespace RestaurantManagement.Modules.Identity.Tests
             using var database = new IdentityTestDatabase();
             var userId = await SeedUserAsync(database, RolesInBothOrganizations());
             var lookup = CreateLookup(Cantina(), Trattoria());
-            await SelectAsync(database, lookup, userId, CantinaId);
+            var login = await LoginAsync(database, lookup);
+            await SelectAsync(database, lookup, userId, CantinaId, login.RefreshToken);
             var loginResponse = await LoginAsync(database, lookup);
 
             // Act
@@ -615,58 +624,6 @@ namespace RestaurantManagement.Modules.Identity.Tests
             active.OrganizationId.ShouldBe(TrattoriaId, "the new active token carries the chosen organization");
         }
 
-        // refresh-tokens-own-table Scenario 43
-        [Fact]
-        [Trait("Rule", "S8")]
-        public async Task SelectOrganizationAsync_WithoutCookie_StartsNewFamilyWithChosenOrganizationAndDevice()
-        {
-            // Arrange
-            using var database = new IdentityTestDatabase();
-            var userId = await SeedUserAsync(database, RolesInBothOrganizations());
-            var lookup = CreateLookup(Cantina(), Trattoria());
-
-            // Act
-            var selected = await SelectAsync(database, lookup, userId, CantinaId, refreshToken: null, client: TestClients.ManagerLaptop);
-
-            // Assert
-            selected.RefreshToken.ShouldNotBeNullOrWhiteSpace("without a cookie a new session is started for the chosen organization");
-            var token = (await ReadTokensAsync(database)).ShouldHaveSingleItem();
-            token.UserId.ShouldBe(userId);
-            token.OrganizationId.ShouldBe(CantinaId, "the new session carries the chosen organization");
-            token.RevokedAt.ShouldBeNull("the new session is active");
-            token.DeviceDescription.ShouldBe(TestClients.ManagerLaptop.DeviceDescription);
-            token.IpAddress.ShouldBe(TestClients.ManagerLaptop.IpAddress);
-        }
-
-        // refresh-tokens-own-table Scenario 44
-        [Fact]
-        [Trait("Rule", "S8")]
-        public async Task SelectOrganizationAsync_WithExpiredCookie_StartsNewFamilyAndLeavesExpiredTokenUnchanged()
-        {
-            // Arrange
-            using var database = new IdentityTestDatabase();
-            var userId = await SeedUserAsync(database, RolesInBothOrganizations());
-            var lookup = CreateLookup(Cantina(), Trattoria());
-            var loginResponse = await LoginAsync(database, lookup);
-            Guid expiredFamilyId;
-            using (var context = database.CreateContext())
-            {
-                var loginToken = await context.Set<RefreshToken>().SingleAsync();
-                loginToken.ExpiresAt = DateTime.UtcNow.AddMinutes(-1);
-                expiredFamilyId = loginToken.FamilyId;
-                await context.SaveChangesAsync();
-            }
-
-            // Act
-            await SelectAsync(database, lookup, userId, CantinaId, loginResponse.RefreshToken);
-
-            // Assert
-            var tokens = await ReadTokensAsync(database);
-            tokens.Count.ShouldBe(2, "an expired cookie is not reused: a new session family is started next to it");
-            tokens.Single(t => t.FamilyId == expiredFamilyId).RevokedAt.ShouldBeNull("the expired token is left unchanged");
-            tokens.Single(t => t.FamilyId != expiredFamilyId).OrganizationId.ShouldBe(CantinaId, "the new session carries the chosen organization");
-        }
-
         // refresh-tokens-own-table Scenario 45
         [Fact]
         [Trait("Rule", "S10")]
@@ -689,10 +646,88 @@ namespace RestaurantManagement.Modules.Identity.Tests
             RoleClaimsOf(refreshed.Auth.Token).ShouldBeEmpty("the tablet's token carries no role");
         }
 
-        // refresh-tokens-own-table Scenario 70
+        [Fact]
+        [Trait("Rule", "S11")]
+        public async Task SelectOrganizationAsync_SessionStarted28DaysAgo_NewTokenKeepsTheLoginTimeAndEndsAtLoginPlus30Days()
+        {
+            // Arrange
+            using var database = new IdentityTestDatabase();
+            var userId = await SeedUserAsync(database, RolesInBothOrganizations());
+            var lookup = CreateLookup(Cantina(), Trattoria());
+            var login = await LoginAsync(database, lookup);
+            var loginTime = DateTime.UtcNow.AddDays(-28);
+            using (var context = database.CreateContext())
+            {
+                var loginToken = await context.Set<RefreshToken>().SingleAsync();
+                loginToken.SessionStartedAt = loginTime;
+                loginToken.ExpiresAt = DateTime.UtcNow.AddDays(TestJwtOptions.SessionInactivityDays);
+                await context.SaveChangesAsync();
+            }
+
+            // Act
+            var selected = await SelectAsync(database, lookup, userId, TrattoriaId, login.RefreshToken);
+
+            // Assert
+            var active = (await ReadTokensAsync(database)).Single(t => t.RevokedAt == null);
+            active.SessionStartedAt.ShouldBe(loginTime, TimeSpan.FromSeconds(1), "choosing an organization keeps the original login time");
+            active.ExpiresAt.ShouldBe(loginTime.AddDays(TestJwtOptions.SessionAbsoluteDays), TimeSpan.FromSeconds(1), "the session still ends 30 days after login");
+            selected.RefreshTokenExpiresAt.ShouldBe(active.ExpiresAt, TimeSpan.FromSeconds(1), "the cookie ends with the session");
+        }
+
+        [Theory]
+        [InlineData(null)]
+        [InlineData("")]
+        [InlineData("bm90LWEtcmVhbC10b2tlbi1mb3ItY2FudGluYQ==")]
+        [Trait("Rule", "S8")]
+        public async Task SelectOrganizationAsync_NoOrUnknownCookie_ThrowsInvalidOrExpiredTokenWith401AndStoresNoToken(string? cookie)
+        {
+            // Arrange
+            using var database = new IdentityTestDatabase();
+            var userId = await SeedUserAsync(database, RolesInBothOrganizations());
+            var lookup = CreateLookup(Cantina(), Trattoria());
+
+            // Act
+            var act = () => SelectAsync(database, lookup, userId, CantinaId, cookie, TestClients.ManagerLaptop);
+
+            // Assert
+            var thrown = await Should.ThrowAsync<BusinessException>(act);
+            thrown.StatusCode.ShouldBe(UnauthorizedStatusCode, "a switch without the caller's own refresh cookie is refused with 401");
+            thrown.Message.ShouldBe("InvalidOrExpiredToken", "the refusal is the usual generic message");
+            (await ReadTokensAsync(database)).ShouldBeEmpty("a refused switch never starts a new session");
+        }
+
+        [Theory]
+        [InlineData(8, -1)]
+        [InlineData(31, 3)]
+        [Trait("Rule", "S8")]
+        public async Task SelectOrganizationAsync_IdleOrPastLimitCookie_ThrowsInvalidOrExpiredTokenWith401AndStartsNoSession(int sessionStartedDaysAgo, int expiresInDays)
+        {
+            // Arrange
+            using var database = new IdentityTestDatabase();
+            var userId = await SeedUserAsync(database, RolesInBothOrganizations());
+            var lookup = CreateLookup(Cantina(), Trattoria());
+            var login = await LoginAsync(database, lookup);
+            using (var context = database.CreateContext())
+            {
+                var loginToken = await context.Set<RefreshToken>().SingleAsync();
+                loginToken.SessionStartedAt = DateTime.UtcNow.AddDays(-sessionStartedDaysAgo);
+                loginToken.ExpiresAt = DateTime.UtcNow.AddDays(expiresInDays);
+                await context.SaveChangesAsync();
+            }
+
+            // Act
+            var act = () => SelectAsync(database, lookup, userId, CantinaId, login.RefreshToken);
+
+            // Assert
+            var thrown = await Should.ThrowAsync<BusinessException>(act);
+            thrown.StatusCode.ShouldBe(UnauthorizedStatusCode, "a cookie unused for 7 days or 30 days past login cannot switch organization");
+            var tokens = await ReadTokensAsync(database);
+            tokens.ShouldHaveSingleItem("a refused switch never starts a new session next to the old one").RevokedAt.ShouldBeNull("the refused token is left unchanged");
+        }
+
         [Fact]
         [Trait("Rule", "S6")]
-        public async Task SelectOrganizationAsync_CookieOfAnotherUser_LeavesTheirTokenUntouchedAndStartsCallerFamily()
+        public async Task SelectOrganizationAsync_CookieOfAnotherUser_ThrowsUnauthorizedAndLeavesTheirTokenUntouched()
         {
             // Arrange: Paolo's cookie is sent with Maria's access pass
             using var database = new IdentityTestDatabase();
@@ -707,18 +742,17 @@ namespace RestaurantManagement.Modules.Identity.Tests
             var lookup = CreateLookup(Cantina(), Trattoria());
 
             // Act
-            var selected = await SelectAsync(database, lookup, mariaId, CantinaId, paoloToken.Token);
+            var act = () => SelectAsync(database, lookup, mariaId, CantinaId, paoloToken.Token);
 
             // Assert
-            selected.RefreshToken.ShouldNotBe(paoloToken.Token, "another user's cookie is not rotated for the caller");
+            var thrown = await Should.ThrowAsync<BusinessException>(act);
+            thrown.StatusCode.ShouldBe(UnauthorizedStatusCode, "another user's cookie never gives the caller a session");
             var tokens = await ReadTokensAsync(database);
-            var paolos = tokens.Single(t => t.UserId == paoloId);
+            var paolos = tokens.ShouldHaveSingleItem("no token is issued for the caller");
+            paolos.UserId.ShouldBe(paoloId);
             paolos.RevokedAt.ShouldBeNull("the other user's token stays active");
             paolos.ReplacedByTokenId.ShouldBeNull("the other user's token is not replaced");
             paolos.OrganizationId.ShouldBe(DeletedOrganizationId);
-            var marias = tokens.Single(t => t.UserId == mariaId);
-            marias.FamilyId.ShouldNotBe(paoloToken.FamilyId, "the caller gets a new session family of their own");
-            marias.OrganizationId.ShouldBe(CantinaId, "the caller's new session carries the chosen organization");
         }
     }
 }

@@ -16,9 +16,15 @@ namespace RestaurantManagement.Shared.Tests
             return new JwtOptionsValidator(environment);
         }
 
-        private static JwtOptions CreateOptions(string key = StrongKey, int expireMinutes = 15)
+        private static JwtOptions CreateOptions(string key = StrongKey, int expireMinutes = 15, int inactivityDays = 7, int absoluteDays = 30)
         {
-            return new JwtOptions { Key = key, ExpireMinutes = expireMinutes };
+            return new JwtOptions
+            {
+                Key = key,
+                ExpireMinutes = expireMinutes,
+                SessionInactivityDays = inactivityDays,
+                SessionAbsoluteDays = absoluteDays
+            };
         }
 
         // Scenario 1
@@ -164,6 +170,68 @@ namespace RestaurantManagement.Shared.Tests
 
             // Assert
             result.Succeeded.Should().BeTrue("a strong key with a positive token lifetime is accepted in production");
+        }
+
+        [Theory]
+        [InlineData(0, 30, "Jwt:SessionInactivityDays")]
+        [InlineData(-1, 30, "Jwt:SessionInactivityDays")]
+        [InlineData(7, 0, "Jwt:SessionAbsoluteDays")]
+        [InlineData(7, -1, "Jwt:SessionAbsoluteDays")]
+        [Trait("Rule", "SH51")]
+        public void Validate_NonPositiveSessionLimit_FailsNamingTheSetting(int inactivityDays, int absoluteDays, string setting)
+        {
+            // Arrange
+            var sut = CreateSut(Environments.Production);
+
+            // Act
+            var result = sut.Validate(null, CreateOptions(inactivityDays: inactivityDays, absoluteDays: absoluteDays));
+
+            // Assert
+            result.Failed.Should().BeTrue("a session limit of zero or less is refused at startup");
+            result.FailureMessage.Should().Contain(setting, "the failure names the session limit to fix");
+        }
+
+        [Fact]
+        [Trait("Rule", "SH51")]
+        public void Validate_InactivityLongerThanAbsoluteLimit_FailsNamingJwtSessionInactivityDays()
+        {
+            // Arrange
+            var sut = CreateSut(Environments.Production);
+
+            // Act
+            var result = sut.Validate(null, CreateOptions(inactivityDays: 31, absoluteDays: 30));
+
+            // Assert
+            result.Failed.Should().BeTrue("a session cannot stay idle longer than it may live in total");
+            result.FailureMessage.Should().Contain("Jwt:SessionInactivityDays", "the failure names the inactivity limit");
+        }
+
+        [Fact]
+        [Trait("Rule", "SH51")]
+        public void Validate_InactivityEqualToAbsoluteLimit_Succeeds()
+        {
+            // Arrange
+            var sut = CreateSut(Environments.Production);
+
+            // Act
+            var result = sut.Validate(null, CreateOptions(inactivityDays: 30, absoluteDays: 30));
+
+            // Assert
+            result.Succeeded.Should().BeTrue("equal inactivity and absolute limits are accepted");
+        }
+
+        [Fact]
+        [Trait("Rule", "SH51")]
+        public void Validate_SevenDaysInactivityAndThirtyDaysAbsolute_Succeeds()
+        {
+            // Arrange
+            var sut = CreateSut(Environments.Production);
+
+            // Act
+            var result = sut.Validate(null, CreateOptions(inactivityDays: 7, absoluteDays: 30));
+
+            // Assert
+            result.Succeeded.Should().BeTrue("the shipped limits of 7 and 30 days are accepted");
         }
     }
 }

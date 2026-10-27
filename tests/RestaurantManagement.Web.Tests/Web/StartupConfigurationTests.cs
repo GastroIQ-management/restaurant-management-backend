@@ -127,6 +127,44 @@ public class StartupConfigurationTests : IDisposable
         error.ToString().ShouldContain("Jwt:ExpireMinutes", Case.Sensitive, "the app must refuse to start when the access token lifetime is not positive, and the error must name the setting to fix");
     }
 
+    [Theory]
+    [InlineData("Jwt:SessionInactivityDays", "0")]
+    [InlineData("Jwt:SessionInactivityDays", "-3")]
+    [InlineData("Jwt:SessionAbsoluteDays", "0")]
+    [InlineData("Jwt:SessionAbsoluteDays", "-3")]
+    [Trait("Rule", "T4")]
+    [Trait("Rule", "W18")]
+    public void Startup_NonPositiveSessionLimit_FailsNamingTheSetting(string setting, string days)
+    {
+        // Arrange
+        var factory = CreateFactory(Environments.Development, new() { [setting] = days });
+
+        // Act
+        var error = StartupFailure.Capture(factory);
+
+        // Assert
+        error.ToString().ShouldContain(setting, Case.Sensitive, "the app must refuse to start when a session limit is not positive, and the error must name the setting to fix");
+    }
+
+    [Fact]
+    [Trait("Rule", "T4")]
+    [Trait("Rule", "W18")]
+    public void Startup_SessionInactivityAboveAbsoluteLimit_FailsNamingJwtSessionInactivityDays()
+    {
+        // Arrange
+        var factory = CreateFactory(Environments.Development, new()
+        {
+            ["Jwt:SessionInactivityDays"] = "31",
+            ["Jwt:SessionAbsoluteDays"] = "30"
+        });
+
+        // Act
+        var error = StartupFailure.Capture(factory);
+
+        // Assert
+        error.ToString().ShouldContain("Jwt:SessionInactivityDays", Case.Sensitive, "the app must refuse to start when the inactivity limit is longer than the absolute limit, and the error must name the setting to fix");
+    }
+
     // Scenario 17
     [Theory]
     [InlineData("1.5")]

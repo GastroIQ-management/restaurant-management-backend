@@ -283,7 +283,7 @@ namespace RestaurantManagement.Modules.Identity.Tests
 
             // Assert
             result.RefreshToken.ShouldNotBeNullOrWhiteSpace("a login issues a refresh token");
-            result.RefreshTokenExpiresAt.ShouldBe(DateTime.UtcNow.AddDays(TestJwtOptions.RefreshTokenExpireDays), TimeSpan.FromMinutes(1));
+            result.RefreshTokenExpiresAt.ShouldBe(DateTime.UtcNow.AddDays(TestJwtOptions.SessionInactivityDays), TimeSpan.FromMinutes(1));
             var token = (await ReadTokensAsync(database)).ShouldHaveSingleItem();
             token.UserId.ShouldBe(userId, "the login stores one refresh token for the user");
             token.OrganizationId.ShouldBeNull();
@@ -401,7 +401,7 @@ namespace RestaurantManagement.Modules.Identity.Tests
         // Scenario 40
         [Fact]
         [Trait("Rule", "F1")]
-        public async Task RefreshTokenAsync_ActiveToken_NewTokenExpiresInRefreshTokenExpireDays()
+        public async Task RefreshTokenAsync_ActiveToken_NewTokenExpiresInSessionInactivityDays()
         {
             // Arrange
             using var database = new IdentityTestDatabase();
@@ -412,7 +412,28 @@ namespace RestaurantManagement.Modules.Identity.Tests
             var result = await RefreshAsync(database, issued.Token);
 
             // Assert
-            result.RefreshTokenExpiresAt.ShouldBe(DateTime.UtcNow.AddDays(TestJwtOptions.RefreshTokenExpireDays), TimeSpan.FromMinutes(1));
+            result.RefreshTokenExpiresAt.ShouldBe(DateTime.UtcNow.AddDays(TestJwtOptions.SessionInactivityDays), TimeSpan.FromMinutes(1));
+        }
+
+        [Fact]
+        [Trait("Rule", "F12")]
+        public async Task RefreshTokenAsync_SessionStartedOver30DaysAgoWithUnexpiredToken_ThrowsInvalidOrExpiredToken401()
+        {
+            // Arrange
+            using var database = new IdentityTestDatabase();
+            var userId = await SeedUserAsync(database);
+            var issued = await IssueTokenAsync(database, userId);
+            using (var context = database.CreateContext())
+            {
+                var token = await context.Set<RefreshToken>().SingleAsync();
+                token.SessionStartedAt = DateTime.UtcNow.AddDays(-31);
+                token.ExpiresAt = DateTime.UtcNow.AddDays(3);
+                await context.SaveChangesAsync();
+            }
+
+            // Act + Assert
+            await AssertRefreshRejectedAsync(database, issued.Token);
+            (await ReadTokensAsync(database)).ShouldHaveSingleItem().RevokedAt.ShouldBeNull("a session past its 30 days is refused like an expired one: nothing is revoked");
         }
 
         [Fact]

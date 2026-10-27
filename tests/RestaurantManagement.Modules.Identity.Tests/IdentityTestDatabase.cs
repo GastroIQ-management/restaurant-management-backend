@@ -95,11 +95,12 @@ namespace RestaurantManagement.Modules.Identity.Tests
 
     /// <summary>
     /// JWT (JSON Web Token) settings shared by the session and refresh token tests:
-    /// access passes last 60 minutes, refresh tokens 30 days.
+    /// access passes last 60 minutes, a session ends after 7 days unused or 30 days after login.
     /// </summary>
     public static class TestJwtOptions
     {
-        public const int RefreshTokenExpireDays = 30;
+        public const int SessionInactivityDays = 7;
+        public const int SessionAbsoluteDays = 30;
 
         public static IOptions<JwtOptions> Create()
         {
@@ -109,7 +110,8 @@ namespace RestaurantManagement.Modules.Identity.Tests
                 Issuer = "RestaurantManagementTests",
                 Audience = "RestaurantManagementTests",
                 ExpireMinutes = 60,
-                RefreshTokenExpireDays = RefreshTokenExpireDays
+                SessionInactivityDays = SessionInactivityDays,
+                SessionAbsoluteDays = SessionAbsoluteDays
             });
         }
     }

@@ -60,7 +60,10 @@ public class ShippedLimitsTests
 
         // Assert
         jwt.ExpireMinutes.ShouldBe(15, "an access token lasts 15 minutes");
-        jwt.RefreshTokenExpireDays.ShouldBe(30, "a refresh token lasts 30 days");
+        Shipped["Jwt:SessionInactivityDays"].ShouldBe("7", "the shipped file sets the inactivity limit itself: a session unused for 7 days ends");
+        Shipped["Jwt:SessionAbsoluteDays"].ShouldBe("30", "the shipped file sets the absolute limit itself: a session ends 30 days after login");
+        jwt.SessionInactivityDays.ShouldBe(7, "a session not refreshed for 7 days ends");
+        jwt.SessionAbsoluteDays.ShouldBe(30, "a session ends 30 days after its login whatever its use");
     }
 
     [Theory]

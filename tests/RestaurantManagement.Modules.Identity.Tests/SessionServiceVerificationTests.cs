@@ -30,7 +30,8 @@ namespace RestaurantManagement.Modules.Identity.Tests
                 Issuer = "RestaurantManagementTests",
                 Audience = "RestaurantManagementTests",
                 ExpireMinutes = 60,
-                RefreshTokenExpireDays = 30
+                SessionInactivityDays = 7,
+                SessionAbsoluteDays = 30
             });
         }
 

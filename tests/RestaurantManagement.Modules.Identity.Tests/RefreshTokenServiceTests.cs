@@ -86,6 +86,18 @@ namespace RestaurantManagement.Modules.Identity.Tests
             await context.SaveChangesAsync();
         }
 
+        private static async Task SetSessionOfAllTokensAsync(IdentityTestDatabase database, DateTime sessionStartedAt, DateTime expiresAt)
+        {
+            using var context = database.CreateContext();
+            var tokens = await context.Set<RefreshToken>().ToListAsync();
+            tokens.ForEach(t =>
+            {
+                t.SessionStartedAt = sessionStartedAt;
+                t.ExpiresAt = expiresAt;
+            });
+            await context.SaveChangesAsync();
+        }
+
         // Scenario 9
         [Fact]
         [Trait("Rule", "F2")]
@@ -214,7 +226,7 @@ namespace RestaurantManagement.Modules.Identity.Tests
             token.RevokedAt.ShouldBeNull("a new sign-in token is active");
             token.DeviceDescription.ShouldBe(TabletDevice, "the sign-in records which device was used");
             token.IpAddress.ShouldBe(TabletIp, "the sign-in records the IP address of the device");
-            token.ExpiresAt.ShouldBe(DateTime.UtcNow.AddDays(TestJwtOptions.RefreshTokenExpireDays), TimeSpan.FromMinutes(1));
+            token.ExpiresAt.ShouldBe(DateTime.UtcNow.AddDays(TestJwtOptions.SessionInactivityDays), TimeSpan.FromMinutes(1));
             issued.ExpiresAt.ShouldBe(token.ExpiresAt, TimeSpan.FromSeconds(1));
         }
 
@@ -294,7 +306,7 @@ namespace RestaurantManagement.Modules.Identity.Tests
         // Scenario 20
         [Fact]
         [Trait("Rule", "F1")]
-        public async Task RotateAsync_ActiveToken_ReturnsNewTokenActiveInSameFamilyWithRenewedExpiry()
+        public async Task RotateAsync_ActiveToken_ReturnsNewTokenActiveInSameFamilyWithInactivityExpiry()
         {
             // Arrange
             using var database = await CreateDatabaseWithUsersAsync();
@@ -308,7 +320,7 @@ namespace RestaurantManagement.Modules.Identity.Tests
             rotated.Token.ShouldNotBe(issued.Token, "rotation issues a different token");
             rotated.FamilyId.ShouldBe(issued.FamilyId, "the new token stays in the same session family");
             rotated.UserId.ShouldBe(MariaId);
-            rotated.ExpiresAt.ShouldBe(DateTime.UtcNow.AddDays(TestJwtOptions.RefreshTokenExpireDays), TimeSpan.FromMinutes(1));
+            rotated.ExpiresAt.ShouldBe(DateTime.UtcNow.AddDays(TestJwtOptions.SessionInactivityDays), TimeSpan.FromMinutes(1));
             var newToken = await ReadFamilyMemberAsync(database, issued.FamilyId, active: true);
             newToken.TokenHash.ShouldNotBe(rotated.Token, "the new token is stored only as a fingerprint");
         }
@@ -464,6 +476,133 @@ namespace RestaurantManagement.Modules.Identity.Tests
             token.RevokedAt.ShouldBeNull("the other user's token stays active");
             token.ReplacedByTokenId.ShouldBeNull("the other user's token is not replaced");
             token.OrganizationId.ShouldBe(TrattoriaOrganizationId);
+        }
+
+        [Fact]
+        [Trait("Rule", "F13")]
+        public async Task IssueAsync_NewSignIn_StoresTheLoginTime()
+        {
+            // Arrange
+            using var database = await CreateDatabaseWithUsersAsync();
+
+            // Act
+            await IssueAsync(database, MariaId);
+
+            // Assert
+            var token = (await ReadTokensAsync(database)).ShouldHaveSingleItem();
+            token.SessionStartedAt.ShouldBe(DateTime.UtcNow, TimeSpan.FromMinutes(1), "a sign-in records the login time that ends the session 30 days later");
+        }
+
+        [Fact]
+        [Trait("Rule", "F13")]
+        public async Task RotateAsync_SessionStartedTenDaysAgo_ReplacementKeepsTheLoginTime()
+        {
+            // Arrange
+            using var database = await CreateDatabaseWithUsersAsync();
+            var issued = await IssueAsync(database, MariaId);
+            var loginTime = DateTime.UtcNow.AddDays(-10);
+            await SetSessionOfAllTokensAsync(database, loginTime, DateTime.UtcNow.AddDays(TestJwtOptions.SessionInactivityDays));
+
+            // Act
+            await RotateAsync(database, issued.Token);
+
+            // Assert
+            var replacement = await ReadFamilyMemberAsync(database, issued.FamilyId, active: true);
+            replacement.SessionStartedAt.ShouldBe(loginTime, TimeSpan.FromSeconds(1), "a refresh keeps the original login time, it never restarts the 30 days");
+        }
+
+        [Fact]
+        [Trait("Rule", "F13")]
+        public async Task RotateAsync_SessionStarted28DaysAgo_ReplacementExpiresAtLoginPlus30Days()
+        {
+            // Arrange
+            using var database = await CreateDatabaseWithUsersAsync();
+            var issued = await IssueAsync(database, MariaId);
+            var loginTime = DateTime.UtcNow.AddDays(-28);
+            await SetSessionOfAllTokensAsync(database, loginTime, DateTime.UtcNow.AddDays(TestJwtOptions.SessionInactivityDays));
+
+            // Act
+            var rotated = await RotateAsync(database, issued.Token);
+
+            // Assert
+            var sessionEnd = loginTime.AddDays(TestJwtOptions.SessionAbsoluteDays);
+            rotated.ShouldNotBeNull("a session still inside its 30 days can refresh");
+            rotated.ExpiresAt.ShouldBe(sessionEnd, TimeSpan.FromSeconds(1), "the new token expires at the session end, not 7 days from now");
+            (await ReadFamilyMemberAsync(database, issued.FamilyId, active: true)).ExpiresAt.ShouldBe(sessionEnd, TimeSpan.FromSeconds(1), "the stored expiry is capped at login plus 30 days");
+        }
+
+        [Fact]
+        [Trait("Rule", "F13")]
+        public async Task RotateAsync_RotatedTwiceNearSessionEnd_SessionEndDoesNotMove()
+        {
+            // Arrange
+            using var database = await CreateDatabaseWithUsersAsync();
+            var issued = await IssueAsync(database, MariaId);
+            var loginTime = DateTime.UtcNow.AddDays(-28);
+            await SetSessionOfAllTokensAsync(database, loginTime, DateTime.UtcNow.AddDays(TestJwtOptions.SessionInactivityDays));
+            var first = await RotateAsync(database, issued.Token);
+
+            // Act
+            var second = await RotateAsync(database, first!.Token);
+
+            // Assert
+            var sessionEnd = loginTime.AddDays(TestJwtOptions.SessionAbsoluteDays);
+            first.ExpiresAt.ShouldBe(sessionEnd, TimeSpan.FromSeconds(1), "the first refresh ends the session at login plus 30 days");
+            second.ShouldNotBeNull("the session is still inside its 30 days");
+            second.ExpiresAt.ShouldBe(sessionEnd, TimeSpan.FromSeconds(1), "refreshing never moves the session end");
+        }
+
+        [Fact]
+        [Trait("Rule", "F11")]
+        public async Task RotateAsync_TokenIdleForEightDays_ReturnsNullWithoutRevokingIt()
+        {
+            // Arrange
+            using var database = await CreateDatabaseWithUsersAsync();
+            var issued = await IssueAsync(database, MariaId);
+            await SetSessionOfAllTokensAsync(database, DateTime.UtcNow.AddDays(-8), DateTime.UtcNow.AddMinutes(-1));
+
+            // Act
+            var rotated = await RotateAsync(database, issued.Token);
+
+            // Assert
+            rotated.ShouldBeNull("a session unused for 7 days is refused");
+            (await ReadTokensAsync(database)).ShouldHaveSingleItem().RevokedAt.ShouldBeNull("an idle token is refused like an expired one: nothing is revoked");
+        }
+
+        [Fact]
+        [Trait("Rule", "F12")]
+        public async Task RotateAsync_SessionStartedOver30DaysAgoWithUnexpiredToken_ReturnsNullWithoutRevokingIt()
+        {
+            // Arrange
+            using var database = await CreateDatabaseWithUsersAsync();
+            var issued = await IssueAsync(database, MariaId);
+            await SetSessionOfAllTokensAsync(database, DateTime.UtcNow.AddDays(-30).AddMinutes(-1), DateTime.UtcNow.AddDays(3));
+
+            // Act
+            var rotated = await RotateAsync(database, issued.Token);
+
+            // Assert
+            rotated.ShouldBeNull("a session is refused 30 days after login, even when the token itself has not expired");
+            (await ReadTokensAsync(database)).ShouldHaveSingleItem().RevokedAt.ShouldBeNull("a session past its limit is refused like an expired one: nothing is revoked");
+        }
+
+        [Fact]
+        [Trait("Rule", "F12")]
+        public async Task RotateAsync_RotatedTokenOfSessionPastItsLimit_ReturnsNullAndDoesNotRevokeTheFamily()
+        {
+            // Arrange
+            using var database = await CreateDatabaseWithUsersAsync();
+            var issued = await IssueAsync(database, MariaId);
+            await RotateAsync(database, issued.Token);
+            await SetSessionOfAllTokensAsync(database, DateTime.UtcNow.AddDays(-31), DateTime.UtcNow.AddDays(1));
+
+            // Act
+            var reused = await RotateAsync(database, issued.Token);
+
+            // Assert
+            reused.ShouldBeNull("a token of a session past its limit is refused");
+            var family = (await ReadTokensAsync(database)).Where(t => t.FamilyId == issued.FamilyId).ToList();
+            family.ShouldNotContain(t => t.RevocationReason == RefreshToken.ReasonReuseDetected, "the session limit check runs before reuse detection, so the family is not marked as reused");
         }
     }
 }

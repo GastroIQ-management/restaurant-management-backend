@@ -188,7 +188,7 @@ public class RefreshTokensTableTests : IClassFixture<PostgresDatabaseFixture>
     {
         // Arrange
         var options = await CreateOptionsAsync();
-        var jwtOptions = Options.Create(new JwtOptions { RefreshTokenExpireDays = 30 });
+        var jwtOptions = Options.Create(new JwtOptions { SessionInactivityDays = 7, SessionAbsoluteDays = 30 });
         string rawToken;
         await using (var setupContext = new IdentityDbContext(options))
         {
@@ -231,5 +231,21 @@ public class RefreshTokensTableTests : IClassFixture<PostgresDatabaseFixture>
 
         // Assert
         service.ShouldBeOfType<RefreshTokenService>("the app must use the real refresh token service, or sessions would not work");
+    }
+
+    [Fact]
+    [Trait("Rule", "D35")]
+    public async Task Migrate_CleanDatabase_RefreshTokensLoginTimeColumnIsRequired()
+    {
+        // Arrange
+        await using var context = new IdentityDbContext(await CreateOptionsAsync());
+        await context.Database.MigrateAsync();
+
+        // Act
+        var isNullable = await ReadScalarAsync(context,
+            "SELECT is_nullable FROM information_schema.columns WHERE table_name = 'refresh_tokens' AND column_name = 'session_started_at'");
+
+        // Assert
+        isNullable.ShouldBe("NO", "every session must record when its login happened, or the 30-day limit could not be checked");
     }
 }
