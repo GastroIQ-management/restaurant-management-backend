@@ -6,6 +6,8 @@ namespace RestaurantManagement.Modules.Menu.Models
 {
     public class CreateMenuCategoryRequest
     {
+        [RequiredId(ErrorMessage = "RequiredAttribute_ValidationError")]
+        [JsonConverter(typeof(LenientGuidConverter))]
         public Guid Id { get; set; }
 
         [RequiredId(ErrorMessage = "RequiredAttribute_ValidationError")]

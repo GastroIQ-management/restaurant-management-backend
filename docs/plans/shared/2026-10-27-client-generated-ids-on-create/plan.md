@@ -37,8 +37,8 @@
 
 ## Checklist
 - [x] T1 — Shared "ID already used" code and primary key clash check
-- [ ] T2 — Menu create takes the client's ID
-- [ ] T3 — Menu category create takes the client's ID
+- [x] T2 — Menu create takes the client's ID
+- [x] T3 — Menu category create takes the client's ID
 - [ ] T4 — Location create takes the client's ID
 - [ ] T5 — Organization create takes the client's ID
 - [ ] T6 — Role create takes the client's ID
