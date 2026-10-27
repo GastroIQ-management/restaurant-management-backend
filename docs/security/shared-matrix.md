@@ -89,7 +89,7 @@ database tests in `tests/RestaurantManagement.Web.Tests/Shared/`.
 | SH67 | The same refused write sent by an anonymous and by a signed-in caller | The same status and body: the check runs before sign-in | ✅ | `AppVersionEndpointTests.Write_WithoutAppVersion_AnonymousAndSignedInCallersGetTheSameAnswer` |
 | SH68 | The refusal of a write from an allowed browser origin | Carries the cross-origin permission headers, so the page can read it (the check runs after CORS) | ✅ | `AppVersionEndpointTests.Write_WithoutAppVersionFromAllowedOrigin_RefusalCanBeReadByTheBrowser` |
 | SH69 | The title of the app version refusal | In English, Portuguese or French as asked; the code is never translated | ✅ | `AppVersionEndpointTests.Write_WithoutAppVersion_TitleFollowsTheLanguageAndCodeStaysTheSame` |
-| SH70 | The audit log at its unversioned path `/api/audit-log` | 404; it answers only under `/api/v1/audit-log` | ❌ | `AuditLogVersionedRouteTests.UnversionedPath_AuditLog_Answers404` |
+| SH70 | The audit log at its unversioned path `/api/audit-log` | 404; it answers only under `/api/v1/audit-log` | ✅ | `AuditLogVersionedRouteTests.UnversionedPath_AuditLog_Answers404` |
 
 ## 6. Configuration checks
 | ID | Case | Expected | Status | Test |

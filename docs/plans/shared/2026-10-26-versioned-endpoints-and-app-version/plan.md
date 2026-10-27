@@ -39,7 +39,7 @@ least 30 days after the next one ships · #4 the OpenAPI document is published p
 
 ## Checklist
 - [x] T1 — Writes require the app version header
-- [ ] T2 — Audit log under `/api/v1/`
+- [x] T2 — Audit log under `/api/v1/`
 - [ ] T3 — Organization endpoints under `/api/v1/`
 - [ ] T4 — Menu endpoints under `/api/v1/`
 - [ ] T5 — Identity endpoints and refresh cookie under `/api/v1/`
