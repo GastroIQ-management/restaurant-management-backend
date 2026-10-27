@@ -56,7 +56,7 @@ namespace RestaurantManagement.Modules.Organization.Services
         {
             var userExists = await _memberAccess.UserExistsAsync(ownerUserId);
             if (!userExists)
-                throw new BusinessException(_localizer["UserNotFound"].Value, 401);
+                throw new BusinessException(ErrorCodes.Unauthorized, _localizer["UserNotFound"].Value);
 
             // Get user's organization IDs from Identity module
             var userOrgIds = await _memberAccess.GetOrganizationIdsForUserAsync(ownerUserId);
@@ -75,7 +75,7 @@ namespace RestaurantManagement.Modules.Organization.Services
 
             if (hasTrialOrg)
             {
-                throw new BusinessException(_localizer["TrialOrganizationsCannotCreateNew"].Value, 400);
+                throw new BusinessException(OrganizationErrorCodes.TrialLimitReached, _localizer["TrialOrganizationsCannotCreateNew"].Value);
             }
 
             using var tx = await _orgDb.Database.BeginTransactionAsync();
@@ -191,17 +191,17 @@ namespace RestaurantManagement.Modules.Organization.Services
         public async Task<OrganizationResponse> EditOrganizationAsync(Guid userId, EditOrganizationRequest request)
         {
             var organizationId = _tenantContext.OrganizationId
-                ?? throw new BusinessException(_localizer["OrganizationRequired"].Value, 403);
+                ?? throw new BusinessException(ErrorCodes.OrganizationRequired, _localizer["OrganizationRequired"].Value);
 
             // 1. check if organiztion exists and get it
             var organization = await _orgDb.Organizations.FirstOrDefaultAsync(org => org.Id == organizationId);
             if (organization == null)
-                throw new BusinessException(_localizer["OrganizationNotFound"].Value, 404);
+                throw new BusinessException(ErrorCodes.OrganizationNotFound, _localizer["OrganizationNotFound"].Value);
 
             // 2. Get the organiztion settings
             var organizationSettings = await _orgDb.OrganizationSettings.FirstOrDefaultAsync(orgS => orgS.OrganizationId == organizationId);
             if (organizationSettings == null)
-                throw new BusinessException(_localizer["OrganizationSettingsNotFound"].Value, 404);
+                throw new BusinessException(OrganizationErrorCodes.SettingsNotFound, _localizer["OrganizationSettingsNotFound"].Value);
 
             // 3. Only the Owner may edit the organization and its settings
             await _accessGuard.RequireOwnerAsync();
@@ -262,7 +262,7 @@ namespace RestaurantManagement.Modules.Organization.Services
         {
             var userExists = await _memberAccess.UserExistsAsync(userId);
             if (!userExists)
-                throw new BusinessException(_localizer["UserNotFound"].Value, 401);
+                throw new BusinessException(ErrorCodes.Unauthorized, _localizer["UserNotFound"].Value);
 
             // Get organization IDs from Identity module
             var orgIds = await _memberAccess.GetOrganizationIdsForUserAsync(userId);

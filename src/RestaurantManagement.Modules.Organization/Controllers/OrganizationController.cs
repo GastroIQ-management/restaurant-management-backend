@@ -64,7 +64,7 @@ namespace RestaurantManagement.Modules.Organization.Controllers
             {
                 return userId;
             }
-            throw new BusinessException(_localizer["UnauthorizedMessage"].Value, 401);
+            throw new BusinessException(ErrorCodes.Unauthorized, _localizer["UnauthorizedMessage"].Value);
         }
     }
 }
