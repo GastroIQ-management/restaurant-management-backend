@@ -44,7 +44,7 @@ least 30 days after the next one ships · #4 the OpenAPI document is published p
 - [x] T4 — Menu endpoints under `/api/v1/`
 - [x] T5 — Identity endpoints and refresh cookie under `/api/v1/`
 - [x] T6 — One OpenAPI document per version, route guard and version rules
-- [ ] T7 — OpenAPI declares the app version header on writes
+- [x] T7 — OpenAPI declares the app version header on writes
 
 ## Assumptions
 - URL path versioning written in each controller's `[Route]`, with no versioning library (no `Asp.Versioning`): a version is a route prefix plus its own OpenAPI document, enough to serve two versions side by side
