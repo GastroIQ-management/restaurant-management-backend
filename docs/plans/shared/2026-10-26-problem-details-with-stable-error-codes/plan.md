@@ -40,6 +40,7 @@ errors 500–599), 409 "in progress" and 429 · #5 the codes appear in the OpenA
 - [x] All tasks done, tests passing
 - [x] All Outcomes met (the backlog item's Acceptance criteria)
 - [x] Affected tests green after the last batch
+- [ ] Full suite green in CI (Continuous Integration)
 - [x] No out-of-scope changes; findings in the backlog
 - [x] Every touched module's matrix updated; `python3 .claude/scripts/check-security-matrices.py` passes
 - [x] Backlog item only: deleted if fully solved (deletion left uncommitted for the user), or updated with what is left
