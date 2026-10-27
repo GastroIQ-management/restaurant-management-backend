@@ -1,6 +1,6 @@
 # Plan: Problem Details with stable error codes
 
-**Source:** backlog/offline/2026-10-26-problem-details-with-stable-error-codes.md   **Date:** 2026-10-26   **Status:** In progress
+**Source:** backlog/offline/2026-10-26-problem-details-with-stable-error-codes.md   **Date:** 2026-10-26   **Status:** Done
 **Risk:** High — new Shared contract: every error body of every endpoint changes shape, sign-in refusals included; no data or schema change
 
 ## Summary
@@ -37,12 +37,13 @@ errors 500–599), 409 "in progress" and 429 · #5 the codes appear in the OpenA
 | T8 | — | — (Swashbuckle already used) | — |
 
 ## Overall Definition of Done
-- [ ] All tasks done, tests passing
-- [ ] All Outcomes met (the backlog item's Acceptance criteria)
-- [ ] Affected tests green after the last batch; full suite green in CI (Continuous Integration)
-- [ ] No out-of-scope changes; findings in the backlog
-- [ ] Every touched module's matrix updated; `python3 .claude/scripts/check-security-matrices.py` passes
-- [ ] Backlog item only: deleted if fully solved (deletion left uncommitted for the user), or updated with what is left
+- [x] All tasks done, tests passing
+- [x] All Outcomes met (the backlog item's Acceptance criteria)
+- [x] Affected tests green after the last batch
+- [ ] Full suite green in CI (Continuous Integration)
+- [x] No out-of-scope changes; findings in the backlog
+- [x] Every touched module's matrix updated; `python3 .claude/scripts/check-security-matrices.py` passes
+- [x] Backlog item only: deleted if fully solved (deletion left uncommitted for the user), or updated with what is left
 
 ## Checklist
 - [x] T1 — Shared Problem Details answer and code catalog
@@ -53,7 +54,7 @@ errors 500–599), 409 "in progress" and 429 · #5 the codes appear in the OpenA
 - [x] T6 — Identity sign-in and account refusals name their codes
 - [x] T7 — Identity members, roles and invitations refusals name their codes
 - [x] T8 — Error codes and retry rule in the OpenAPI document
-- [ ] T9 — Remove the code-less error constructor
+- [x] T9 — Remove the code-less error constructor
 
 ## Assumptions
 - `title` holds the localized message (today's `message`); `detail` only holds the Development-only exception text on 500 — RFC 9457 `title` is the per-problem summary, one per code

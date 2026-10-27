@@ -144,6 +144,6 @@ namespace RestaurantManagement.Modules.Identity.Services.Passwords
             => user.PasswordResetLockedUntil.HasValue && user.PasswordResetLockedUntil > DateTime.UtcNow;
 
         private BusinessException InvalidRequest()
-            => new(_localizer["InvalidEmailOrResetCode"].Value, 401);
+            => new(ErrorCodes.Unauthorized, _localizer["InvalidEmailOrResetCode"].Value);
     }
 }
