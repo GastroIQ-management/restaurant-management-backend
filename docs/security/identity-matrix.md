@@ -43,7 +43,7 @@ passwords keep the uppercase, digit and symbol rule (R7, R8; ASVS V6.2.5) · no 
 sessions: logout-all is enough (O5; ASVS V7.5.2) · passwords over 72 bytes are refused, so 64
 accented or non-Latin characters may not fit (R6, T7; bcrypt limit, ASVS V6.2.9).
 
-## 1. Register: `POST /api/auth/register` (public)
+## 1. Register: `POST /api/v1/auth/register` (public)
 | ID | Case | Expected | Status | Test |
 |---|---|---|---|---|
 | R1 | Valid data | 200; user saved active and unverified; 6-digit code emailed | ✅ | `RegistrationServiceTests.RegisterAsync_ValidRequest_SendsVerificationEmailWithFirstNameAndConfiguredExpiry`, `RegistrationServiceTests.RegisterAsync_EmailSendingFails_StillCreatesUnverifiedUser` |
@@ -64,7 +64,7 @@ accented or non-Latin characters may not fit (R6, T7; bcrypt limit, ASVS V6.2.9)
 | R16 | A new account is registered | Its verification email is in the language of the registration request (en, pt or fr), English for any other | ✅ | `RegistrationEmailLanguageTests.RegisterAsync_RequestCulture_SendsVerificationEmailInThatLanguage` |
 | R17 | Email already registered | 400 `registration.email_already_registered` | ✅ | `RegistrationServiceTests.RegisterAsync_EmailAlreadyRegistered_ThrowsEmailAlreadyRegisteredCode` |
 
-## 2. Verify email: `POST /api/auth/verify` (public)
+## 2. Verify email: `POST /api/v1/auth/verify` (public)
 | ID | Case | Expected | Status | Test |
 |---|---|---|---|---|
 | V1 | Correct code | 200; user verified; code used; failed-attempt counter reset | ✅ | `VerificationServiceTests.VerifyEmailAsync_ValidCode_MarksUserVerifiedAndCodeUsed`, `VerificationServiceTests.VerifyEmailAsync_SuccessAfterPriorFailures_ResetsVerificationFailedAttempts`, `AuthControllerTests.VerifyEmail_ValidRequest_ReturnsOkWithMessageBody`, `VerificationServiceTests.VerifyEmailAsync_CodeNotYetExpired_MarksUserVerified`, `VerificationServiceTests.VerifyEmailAsync_CorrectCodeAfterFailuresBelowMax_MarksUserVerified`, `VerificationServiceTests.VerifyEmailAsync_CorrectCodeOnFirstAttempt_MarksUserVerified` |
@@ -80,7 +80,7 @@ accented or non-Latin characters may not fit (R6, T7; bcrypt limit, ASVS V6.2.9)
 | V11 | Locked account compared with an unknown email, on verify (resend: see RS1) | Same status and body for both; verify runs the same code lookup for a locked account, so the answer takes the same time | ✅ | `VerificationServiceTests.VerifyEmailAsync_LockedAccountAndUnknownEmail_ReturnSameStatusAndMessage`, `VerificationServiceTests.VerifyEmailAsync_LockedAccountWithCorrectCode_RunsTheCodeLookupLikeAnUnknownEmail` |
 | V12 | Unknown email and wrong code | Both 401 `auth.invalid_code` | ✅ | `VerificationServiceTests.VerifyEmailAsync_UnknownEmailAndWrongCode_BothThrowTheInvalidCodeCode` |
 
-## 3. Resend verification: `POST /api/auth/resend-verification` (public)
+## 3. Resend verification: `POST /api/v1/auth/resend-verification` (public)
 | ID | Case | Expected | Status | Test |
 |---|---|---|---|---|
 | RS1 | Any email: unknown, already verified, locked, within the 60 s wait, or eligible | Same status (200) and same body; the request never reveals the account state | ✅ | `VerificationResendEndpointTests.ResendVerification_EveryAccountState_ReturnsTheSameStatusAndBody`, `AuthControllerTests.ResendVerification_ValidRequest_ReturnsOkWithMessageBody` |
@@ -96,11 +96,11 @@ accented or non-Latin characters may not fit (R6, T7; bcrypt limit, ASVS V6.2.9)
 | RS11 | Sending the verification email: send fails | The failure is logged with the user ID, never the email address or the code | ✅ | `VerificationEmailProcessorTests.ProcessDueAsync_SendFails_LogsTheUserIdAndNeverTheEmailAddressOrCode` |
 | RS12 | Sending the verification email to a user with a preferred language, and to one with none | The email is in the user's language; with none stored it is in English (a background job has no request to read a language from) | ✅ | `VerificationEmailProcessorTests.ProcessDueAsync_UserWithPreferredLanguage_EmailsInThatLanguage`, `VerificationEmailProcessorTests.ProcessDueAsync_UserWithoutPreferredLanguage_EmailsInEnglish` |
 
-## 4. Login: `POST /api/auth/login` (public)
+## 4. Login: `POST /api/v1/auth/login` (public)
 | ID | Case | Expected | Status | Test |
 |---|---|---|---|---|
 | L1 | Valid credentials | 200 with access token; refresh token only in the cookie, never in the body | ✅ | `SessionServiceLoginTests.LoginAsync_ValidCredentials_ReturnsTokens`, `SessionServiceVerificationTests.LoginAsync_AfterVerification_ReturnsTokens`, `RefreshTokenCookieEndpointTests.Login_ValidCredentials_ResponseBodyHasNoRefreshToken`, `SessionServiceRefreshTests.LoginAsync_ValidCredentials_CreatesOneActiveTokenForThisDevice` |
-| L2 | Refresh cookie flags | Named `__Secure-refresh_token` (the old name is never set); HttpOnly, Secure, SameSite=Strict, Path=/api/v1/auth | ❌ | `RefreshTokenCookieEndpointTests.Login_ValidCredentials_SetsHttpOnlySecureStrictCookieOnAuthPath`, `RefreshTokenCookieEndpointTests.Login_ValidCredentials_DoesNotSetTheOldCookieName` |
+| L2 | Refresh cookie flags | Named `__Secure-refresh_token` (the old name is never set); HttpOnly, Secure, SameSite=Strict, Path=/api/v1/auth | ✅ | `RefreshTokenCookieEndpointTests.Login_ValidCredentials_SetsHttpOnlySecureStrictCookieOnAuthPath`, `RefreshTokenCookieEndpointTests.Login_ValidCredentials_DoesNotSetTheOldCookieName` |
 | L3 | Email in other casing or with spaces | Logs in | ✅ | `SessionServiceLoginTests.LoginAsync_EmailInOtherCasingWithSurroundingSpaces_IssuesTokens` |
 | L4 | Success | That address's earlier failures stop counting (the account count is untouched, see L24); `LastLoginAt` set; phone number not returned | ✅ | `SessionServiceLoginTests.LoginAsync_CorrectPasswordAfterFailures_ClearsAddressCountAndRecordsLoginTime`, `SessionServiceLockoutTests.LoginAsync_CorrectPasswordAfterFourWrong_RestartsThatAddressCount`, `SessionServiceLoginTests.LoginAsync_LockExpiredCorrectPassword_IssuesTokensAndClearsLock`, `SessionServiceLoginTests.LoginAsync_UserWithPhoneNumber_ResponseHasNoPhoneNumber` |
 | L5 | Unknown email, wrong password, unverified, deactivated, address-locked or account-locked | All the same 401 `InvalidEmailOrPassword` | ✅ | `SessionServiceLoginTests.LoginAsync_UnknownEmailAndWrongPassword_ReturnSameStatusAndMessage`, `SessionServiceLoginTests.LoginAsync_UnverifiedCorrectPassword_MatchesGenericFailure`, `SessionServiceRefreshTests.LoginAsync_InactiveUserCorrectPassword_ThrowsGeneric401`, `SessionServiceLoginTests.LoginAsync_LockedAccountCorrectPassword_Throws401MatchingWrongPassword`, `AuthUniformResponseTests.AuthFailures_AcrossFoldedCases_UseOneMessagePerEndpoint`, `LoginLockoutEndpointTests.Login_WrongPasswordAddressLockedAndAccountLocked_AllGetTheSameStatusAndBody` |
@@ -138,7 +138,7 @@ accented or non-Latin characters may not fit (R6, T7; bcrypt limit, ASVS V6.2.9)
 | L37 | Account-locked request interrupted mid-send (app crash) | Dropped without sending again and logged by request ID only; a send that fails normally clears its own "send started" mark and retries | ✅ | `AccountLockedEmailProcessorCrashTests.ProcessDueAsync_ClaimedRequestWhoseSendAlreadyStarted_DropsItWithoutSendingAndLogsOnlyItsId`, `AccountLockedEmailProcessorCrashTests.ProcessDueAsync_SendInProgressOrFailed_MarkSetThenClearedSoRetryStillSends` |
 | L38 | Unknown email, wrong password, unverified or deactivated account | All the same 401 `auth.invalid_credentials` | ✅ | `SessionServiceLoginTests.LoginAsync_UnknownEmailWrongPasswordUnverifiedOrDeactivatedAccount_ThrowTheSameInvalidCredentialsCode` |
 
-## 5. Refresh: `POST /api/auth/refresh` (refresh cookie)
+## 5. Refresh: `POST /api/v1/auth/refresh` (refresh cookie)
 | ID | Case | Expected | Status | Test |
 |---|---|---|---|---|
 | F1 | Valid cookie | New tokens and cookie; old token revoked as rotated; same family; expiry is the earlier of 7 days from now and the session end (30 days after login) | ✅ | `SessionServiceRefreshTests.RefreshTokenAsync_ActiveToken_ReplacesItWithNewTokenInSameFamily`, `SessionServiceRefreshTests.RefreshTokenAsync_ActiveToken_NewTokenExpiresInSessionInactivityDays`, `RefreshTokenServiceTests.RotateAsync_ActiveToken_OldTokenRevokedAsRotatedAndPointsToReplacement`, `RefreshTokenCookieEndpointTests.Refresh_WithCookie_SendsCookieTokenToSessionAndSetsReplacementCookie`, `SessionServiceRefreshTests.RefreshTokenAsync_ActiveVerifiedUnlockedUser_ReturnsNewTokens`, `RefreshTokenServiceTests.RotateAsync_ActiveToken_ReturnsNewTokenActiveInSameFamilyWithInactivityExpiry` |
@@ -156,7 +156,7 @@ accented or non-Latin characters may not fit (R6, T7; bcrypt limit, ASVS V6.2.9)
 | F13 | Login and refresh | Login stores the login time; a refresh keeps it; the new token expires at the earlier of 7 days from now and login + 30 days; refreshing again never moves the session end | ✅ | `RefreshTokenServiceTests.IssueAsync_NewSignIn_StoresTheLoginTime`, `RefreshTokenServiceTests.RotateAsync_SessionStartedTenDaysAgo_ReplacementKeepsTheLoginTime`, `RefreshTokenServiceTests.RotateAsync_SessionStarted28DaysAgo_ReplacementExpiresAtLoginPlus30Days`, `RefreshTokenServiceTests.RotateAsync_RotatedTwiceNearSessionEnd_SessionEndDoesNotMove` |
 | F14 | Unknown refresh token | 401 `session.invalid_or_expired` | ✅ | `SessionServiceRefreshTests.RefreshTokenAsync_UnknownToken_ThrowsSessionInvalidOrExpiredCode` |
 
-## 6. Choose organization: `POST /api/auth/select-organization` (signed in)
+## 6. Choose organization: `POST /api/v1/auth/select-organization` (signed in)
 | ID | Case | Expected | Status | Test |
 |---|---|---|---|---|
 | S1 | Not signed in | 401 | ✅ | `SelectOrganizationEndpointTests.SelectOrganization_NoAuthenticationToken_ReturnsUnauthorized` |
@@ -172,7 +172,7 @@ accented or non-Latin characters may not fit (R6, T7; bcrypt limit, ASVS V6.2.9)
 | S11 | Switching organization late in a session | The new token keeps the login time; the session still ends 30 days after login | ✅ | `SessionServiceSelectOrganizationTests.SelectOrganizationAsync_SessionStarted28DaysAgo_NewTokenKeepsTheLoginTimeAndEndsAtLoginPlus30Days` |
 | S12 | Empty organization ID; not a member, unknown, inactive or another user's organization | 400 `session.organization_required` for the empty ID; the same 403 `session.not_a_member` for all the others | ✅ | `SessionServiceSelectOrganizationTests.SelectOrganizationAsync_NoOrganizationNotAMemberOrUnknownOrganization_ThrowsTheirOwnCode` |
 
-## 7. Logout: `POST /api/auth/logout` and `/logout-all`
+## 7. Logout: `POST /api/v1/auth/logout` and `/logout-all`
 | ID | Case | Expected | Status | Test |
 |---|---|---|---|---|
 | O1 | Logout with no cookie or an unknown cookie | 204; nothing changes | ✅ | `SessionServiceLogoutTests.LogoutAsync_NoCookie_CompletesAndChangesNothing`, `SessionServiceLogoutTests.LogoutAsync_UnknownToken_CompletesAndChangesNothing`, `LogoutEndpointTests.Logout_NoCookie_ReturnsNoContent`, `RefreshTokenServiceTests.RevokeAsync_UnknownToken_ReturnsFalseAndChangesNothing` |
@@ -182,7 +182,7 @@ accented or non-Latin characters may not fit (R6, T7; bcrypt limit, ASVS V6.2.9)
 | O5 | Logout-all | Every token of the caller revoked, for any signed-in user; cookie cleared; other users untouched | ✅ | `SessionServiceLogoutTests.LogoutAllAsync_UserOnTwoDevices_NoActiveTokenLeft`, `SessionServiceLogoutTests.LogoutAllAsync_UserOfOrganizationA_UserOfOrganizationBKeepsActiveToken`, `LogoutEndpointTests.LogoutAll_SignedIn_RevokesTokensOfTheCallerOnly`, `LogoutEndpointTests.LogoutAll_SignedIn_ClearsRefreshCookie`, `LogoutEndpointTests.LogoutAll_SignedIn_ReturnsNoContent`, `RefreshTokenServiceTests.RevokeAllForUserAsync_UserOnTwoDevices_NoActiveTokenLeftAndReasonLogoutEverywhere`, `RefreshTokenServiceTests.RevokeAllForUserAsync_AnotherUserInAnotherOrganization_KeepsActiveToken` |
 | O6 | Rate limit exceeded on logout | 429 | ✅ | `LogoutEndpointTests.Logout_RefreshLimitExceeded_ReturnsTooManyRequests` |
 
-## 8. Forgot and reset password: `POST /api/auth/forgot-password`, `/reset-password` (public)
+## 8. Forgot and reset password: `POST /api/v1/auth/forgot-password`, `/reset-password` (public)
 | ID | Case | Expected | Status | Test |
 |---|---|---|---|---|
 | P1 | Forgot: any email (known, unknown, deactivated, unverified, reset locked) | Same acknowledgement; one queued request and no reset code; the request never reads users and never sends an email | ✅ | `PasswordResetServiceRequestTests.RequestResetCodeAsync_AnyEmail_QueuesOneRequestAndCreatesNoCode`, `PasswordResetServiceRequestTests.RequestResetCodeAsync_KnownEmail_NeverReadsUsersOrResetCodes`, `PasswordResetEndpointTests.ForgotPassword_KnownAndUnknownEmail_IdenticalStatusAndBody`, `PasswordResetServiceRequestTests.RequestResetCodeAsync_AnyEmail_QueuesTheRequestWithThePasswordResetPurpose` |
@@ -215,7 +215,7 @@ accented or non-Latin characters may not fit (R6, T7; bcrypt limit, ASVS V6.2.9)
 | P28 | Reset pass with a queued verification request | A due verification request is not claimed, tried or emailed, and an old failed one is not purged by the reset pass | ✅ | `PasswordResetEmailProcessorPurposeTests.ProcessDueAsync_DueVerificationRequest_IsLeftUntouchedByAResetPass`, `PasswordResetEmailProcessorPurposeTests.ProcessDueAsync_OldFailedVerificationRequest_IsNotPurgedByAResetPass` |
 | P29 | Sending the reset email to a user with a preferred language, and to one with none | The email is in the user's language; with none stored it is in English | ✅ | `PasswordResetEmailProcessorTests.ProcessDueAsync_UserWithPreferredLanguage_EmailsInThatLanguage`, `PasswordResetEmailProcessorTests.ProcessDueAsync_UserWithoutPreferredLanguage_EmailsInEnglish` |
 
-## 9. Change password: `POST /api/auth/change-password` (signed in)
+## 9. Change password: `POST /api/v1/auth/change-password` (signed in)
 | ID | Case | Expected | Status | Test |
 |---|---|---|---|---|
 | C1 | Not signed in | 401 | ✅ | `PasswordChangeEndpointTests.ChangePassword_NoAccessToken_ReturnsUnauthorized` |
@@ -242,7 +242,7 @@ accented or non-Latin characters may not fit (R6, T7; bcrypt limit, ASVS V6.2.9)
 | T7 | Password hasher | Over 72 bytes: hashing refused, check fails; blank or malformed hash fails; salted | ✅ | `BcryptPasswordHasherTests.Hash_PasswordOver72Bytes_Throws`, `BcryptPasswordHasherTests.Verify_PasswordOver72Bytes_ReturnsFalseEvenWhenFirst72BytesMatch`, `BcryptPasswordHasherTests.Verify_BlankOrMalformedHash_ReturnsFalse`, `BcryptPasswordHasherTests.Hash_SamePasswordTwice_ReturnsDifferentHashes`, `BcryptPasswordHasherTests.Verify_WrongPassword_ReturnsFalse`, `BcryptPasswordHasherTests.Verify_BlankPassword_ReturnsFalse`, `BcryptPasswordHasherTests.Hash_PasswordOfExactly72Bytes_HashesAndVerifies` |
 | T8 | Refresh tokens stored | Only as a fingerprint, unique | ✅ | `RefreshTokenServiceTests.IssueAsync_NewSignIn_StoredFingerprintDiffersFromIssuedToken`, `RefreshTokensTableTests.InsertRefreshToken_SameFingerprintTwice_IsRejectedByUniqueIndex` |
 | T9 | Cleanup of refresh tokens | Expired over 30 days: deleted. Revoked but not expired (a rotated token is live for at most 7 days): kept for reuse detection | ✅ | `RefreshTokenCleanupServiceTests.PurgeExpiredAsync_TokenExpiredLongerThanRetention_DeletesIt`, `RefreshTokenCleanupServiceTests.PurgeExpiredAsync_RevokedLongAgoButNotExpired_KeepsItForReuseDetection`, `RefreshTokenCleanupServiceTests.PurgeExpiredAsync_TokenExpiredWithinRetention_KeepsIt`, `RefreshTokenCleanupServiceTests.PurgeExpiredAsync_ActiveToken_KeepsIt`, `RefreshTokenCleanupServiceTests.PurgeExpiredAsync_MixedTokens_DeletesOnlyTheOldOnes`, `RefreshTokenCleanupServiceTests.PurgeExpiredAsync_RotatedTokenWithinItsSevenDayLife_KeepsItForReuseDetection` |
-| T10 | Refresh cookie path (`/api/v1/auth`) | Matches every auth route | ❌ | `AuthRoutePathTests.AuthEndpoint_RouteTemplate_StartsWithRefreshCookiePathExactly` |
+| T10 | Refresh cookie path (`/api/v1/auth`) | Matches every auth route | ✅ | `AuthRoutePathTests.AuthEndpoint_RouteTemplate_StartsWithRefreshCookiePathExactly` |
 | T11 | Cross-origin requests with credentials | Allowed only from configured origins | ✅ | `RefreshTokenCookieEndpointTests.Cors_PreflightFromAllowedOrigin_AllowsCredentials` |
 | T12 | Deleting a user | Refused while they are a member of an organization; codes, refresh tokens and login failures deleted with the user, never another user's | ✅ | `IdentityDeleteRulesTests.DeleteUser_HasMembership_IsRefusedAndMembershipKept`, `IdentityDeleteRulesTests.DeleteUser_AnotherUserHasVerificationCode_OtherUsersCodeKept`, `RefreshTokensTableTests.DeleteUser_AnotherUserHasRefreshToken_OtherUsersTokenKept`, `IdentityDeleteRulesTests.DeleteUser_DeactivatedUserHasMembership_IsRefusedAndMembershipKept`, `IdentityDeleteRulesTests.DeleteUser_HasVerificationCodesAndNoMemberships_UserAndCodesDeleted`, `RefreshTokensTableTests.DeleteUser_HasRefreshTokens_UserAndTokensDeleted`, `LoginFailuresTableTests.Migrate_CleanDatabase_LoginFailuresGoWithTheirUser` |
 | T13 | Memberships stored | One membership per user and organization; always tied to a real organization (never the empty ID) | ✅ | `OrganizationMemberConstraintsTests.InsertMember_SecondMembershipSameUserAndOrganization_IsRejectedByUniqueIndex`, `OrganizationMemberConstraintsTests.InsertMember_EmptyOrganization_IsRejectedByCheck` |
@@ -302,14 +302,14 @@ accented or non-Latin characters may not fit (R6, T7; bcrypt limit, ASVS V6.2.9)
 | T71 | Accepting with a new account when the invited email already has an account | 400 asking to sign in; nothing joined | ✅ | `InvitationAcceptTests.AcceptWithNewAccountAsync_InvitedEmailAlreadyHasAnAccount_Refuses400AskingToSignIn` |
 | T72 | `POST api/invitations/accept`: the invited account accepts | Joins with exactly the invited grid and labels; never Owner (an Owner field in the invitation body is ignored); memberships in other organizations untouched | ✅ | `InvitationAcceptEndpointTests.Accept_SignedInAccountWithTheInvitedEmail_JoinsWithExactlyTheInvitedGridAndIsNeverOwner` |
 | T73 | An invitee who has not accepted yet asks for data of the organization | 403 and no membership exists: a pending invitation grants nothing | ✅ | `InvitationAcceptEndpointTests.GetMenus_InviteeWhoHasNotAcceptedYet_IsForbidden` |
-| T74 | `POST api/auth/accept-invitation` (public): a person without an account | The account is created verified, joins with exactly the invited grid | ✅ | `InvitationAcceptEndpointTests.AcceptWithNewAccount_PersonWithoutAccount_CreatesAVerifiedAccountAndJoinsWithTheInvitedGrid` |
+| T74 | `POST api/v1/auth/accept-invitation` (public): a person without an account | The account is created verified, joins with exactly the invited grid | ✅ | `InvitationAcceptEndpointTests.AcceptWithNewAccount_PersonWithoutAccount_CreatesAVerifiedAccountAndJoinsWithTheInvitedGrid` |
 | T75 | The same link used twice at the same moment | Joins once; the other request gets the generic 400 | ✅ | `InvitationAcceptEndpointTests.Accept_SameLinkTwiceAtTheSameMoment_JoinsOnceAndRefusesTheOther` |
 | T76 | `DELETE api/invitations/{invitationId}`: cancelling a pending invitation | Succeeds; the link is then refused with 400 and nothing is joined | ✅ | `InvitationCancelEndpointTests.CancelInvitation_PendingInvitation_StopsTheLinkFromWorking` |
 | T77 | A cancellation is audited | One `member.invitation_cancelled` entry: Before = email and roles, After = cancelled | ✅ | `InvitationCancelEndpointTests.CancelInvitation_PendingInvitation_WritesOneAuditEntryWithBeforeAndAfter` |
 | T78 | A caller whose default role lacks Members = Manage (Manager, Cashier, Waiter, Kitchen) cancels an invitation | 403 for each; the invitation stays pending | ✅ | `InvitationCancelEndpointTests.CancelInvitation_CallerWithADefaultRoleThatLacksMembersManage_ReturnsForbiddenAndKeepsItPending` |
 | T79 | Cancelling another organization's invitation | 404; it stays pending | ✅ | `InvitationCancelEndpointTests.CancelInvitation_InvitationOfAnotherOrganization_ReturnsNotFoundAndStaysPending` |
 | T80 | No access token on edit access, create, cancel or accept (signed-in invitation endpoints) | 401 | ✅ | `InvitationAuthEndpointTests.SignedInInvitationEndpoints_NoAccessToken_ReturnUnauthorized` |
-| T81 | More requests than the verify limit to `POST api/auth/accept-invitation` | 429 | ✅ | `InvitationAuthEndpointTests.AcceptWithNewAccount_MoreRequestsThanTheVerifyLimit_ReturnsTooManyRequests` |
+| T81 | More requests than the verify limit to `POST api/v1/auth/accept-invitation` | 429 | ✅ | `InvitationAuthEndpointTests.AcceptWithNewAccount_MoreRequestsThanTheVerifyLimit_ReturnsTooManyRequests` |
 | T82 | A weak password when accepting with a new account | 400, same rules as registration (R6–R8) | ✅ | `InvitationAuthEndpointTests.AcceptWithNewAccount_WeakPassword_ReturnsBadRequest` |
 | T83 | `POST api/invitations` with a missing, malformed or longer than 320 characters email | 400 (same rules as registration); nothing stored, no email sent | ✅ | `InvitationEmailValidationEndpointTests.CreateInvitation_MissingOrMalformedEmail_ReturnsBadRequestAndStoresNothing`, `InvitationEmailValidationEndpointTests.CreateInvitation_EmailLongerThan320Characters_ReturnsBadRequestAndStoresNothing` |
 | T84 | An invitation or access edit body with more than the allowed locations (50), role names (20) or levels (20) | 400; nothing stored or changed | ✅ | `InvitationSizeLimitEndpointTests.CreateInvitation_OversizedCollection_ReturnsBadRequestAndStoresNothing`, `InvitationSizeLimitEndpointTests.SetAccess_OversizedCollection_ReturnsBadRequestAndChangesNothing` |
@@ -374,7 +374,7 @@ accented or non-Latin characters may not fit (R6, T7; bcrypt limit, ASVS V6.2.9)
 | T144 | An Admin gives a level above their own | 403 `access.level_above_own`, apart from `access.denied` | ✅ | `MemberDelegationRulesTests.RequireAsync_AdminGivesALevelAboveTheirOwn_ThrowsLevelAboveOwnCode` |
 | T145 | Two invitations to the same email at the same moment | Every loser gets 409 `invitation.already_open`, a lasting conflict that is never retried and never `validation.failed` | ✅ | `InvitationCreateRefusalEndpointTests.CreateInvitation_SameEmailAtTheSameMoment_EveryLoserAnswersTheLastingConflictCode` |
 | T146 | A role name used in another letter case | 400 `role.name_already_used` (the pre-check and the unique-index catch use the same code) | ✅ | `RoleServiceCreateTests.CreateAsync_NameUsedInAnotherLetterCase_ThrowsRoleNameAlreadyUsedCode` |
-| T147 | Identity endpoints at their unversioned paths (`/api/auth`, `/api/roles`, `/api/invitations`, `/api/users/me`, `/api/members`) | 404; they answer only under `/api/v1/` | ❌ | `IdentityVersionedRouteTests.UnversionedPath_IdentityEndpoints_Answer404` |
+| T147 | Identity endpoints at their unversioned paths (`/api/auth`, `/api/roles`, `/api/invitations`, `/api/users/me`, `/api/members`) | 404; they answer only under `/api/v1/` | ✅ | `IdentityVersionedRouteTests.UnversionedPath_IdentityEndpoints_Answer404` |
 
 ## 11. Schema, migration and wiring tests
 These protect the database and the app setup rather than a rule users meet. They are listed so

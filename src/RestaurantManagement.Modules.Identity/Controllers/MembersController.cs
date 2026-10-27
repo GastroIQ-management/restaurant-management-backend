@@ -6,7 +6,7 @@ using RestaurantManagement.Modules.Identity.Services.Members;
 namespace RestaurantManagement.Modules.Identity.Controllers
 {
     [ApiController]
-    [Route("api/members")]
+    [Route("api/v1/members")]
     [Authorize]
     public class MembersController : ControllerBase
     {
@@ -17,7 +17,7 @@ namespace RestaurantManagement.Modules.Identity.Controllers
             _memberAccessService = memberAccessService;
         }
 
-        // PUT api/members/{userId}/access/{locationId}
+        // PUT api/v1/members/{userId}/access/{locationId}
         // The delegation rules do the authorization, so the action declares no policy of its own.
         [HttpPut("{userId:guid}/access/{locationId:guid}")]
         public async Task<ActionResult<MemberLocationAccessResponse>> SetAccess(Guid userId, Guid locationId, [FromBody] SetMemberAccessRequest request)

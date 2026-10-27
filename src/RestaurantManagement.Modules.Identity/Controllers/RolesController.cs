@@ -6,7 +6,7 @@ using RestaurantManagement.Modules.Identity.Services.Roles;
 namespace RestaurantManagement.Modules.Identity.Controllers
 {
     [ApiController]
-    [Route("api/roles")]
+    [Route("api/v1/roles")]
     [Authorize]
     public class RolesController : ControllerBase
     {
@@ -17,24 +17,24 @@ namespace RestaurantManagement.Modules.Identity.Controllers
             _roleService = roleService;
         }
 
-        // GET api/roles
+        // GET api/v1/roles
         [HttpGet]
         public async Task<ActionResult<List<RoleResponse>>> List() => Ok(await _roleService.ListAsync());
 
-        // GET api/roles/{roleId}
+        // GET api/v1/roles/{roleId}
         [HttpGet("{roleId:guid}")]
         public async Task<ActionResult<RoleResponse>> Get(Guid roleId) => Ok(await _roleService.GetAsync(roleId));
 
-        // POST api/roles
+        // POST api/v1/roles
         [HttpPost]
         public async Task<ActionResult<RoleResponse>> Create([FromBody] CreateRoleRequest request) => Ok(await _roleService.CreateAsync(request));
 
-        // PUT api/roles/{roleId}/levels
+        // PUT api/v1/roles/{roleId}/levels
         [HttpPut("{roleId:guid}/levels")]
         public async Task<ActionResult<RoleResponse>> UpdateLevels(Guid roleId, [FromBody] UpdateRoleLevelsRequest request)
             => Ok(await _roleService.UpdateLevelsAsync(roleId, request));
 
-        // PUT api/roles/{roleId}/name
+        // PUT api/v1/roles/{roleId}/name
         [HttpPut("{roleId:guid}/name")]
         public async Task<ActionResult<RoleResponse>> Rename(Guid roleId, [FromBody] RenameRoleRequest request)
             => Ok(await _roleService.RenameAsync(roleId, request));

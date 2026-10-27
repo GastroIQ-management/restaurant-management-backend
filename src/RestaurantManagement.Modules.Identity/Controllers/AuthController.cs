@@ -16,7 +16,7 @@ using RestaurantManagement.Shared.RateLimiting;
 namespace RestaurantManagement.Modules.Identity.Controllers
 {
     [ApiController]
-    [Route("api/auth")]
+    [Route("api/v1/auth")]
     public class AuthController : ControllerBase
     {
         private readonly IRegistrationService _registrationService;
@@ -36,7 +36,7 @@ namespace RestaurantManagement.Modules.Identity.Controllers
             _invitationService = invitationService;
         }
 
-        // POST api/auth/register
+        // POST api/v1/auth/register
         [HttpPost("register")]
         [AllowAnonymous]
         [EnableRateLimiting(AuthRateLimitPolicies.Register)]
@@ -46,7 +46,7 @@ namespace RestaurantManagement.Modules.Identity.Controllers
             return Ok(response);
         }
 
-        // POST api/auth/login
+        // POST api/v1/auth/login
         [HttpPost("login")]
         [AllowAnonymous]
         [EnableRateLimiting(AuthRateLimitPolicies.Login)]
@@ -57,7 +57,7 @@ namespace RestaurantManagement.Modules.Identity.Controllers
             return RespondWithCookie(result);
         }
 
-        // POST api/auth/refresh
+        // POST api/v1/auth/refresh
         [HttpPost("refresh")]
         [AllowAnonymous]
         [EnableRateLimiting(AuthRateLimitPolicies.Refresh)]
@@ -67,7 +67,7 @@ namespace RestaurantManagement.Modules.Identity.Controllers
             return RespondWithCookie(result);
         }
 
-        // POST api/auth/accept-invitation
+        // POST api/v1/auth/accept-invitation
         [HttpPost("accept-invitation")]
         [AllowAnonymous]
         [EnableRateLimiting(AuthRateLimitPolicies.Verify)]
@@ -77,7 +77,7 @@ namespace RestaurantManagement.Modules.Identity.Controllers
             return NoContent();
         }
 
-        // POST api/auth/select-organization
+        // POST api/v1/auth/select-organization
         [HttpPost("select-organization")]
         [Authorize]
         public async Task<ActionResult<AuthResponse>> SelectOrganization([FromBody] SelectOrganizationRequest request)
@@ -91,7 +91,7 @@ namespace RestaurantManagement.Modules.Identity.Controllers
             return RespondWithCookie(result);
         }
 
-        // POST api/auth/logout
+        // POST api/v1/auth/logout
         [HttpPost("logout")]
         [AllowAnonymous]
         [EnableRateLimiting(AuthRateLimitPolicies.Refresh)]
@@ -102,7 +102,7 @@ namespace RestaurantManagement.Modules.Identity.Controllers
             return NoContent();
         }
 
-        // POST api/auth/logout-all
+        // POST api/v1/auth/logout-all
         [HttpPost("logout-all")]
         [Authorize]
         public async Task<IActionResult> LogoutAll()
@@ -122,7 +122,7 @@ namespace RestaurantManagement.Modules.Identity.Controllers
             return Ok(result.Auth);
         }
 
-        // POST api/auth/verify
+        // POST api/v1/auth/verify
         [HttpPost("verify")]
         [AllowAnonymous]
         [EnableRateLimiting(AuthRateLimitPolicies.Verify)]
@@ -132,7 +132,7 @@ namespace RestaurantManagement.Modules.Identity.Controllers
             return Ok(response);
         }
 
-        // POST api/auth/resend-verification
+        // POST api/v1/auth/resend-verification
         [HttpPost("resend-verification")]
         [AllowAnonymous]
         [EnableRateLimiting(AuthRateLimitPolicies.ResendVerification)]
@@ -142,7 +142,7 @@ namespace RestaurantManagement.Modules.Identity.Controllers
             return Ok(response);
         }
 
-        // POST api/auth/forgot-password
+        // POST api/v1/auth/forgot-password
         [HttpPost("forgot-password")]
         [AllowAnonymous]
         [EnableRateLimiting(AuthRateLimitPolicies.ForgotPassword)]
@@ -152,7 +152,7 @@ namespace RestaurantManagement.Modules.Identity.Controllers
             return Ok(await resetService.RequestResetCodeAsync(request));
         }
 
-        // POST api/auth/reset-password
+        // POST api/v1/auth/reset-password
         [HttpPost("reset-password")]
         [AllowAnonymous]
         [EnableRateLimiting(AuthRateLimitPolicies.ResetPassword)]
@@ -162,7 +162,7 @@ namespace RestaurantManagement.Modules.Identity.Controllers
             return Ok(await resetService.ResetPasswordAsync(request));
         }
 
-        // POST api/auth/change-password
+        // POST api/v1/auth/change-password
         [HttpPost("change-password")]
         [Authorize]
         [EnableRateLimiting(AuthRateLimitPolicies.ChangePassword)]
