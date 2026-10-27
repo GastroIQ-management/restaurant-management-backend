@@ -13,7 +13,10 @@ namespace RestaurantManagement.Shared.Middleware
     {
         public const string HeaderName = "X-App-Version";
 
-        private const int MaxLength = 32;
+        public const int MaxLength = 32;
+
+        // ASCII digits only: \d would also accept non-ASCII digits. Shared with the OpenAPI document so both state one rule.
+        public const string PatternBody = @"[0-9]+\.[0-9]+\.[0-9]+([-+][0-9A-Za-z.+-]+)?";
 
         private readonly RequestDelegate _next;
 
@@ -45,7 +48,7 @@ namespace RestaurantManagement.Shared.Middleware
             => HttpMethods.IsPost(method) || HttpMethods.IsPut(method)
                || HttpMethods.IsPatch(method) || HttpMethods.IsDelete(method);
 
-        [GeneratedRegex(@"^\d+\.\d+\.\d+([-+][0-9A-Za-z.+-]+)?\z")]
+        [GeneratedRegex("^" + PatternBody + @"\z")]
         private static partial Regex SemanticVersion();
     }
 }

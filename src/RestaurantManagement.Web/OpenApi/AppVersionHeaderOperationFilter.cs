@@ -26,8 +26,8 @@ public class AppVersionHeaderOperationFilter : IOperationFilter
             Schema = new OpenApiSchema
             {
                 Type = "string",
-                MaxLength = 32,
-                Pattern = @"^\d+\.\d+\.\d+([-+][0-9A-Za-z.+-]*)?$"
+                MaxLength = AppVersionMiddleware.MaxLength,
+                Pattern = "^" + AppVersionMiddleware.PatternBody + "$"
             }
         });
     }
