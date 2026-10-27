@@ -72,7 +72,7 @@ namespace RestaurantManagement.Modules.Identity.Services.Roles
             await _rules.RequireAsync(new Dictionary<AccessModule, AccessLevel>(), proposed);
 
             var now = DateTime.UtcNow;
-            var role = new OrganizationRole { Id = Guid.NewGuid(), OrganizationId = organizationId, Name = name, CreatedAt = now, UpdatedAt = now };
+            var role = new OrganizationRole { Id = request.Id, OrganizationId = organizationId, Name = name, CreatedAt = now, UpdatedAt = now };
             _db.OrganizationRoles.Add(role);
             foreach (var (module, level) in proposed.Where(p => p.Value != AccessLevel.None))
                 _db.OrganizationRoleLevels.Add(NewLevel(role.Id, organizationId, module, level));
@@ -184,6 +184,11 @@ namespace RestaurantManagement.Modules.Identity.Services.Roles
             catch (DbUpdateException ex) when (IsDuplicateNameViolation(ex))
             {
                 throw new BusinessException(RoleErrorCodes.NameAlreadyUsed, _localizer["RoleNameAlreadyUsed"].Value);
+            }
+            catch (DbUpdateException ex) when (PrimaryKeyViolation.Matches(ex))
+            {
+                // Same answer whichever organization owns the ID.
+                throw new BusinessException(ErrorCodes.IdAlreadyUsed, _localizer["IdAlreadyUsed"].Value);
             }
         }
 

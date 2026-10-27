@@ -41,7 +41,7 @@
 - [x] T3 — Menu category create takes the client's ID
 - [x] T4 — Location create takes the client's ID
 - [x] T5 — Organization create takes the client's ID
-- [ ] T6 — Role create takes the client's ID
+- [x] T6 — Role create takes the client's ID
 - [ ] T7 — Invitation create takes the client's ID
 
 ## Assumptions

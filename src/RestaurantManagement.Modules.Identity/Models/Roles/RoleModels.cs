@@ -1,8 +1,13 @@
+using System.Text.Json.Serialization;
+using RestaurantManagement.Shared.Models;
+
 namespace RestaurantManagement.Modules.Identity.Models.Roles
 {
     /// <summary>Levels maps a module name to a level name (None, Read, Manage); a missing module means None.</summary>
     public class CreateRoleRequest
     {
+        [RequiredId(ErrorMessage = "RequiredAttribute_ValidationError")]
+        [JsonConverter(typeof(LenientGuidConverter))]
         public Guid Id { get; set; }
 
         public string Name { get; set; } = string.Empty;
