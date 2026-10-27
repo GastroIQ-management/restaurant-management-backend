@@ -225,7 +225,7 @@ public class OrganizationClientIdEndpointTests : IClassFixture<PostgresDatabaseF
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.Conflict, "the ID of the user's own organization is refused with 409, never a 500");
         (await CodeAsync(response)).ShouldBe("id.already_used", "the refusal carries the reused-ID code");
-        var name = await factory.InOrganizationAsync<OrganizationDbContext, string>(CantinaId, async db => (await db.Organizations.SingleAsync()).Name);
+        var name = await factory.InOrganizationAsync<OrganizationDbContext, string>(CantinaId, async db => (await db.Organizations.SingleAsync(o => o.Id == CantinaId)).Name);
         name.ShouldBe("Cantina da Nonna", "the existing organization is unchanged");
         (await CountMembershipsAsync(factory, CantinaId, AnaId)).ShouldBe(1, "no second Owner access row is created");
     }

@@ -1,9 +1,13 @@
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
+using RestaurantManagement.Shared.Models;
 
 namespace RestaurantManagement.Modules.Organization.Models
 {
     public class CreateOrganizationRequest
     {
+        [RequiredId(ErrorMessage = "RequiredAttribute_ValidationError")]
+        [JsonConverter(typeof(LenientGuidConverter))]
         public Guid Id { get; set; }
 
         private string _name = string.Empty;
