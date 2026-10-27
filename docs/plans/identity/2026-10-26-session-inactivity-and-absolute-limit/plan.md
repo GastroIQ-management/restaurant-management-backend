@@ -41,11 +41,12 @@ Outcomes are the backlog item's Acceptance criteria, in order:
 | A5 | Cleanup still deletes tokens 30 days after they expire. Reuse detection already stops when a token expires, which is now at most 7 days after it was issued |
 
 ## Overall Definition of Done
-- [ ] All tasks done, tests passing
-- [ ] All Outcomes met (the backlog item's Acceptance criteria)
+- [x] All tasks done, tests passing
+- [x] All Outcomes met (the backlog item's Acceptance criteria)
 - [ ] Affected tests green after the last batch; full suite green in CI (Continuous Integration). Shared changes, so `affected` runs the full suite
-- [ ] No out-of-scope changes; findings in the backlog
-- [ ] Backlog item only: deleted if fully solved (deletion left uncommitted for the user), or updated with what is left
+  - Note: full local run passed (250, 124, 68, 468, 523 tests, 0 failed); left unticked because CI has not run yet
+- [x] No out-of-scope changes; findings in the backlog
+- [x] Backlog item only: deleted if fully solved (deletion left uncommitted for the user), or updated with what is left
 
 ## Checklist
 - [x] T1 — Session limit settings and startup checks
