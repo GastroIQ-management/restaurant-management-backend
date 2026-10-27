@@ -40,13 +40,13 @@ namespace RestaurantManagement.Modules.Menu.Services
             // The tenant query filter hides other organizations' menus, so a foreign MenuId looks missing.
             var menuExists = await _context.Menus.AnyAsync(m => m.Id == request.MenuId);
             if (!menuExists)
-                throw new BusinessException(_localizer["MenuNotFound"].Value, 404);
+                throw new BusinessException(MenuErrorCodes.MenuNotFound, _localizer["MenuNotFound"].Value);
 
             if (request.LocationId.HasValue)
             {
                 var location = await _organizationLookup.GetLocationAsync(request.LocationId.Value);
                 if (location == null || location.OrganizationId != organizationId)
-                    throw new BusinessException(_localizer["LocationNotFound"].Value, 404);
+                    throw new BusinessException(ErrorCodes.LocationNotFound, _localizer["LocationNotFound"].Value);
             }
 
             await _access.RequireManageCategoryAsync(request.LocationId);
@@ -164,7 +164,7 @@ namespace RestaurantManagement.Modules.Menu.Services
         private Guid GetTokenOrganizationId()
         {
             return _tenantContext.OrganizationId
-                ?? throw new BusinessException(_localizer["OrganizationRequired"].Value, 403);
+                ?? throw new BusinessException(ErrorCodes.OrganizationRequired, _localizer["OrganizationRequired"].Value);
         }
 
         private static MenuCategoryResponse MapToResponse(MenuCategory category)

@@ -46,7 +46,7 @@ namespace RestaurantManagement.Modules.Menu.Controllers
 
             var category = await _categoryService.GetByIdAsync(userId, id);
             if (category == null)
-                return NotFound(new { message = _localizer["MenuCategoryNotFound"].Value });
+                throw new BusinessException(MenuErrorCodes.MenuCategoryNotFound, _localizer["MenuCategoryNotFound"].Value);
 
             return Ok(category);
         }
@@ -97,7 +97,7 @@ namespace RestaurantManagement.Modules.Menu.Controllers
 
             var category = await _categoryService.UpdateAsync(userId, id, request);
             if (category == null)
-                return NotFound(new { message = _localizer["MenuCategoryNotFound"].Value });
+                throw new BusinessException(MenuErrorCodes.MenuCategoryNotFound, _localizer["MenuCategoryNotFound"].Value);
 
             return Ok(category);
         }
@@ -112,7 +112,7 @@ namespace RestaurantManagement.Modules.Menu.Controllers
 
             var result = await _categoryService.DeleteAsync(userId, id);
             if (!result)
-                return NotFound(new { message = _localizer["MenuCategoryNotFound"].Value });
+                throw new BusinessException(MenuErrorCodes.MenuCategoryNotFound, _localizer["MenuCategoryNotFound"].Value);
 
             return NoContent();
         }
@@ -124,7 +124,7 @@ namespace RestaurantManagement.Modules.Menu.Controllers
             {
                 return userId;
             }
-            throw new BusinessException(_localizer["UnauthorizedMessage"].Value, 401);
+            throw new BusinessException(ErrorCodes.Unauthorized, _localizer["UnauthorizedMessage"].Value);
         }
     }
 }
