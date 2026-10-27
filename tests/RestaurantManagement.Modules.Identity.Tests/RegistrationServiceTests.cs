@@ -249,5 +249,27 @@ namespace RestaurantManagement.Modules.Identity.Tests
             stored.CodeHash.ShouldNotContain(emailedCode, customMessage: "the verification code is never stored readable, only as a fingerprint");
             hasher.IsMatch(user.Id, emailedCode, stored.CodeHash).ShouldBeTrue("the stored fingerprint must match the code that was emailed");
         }
+
+        [Fact]
+        [Trait("Rule", "R17")]
+        public async Task RegisterAsync_EmailAlreadyRegistered_ThrowsEmailAlreadyRegisteredCode()
+        {
+            // Arrange
+            using var database = new IdentityTestDatabase();
+            using var seedContext = database.CreateContext();
+            seedContext.Users.Add(new User { Email = "existing@test.com", PasswordHash = "hash", FirstName = "Existing", LastName = "User" });
+            await seedContext.SaveChangesAsync();
+            using var context = database.CreateContext();
+            var sut = new RegistrationService(context, TestSecurityOptions.Create(), TestLocalizer.Create(), Substitute.For<IEmailService>(),
+                Substitute.For<ILogger<RegistrationService>>(), TestVerificationCodeHasher.Create(), TestPasswordHasher.Create());
+            var request = new RegisterRequest { Email = "existing@test.com", Password = "Password1!", FirstName = "New", LastName = "Attempt" };
+
+            // Act
+            var act = () => sut.RegisterAsync(request);
+
+            // Assert
+            var thrown = await act.Should().ThrowAsync<BusinessException>();
+            thrown.Which.Code.Should().Be("registration.email_already_registered", "an email already in use has its own code for the form");
+        }
     }
 }

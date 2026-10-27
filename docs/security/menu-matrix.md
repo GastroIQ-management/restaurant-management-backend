@@ -38,6 +38,7 @@ endpoint and database tests in `tests/RestaurantManagement.Web.Tests/Menu/`.
 | M42 | Reads with the Menus level at every involved location | Allowed: a location's menus or categories need Read there; the full menu list, all categories, a menu's categories and a category without a location need Read at every non-closed location | ✅ | `MenuGridAccessTests.MenuAndCategoryReads_MenusReadAtEveryInvolvedLocation_Succeeds` |
 | M43 | The same reads with the Menus level missing at one involved location | 403 | ✅ | `MenuGridAccessTests.MenuAndCategoryReads_MenusReadMissingAtAnInvolvedLocation_ThrowsForbidden` |
 | M44 | Token whose user identifier is not a user ID, on any menu or menu category endpoint | 401 with the translated message | ✅ | `MenuUserIdentifierEndpointTests.MenuEndpoints_UserIdentifierNotAUserId_ReturnsUnauthorizedWithLocalizedMessage`, `MenuUserIdentifierEndpointTests.MenuCategoryEndpoints_UserIdentifierNotAUserId_ReturnsUnauthorizedWithLocalizedMessage` |
+| M47 | A member with Menus Read only edits a menu | 403 `access.denied` | ❌ | `MenuGridEndpointTests.EditMenu_MemberWithMenusReadOnly_AnswersAccessDeniedCode` |
 
 ## 2. Other organizations' data
 | ID | Case | Expected | Status | Test |
@@ -51,6 +52,7 @@ endpoint and database tests in `tests/RestaurantManagement.Web.Tests/Menu/`.
 | M13 | Linking a menu to another organization's location | 404; no link stored | ✅ | `MenuLocationEndpointTests.AttachMenuToLocation_LocationOfAnotherOrganization_ReturnsNotFoundAndStoresNoLink` |
 | M14 | Old routes with the organization in the address | 404 | ✅ | `MenuTenantEndpointTests.OldOrganizationInUrlRoute_Called_ReturnsNotFound` |
 | M15 | Every write | Stamped with the token organization, the user and the time; a write that carries or changes to another organization, or has no organization, is refused with 403 and nothing is written | ✅ | `MenuAuditTests.SaveChangesAsync_NewMenuByUserInOrgA_StampsOrganizationAndCreationAudit`, `MenuAuditTests.SaveChangesAsync_UpdatedMenu_SetsUpdateAuditAndKeepsCreatedFields`, `MenuAuditTests.SaveChangesAsync_NewMenuCarriesAnotherOrganizationId_Throws403AndWritesNothing`, `MenuAuditTests.SaveChangesAsync_UserInOrgBUpdatesOrgAMenu_Throws403AndMenuUnchanged`, `MenuAuditTests.SaveChangesAsync_OrganizationIdChangedOnStoredMenu_Throws403AndMenuStaysInOrgA`, `MenuAuditTests.SaveChangesAsync_NewMenuWithoutCurrentOrganization_Throws403OrganizationRequired`, `MenuAuditTests.SaveChangesAsync_NewMenuCategory_StampsOrganizationAndUpdatedAt`, `MenuAuditTests.SaveChangesAsync_NewMenuCategoryWithoutLocation_KeepsLocationNull`, `MenuAuditTests.SaveChangesAsync_NewLocationMenu_GetsOrganizationFromUserAndUpdatedAt`, `MenuAuditTests.SaveChangesAsync_UpdatedMenuCategory_SetsUpdatedAtAndKeepsCreatedAt` |
+| M46 | Another organization's menu or category, by its ID | The same 404 status, title and code (`menu.not_found`, `menu_category.not_found`) as one that does not exist | ❌ | `MenuTenantEndpointTests.MenuOrCategory_OfAnotherOrganization_AnswersTheSameStatusTitleAndCodeAsAMissingOne` |
 
 ## 3. Menus and categories
 | ID | Case | Expected | Status | Test |
@@ -60,6 +62,7 @@ endpoint and database tests in `tests/RestaurantManagement.Web.Tests/Menu/`.
 | M18 | Deleting a menu | Its categories and location links are removed with it | ✅ | `MenuDeleteCascadeTests.DeleteMenu_MenuWithCategoriesAndLocationLink_RemovesThemAndKeepsOtherMenusCategories` |
 | M19 | A member who is allowed creates, reads, changes and deletes a category | Allowed; the location is kept when it belongs to the organization | ✅ | `MenuCategoryServiceTests.CreateAsync_WhenAccessIsAllowed_CreatesCategory`, `MenuCategoryServiceTests.CreateAsync_WhenLocationBelongsToOrganization_StoresLocationId`, `MenuCategoryServiceTests.GetByIdAsync_WhenAccessIsAllowed_ReturnsCategory`, `MenuCategoryServiceTests.UpdateAsync_WhenAccessIsAllowed_UpdatesCategory`, `MenuCategoryServiceTests.DeleteAsync_WhenAccessIsAllowed_DeletesCategory` |
 | M20 | Category lists | Ordered by sort order, then name | ✅ | `MenuCategoryOrderTests.GetAllAsync_SortOrdersTieAndDiffer_ReturnsBySortOrderThenName`, `MenuCategoryOrderTests.GetByMenuIdAsync_SortOrdersTieAndDiffer_ReturnsBySortOrderThenName` |
+| M45 | A menu or location that does not exist (edit a menu, create a category in a menu, link a menu to a location) | 404 with `menu.not_found` or `location.not_found` | ❌ | `MenuGridAccessTests.MenuAndCategoryServices_MenuOrLocationDoesNotExist_ThrowNotFoundWithTheirOwnCode` |
 
 ## 4. Input rules
 | ID | Case | Expected | Status | Test |

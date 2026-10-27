@@ -111,4 +111,50 @@ public class MemberAccessEndpointTests : IClassFixture<PostgresDatabaseFixture>
         response.StatusCode.ShouldBe(HttpStatusCode.BadRequest, "a module or level that does not exist is a bad request");
         (await CellsAsync(factory, CantinaId, BiaId, BatelId)).ShouldBe(Cells(WaiterLevels), "nothing is stored for a bad request");
     }
+
+    private const string MissingId = "99999999-9999-4999-8999-999999999999";
+
+    public static TheoryData<string, string, string, string, string> OtherOrganizationAndMissingCases => new()
+    {
+        { AccessUrl(PaoloId, BatelId), "Waiter", AccessUrl(Guid.Parse(MissingId), BatelId), "Waiter", "member.not_found" },
+        { AccessUrl(BiaId, CentroId), "Waiter", AccessUrl(BiaId, Guid.Parse(MissingId)), "Waiter", "location.not_found" },
+        { AccessUrl(BiaId, BatelId), "Sommelier", AccessUrl(BiaId, BatelId), "Maitre", "role.not_found" }
+    };
+
+    [Theory]
+    [MemberData(nameof(OtherOrganizationAndMissingCases))]
+    [Trait("Rule", "T142")]
+    public async Task SetAccess_MemberLocationOrRoleOfAnotherOrganization_AnswersTheSameStatusTitleAndCodeAsAMissingOne(
+        string otherOrganizationUrl, string otherOrganizationRole, string missingUrl, string missingRole, string expectedCode)
+    {
+        // Arrange
+        await using var factory = await CreateFactoryAsync(_postgres);
+        var client = factory.ClientFor(AnaId, CantinaId);
+
+        // Act
+        var otherOrganization = await client.PutAsJsonAsync(otherOrganizationUrl, new { roleNames = new[] { otherOrganizationRole } });
+        var missing = await client.PutAsJsonAsync(missingUrl, new { roleNames = new[] { missingRole } });
+
+        // Assert
+        otherOrganization.StatusCode.ShouldBe(HttpStatusCode.NotFound, "another organization's data is answered as if it did not exist");
+        (await LocalizedResponses.CodeAsync(otherOrganization)).ShouldBe(expectedCode, "the code names what was not found");
+        (await LocalizedResponses.CodeAsync(missing)).ShouldBe(expectedCode, "another organization's data has the same code as missing data, so nobody can tell it exists");
+        (await LocalizedResponses.MessageAsync(otherOrganization)).ShouldBe(await LocalizedResponses.MessageAsync(missing), "the title is the same too");
+    }
+
+    [Fact]
+    [Trait("Rule", "T143")]
+    public async Task SetAccess_WaiterWithoutMembersManage_AnswersAccessDeniedCode()
+    {
+        // Arrange
+        await using var factory = await CreateFactoryAsync(_postgres);
+        var client = factory.ClientFor(BiaId, CantinaId);
+
+        // Act
+        var response = await client.PutAsJsonAsync(AccessUrl(BiaId, BatelId), new { roleNames = new[] { "Cashier" } });
+
+        // Assert
+        response.StatusCode.ShouldBe(HttpStatusCode.Forbidden, "a waiter has no Members level");
+        (await LocalizedResponses.CodeAsync(response)).ShouldBe("access.denied", "the refusal carries the access denied code");
+    }
 }

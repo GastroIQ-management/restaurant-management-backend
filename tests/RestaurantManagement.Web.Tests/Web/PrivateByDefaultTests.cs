@@ -7,6 +7,7 @@ using NSubstitute;
 using RestaurantManagement.Modules.Identity.Models.Sessions;
 using RestaurantManagement.Shared;
 using Shouldly;
+using static RestaurantManagement.Web.Tests.LocalizedResponses;
 
 namespace RestaurantManagement.Web.Tests;
 
@@ -60,11 +61,10 @@ public class PrivateByDefaultTests : IDisposable
         var response = await client.GetAsync(UndeclaredUrl);
 
         // Assert
-        response.Content.Headers.ContentType.ShouldNotBeNull("the refusal must be a JSON answer");
-        response.Content.Headers.ContentType.MediaType.ShouldBe("application/json", "the refusal must be a JSON answer");
-        var body = await response.Content.ReadFromJsonAsync<Dictionary<string, string>>();
-        body.ShouldNotBeNull();
-        body["message"].ShouldBe(EnglishUnauthorizedMessage, "an anonymous caller gets the standard unauthorized message");
+        response.Content.Headers.ContentType.ShouldNotBeNull("the refusal must be a Problem Details answer");
+        response.Content.Headers.ContentType.MediaType.ShouldBe("application/problem+json", "the refusal must be a Problem Details answer");
+        var body = await ProblemAsync(response);
+        body["title"]!.GetValue<string>().ShouldBe(EnglishUnauthorizedMessage, "an anonymous caller gets the standard unauthorized message");
     }
 
     [Fact]
@@ -80,9 +80,8 @@ public class PrivateByDefaultTests : IDisposable
         var response = await client.SendAsync(request);
 
         // Assert
-        var body = await response.Content.ReadFromJsonAsync<Dictionary<string, string>>();
-        body.ShouldNotBeNull();
-        body["message"].ShouldBe(PortugueseUnauthorizedMessage, "the unauthorized message follows the caller's language");
+        var body = await ProblemAsync(response);
+        body["title"]!.GetValue<string>().ShouldBe(PortugueseUnauthorizedMessage, "the unauthorized message follows the caller's language");
     }
 
     // Scenario 29
@@ -137,5 +136,26 @@ public class PrivateByDefaultTests : IDisposable
         response.StatusCode.ShouldNotBe(HttpStatusCode.Unauthorized, "the sign-in endpoints are public, so a caller with no token must not be turned away");
         response.StatusCode.ShouldNotBe(HttpStatusCode.Forbidden, "the sign-in endpoints are public, so a caller with no token must not be turned away");
         ((int)response.StatusCode).ShouldBeLessThan(500, "a public endpoint must answer without a server error");
+    }
+
+    [Theory]
+    [InlineData("en", "Unauthorized user.")]
+    [InlineData("pt", "Usuário não autorizado!")]
+    [InlineData("fr", "Utilisateur non autorisé.")]
+    [Trait("Rule", "W1")]
+    public async Task UndeclaredEndpoint_NoAccessTokenInEachLanguage_AnswersOneCodeWithATitleInThatLanguage(string culture, string expectedTitle)
+    {
+        // Arrange
+        var client = CreateClient();
+        var request = new HttpRequestMessage(HttpMethod.Get, UndeclaredUrl);
+        request.Headers.Add("Accept-Language", culture);
+
+        // Act
+        var response = await client.SendAsync(request);
+
+        // Assert
+        response.StatusCode.ShouldBe(HttpStatusCode.Unauthorized, "an anonymous caller is refused");
+        (await CodeAsync(response)).ShouldBe("auth.unauthorized", "the code is the same in every language, only the title is translated");
+        (await MessageAsync(response)).ShouldBe(expectedTitle, "the title follows the caller's language");
     }
 }

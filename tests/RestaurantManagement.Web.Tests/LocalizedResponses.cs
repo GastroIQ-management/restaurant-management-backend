@@ -27,9 +27,17 @@ public static class LocalizedResponses
         return request;
     }
 
-    /// <summary>The "message" property of an error body such as 401, 404 or 500.</summary>
+    /// <summary>The localized "title" of a Problem Details error body such as 401, 404 or 500.</summary>
     public static async Task<string?> MessageAsync(HttpResponseMessage response)
-        => JsonNode.Parse(await response.Content.ReadAsStringAsync())?["message"]?.GetValue<string>();
+        => JsonNode.Parse(await response.Content.ReadAsStringAsync())?["title"]?.GetValue<string>();
+
+    /// <summary>The stable "code" of a Problem Details error body; never translated.</summary>
+    public static async Task<string?> CodeAsync(HttpResponseMessage response)
+        => JsonNode.Parse(await response.Content.ReadAsStringAsync())?["code"]?.GetValue<string>();
+
+    /// <summary>The parsed Problem Details body of an error answer.</summary>
+    public static async Task<JsonNode> ProblemAsync(HttpResponseMessage response)
+        => JsonNode.Parse(await response.Content.ReadAsStringAsync())!;
 
     /// <summary>Every field error of a validation (400) body, from all fields.</summary>
     public static async Task<List<string>> FieldErrorsAsync(HttpResponseMessage response)

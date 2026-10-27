@@ -26,4 +26,8 @@ public class PermissionProbeController : ControllerBase
 
     [HttpGet("undeclared")]
     public IActionResult Undeclared() => Ok();
+
+    // A bodiless error result, as the real controllers return for a bad user identifier.
+    [HttpGet("bodiless-conflict")]
+    public IActionResult BodilessConflict() => Conflict();
 }

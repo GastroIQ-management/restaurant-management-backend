@@ -644,5 +644,39 @@ namespace RestaurantManagement.Modules.Identity.Tests
             var correctFromLockedAddress = () => CreateSut(readContext).LoginAsync(new LoginRequest { Email = email, Password = Password }, TestClients.KitchenTablet, null);
             await correctFromLockedAddress.ShouldThrowAsync<BusinessException>("a correct password from the locked address is refused during the lock");
         }
+
+        [Theory]
+        [InlineData("nobody@test.com", Password, true, true)]
+        [InlineData("verified@test.com", "WrongPassword1!", true, true)]
+        [InlineData("verified@test.com", Password, false, true)]
+        [InlineData("verified@test.com", Password, true, false)]
+        [Trait("Rule", "L38")]
+        public async Task LoginAsync_UnknownEmailWrongPasswordUnverifiedOrDeactivatedAccount_ThrowTheSameInvalidCredentialsCode(
+            string email, string password, bool isVerified, bool isActive)
+        {
+            // Arrange
+            using var database = new IdentityTestDatabase();
+            using var seedContext = database.CreateContext();
+            seedContext.Users.Add(new User
+            {
+                Email = "verified@test.com",
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword(Password),
+                FirstName = "A",
+                LastName = "B",
+                IsVerified = isVerified,
+                IsActive = isActive
+            });
+            await seedContext.SaveChangesAsync();
+            using var context = database.CreateContext();
+            var sut = CreateSut(context);
+
+            // Act
+            var act = () => sut.LoginAsync(new LoginRequest { Email = email, Password = password }, TestClients.KitchenTablet, null);
+
+            // Assert
+            var thrown = await Should.ThrowAsync<BusinessException>(act);
+            thrown.StatusCode.ShouldBe(401, "every collapsed login failure is a 401");
+            thrown.Code.ShouldBe("auth.invalid_credentials", "every collapsed login failure carries one code, so no case can be told apart");
+        }
     }
 }

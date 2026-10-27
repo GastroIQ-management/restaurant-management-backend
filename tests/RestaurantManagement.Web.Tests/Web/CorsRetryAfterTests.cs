@@ -68,4 +68,30 @@ public class CorsRetryAfterTests : IDisposable
         request.Headers.Add(TestRemoteIpStartupFilter.RemoteIpHeader, ClientIp);
         return request;
     }
+
+    [Fact]
+    [Trait("Rule", "W27")]
+    public async Task Register_RateLimited_AnswersProblemDetailsWithRateLimitCodeAndRetryAfter()
+    {
+        // Arrange
+        _factory.RegistrationService.RegisterAsync(Arg.Any<RegisterRequest>())
+            .Returns(new AuthResponse { Email = "marina@cantinadanonna.com.br", FirstName = "Marina", LastName = "Rossi" });
+        using var factory = _factory.WithWebHostBuilder(builder =>
+            builder.ConfigureAppConfiguration((_, configuration) =>
+                configuration.AddInMemoryCollection(new Dictionary<string, string?>
+                {
+                    ["AuthRateLimit:Register:PermitLimit"] = "1",
+                    ["AuthRateLimit:Register:WindowSeconds"] = "60",
+                })));
+        var client = factory.CreateClient();
+        await client.SendAsync(RegisterRequest());
+
+        // Act
+        var response = await client.SendAsync(RegisterRequest());
+
+        // Assert
+        response.Content.Headers.ContentType!.MediaType.ShouldBe("application/problem+json", "a limited request is answered as Problem Details");
+        (await LocalizedResponses.CodeAsync(response)).ShouldBe("rate_limit.exceeded", "the app retries on this code");
+        response.Headers.Contains("Retry-After").ShouldBeTrue("the answer still says how long to wait");
+    }
 }

@@ -124,10 +124,10 @@ public class MenuTenantEndpointTests : IClassFixture<PostgresDatabaseFixture>
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.Forbidden, "a user who has not chosen an organization is refused as forbidden");
         var error = await response.Content.ReadFromJsonAsync<ErrorBody>();
-        error!.Message.ShouldBe(factory.Message("OrganizationRequired"), "the refusal tells the user an organization is required");
+        error!.Title.ShouldBe(factory.Message("OrganizationRequired"), "the refusal tells the user an organization is required");
     }
 
-    private sealed record ErrorBody(string Message);
+    private sealed record ErrorBody(string Title);
 
     // Scenario 13
     [Fact]
@@ -217,5 +217,28 @@ public class MenuTenantEndpointTests : IClassFixture<PostgresDatabaseFixture>
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.NotFound, "the organization is never taken from the address, so the old routes no longer exist");
+    }
+
+    [Theory]
+    [InlineData("PUT", "/api/menus/55555555-0000-4000-8000-000000000002", "/api/menus/55555555-0000-4000-8000-0000000000ff", "menu.not_found")]
+    [InlineData("PUT", "/api/menu-categories/66666666-0000-4000-8000-000000000002", "/api/menu-categories/66666666-0000-4000-8000-0000000000ff", "menu_category.not_found")]
+    [Trait("Rule", "M46")]
+    public async Task MenuOrCategory_OfAnotherOrganization_AnswersTheSameStatusTitleAndCodeAsAMissingOne(string method, string otherOrganizationUrl, string missingUrl, string expectedCode)
+    {
+        // Arrange
+        await using var factory = await CreateFactoryWithTwoOrganizationsAsync();
+        var client = factory.ClientFor(AnaId, CantinaId);
+        var body = new { name = "Cardápio Invadido", description = "Alterado por outra organização", isActive = false, sortOrder = 1 };
+
+        // Act
+        var otherOrganization = await client.SendAsync(Request(method, otherOrganizationUrl, body));
+        var missing = await client.SendAsync(Request(method, missingUrl, body));
+
+        // Assert
+        otherOrganization.StatusCode.ShouldBe(HttpStatusCode.NotFound, "another organization's item is answered as not found");
+        missing.StatusCode.ShouldBe(HttpStatusCode.NotFound, "a missing item is not found too");
+        (await LocalizedResponses.CodeAsync(otherOrganization)).ShouldBe(expectedCode, "the code names the item that was not found");
+        (await LocalizedResponses.CodeAsync(missing)).ShouldBe(expectedCode, "another organization's item has the same code as a missing one, so nobody can tell it exists");
+        (await LocalizedResponses.MessageAsync(otherOrganization)).ShouldBe(await LocalizedResponses.MessageAsync(missing), "the title is the same too");
     }
 }

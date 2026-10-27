@@ -175,4 +175,20 @@ public class LocationCodeEndpointTests : IClassFixture<PostgresDatabaseFixture>
         var status = locations.Single(l => l!["id"]!.GetValue<Guid>() == batelId)!["status"]?.ToString();
         status.ShouldBe("Closed", "an edit that leaves the status out keeps the status the location already had");
     }
+
+    [Fact]
+    [Trait("Rule", "OR45")]
+    public async Task CreateLocation_CodeAlreadyUsedInOrganization_AnswersLocationCodeAlreadyUsedCode()
+    {
+        // Arrange
+        await using var factory = await CreateFactoryAsync();
+        var client = factory.ClientFor(AnaId, CantinaId);
+        await CreateLocationAsync(client, "Unidade Mercado Municipal", "MM");
+
+        // Act
+        var response = await client.PostAsJsonAsync("/api/locations", LocationBody("Unidade Moema", "MM"));
+
+        // Assert
+        (await LocalizedResponses.CodeAsync(response)).ShouldBe("location.code_already_used", "a used location code has its own code the form can show on the code field");
+    }
 }

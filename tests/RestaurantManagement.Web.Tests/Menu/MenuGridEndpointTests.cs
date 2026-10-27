@@ -260,4 +260,20 @@ public class MenuGridEndpointTests : IClassFixture<PostgresDatabaseFixture>
         otherOrganizationOnly.StatusCode.ShouldBe(HttpStatusCode.Forbidden, "Manage everywhere in Trattoria do Sol gives nothing in Cantina da Nonna");
         afterGrantHere.StatusCode.ShouldBe(HttpStatusCode.OK, "the same token creates a menu once Manage is granted at every location of Cantina da Nonna");
     }
+
+    [Fact]
+    [Trait("Rule", "M47")]
+    public async Task EditMenu_MemberWithMenusReadOnly_AnswersAccessDeniedCode()
+    {
+        // Arrange
+        await using var factory = await CreateFactoryAsync();
+        var client = factory.ClientFor(DoraId, CantinaId);
+
+        // Act
+        var response = await client.PutAsJsonAsync($"/api/menus/{DinnerMenuId}", MenuBody);
+
+        // Assert
+        response.StatusCode.ShouldBe(HttpStatusCode.Forbidden, "Read never lets a member change a menu");
+        (await LocalizedResponses.CodeAsync(response)).ShouldBe("access.denied", "the refusal carries the access denied code");
+    }
 }

@@ -58,7 +58,7 @@ public class OrganizationTenantEndpointTests : IClassFixture<PostgresDatabaseFix
 
     private sealed record Row(Guid Id, Guid OrganizationId);
 
-    private sealed record ErrorBody(string Message);
+    private sealed record ErrorBody(string Title);
 
     private async Task<TenantApiFactory> CreateFactoryWithTwoOrganizationsAsync()
     {
@@ -191,6 +191,27 @@ public class OrganizationTenantEndpointTests : IClassFixture<PostgresDatabaseFix
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.Forbidden, "a token with no organization chosen is refused");
-        (await response.Content.ReadFromJsonAsync<ErrorBody>())!.Message.ShouldBe(factory.Message("OrganizationRequired"), "the refusal says an organization is required");
+        (await response.Content.ReadFromJsonAsync<ErrorBody>())!.Title.ShouldBe(factory.Message("OrganizationRequired"), "the refusal says an organization is required");
+    }
+
+    [Fact]
+    [Trait("Rule", "OR46")]
+    public async Task EditLocation_LocationOfAnotherOrganization_AnswersTheSameStatusTitleAndCodeAsAMissingOne()
+    {
+        // Arrange
+        await using var factory = await CreateFactoryWithTwoOrganizationsAsync();
+        var client = factory.ClientFor(AnaId, CantinaId);
+        var missingLocationId = Guid.Parse("44444444-dddd-4ddd-8ddd-0000000000ff");
+
+        // Act
+        var otherOrganization = await client.SendAsync(Request("PUT", $"/api/locations/{TrattoriaCentroId}", LocationBody));
+        var missing = await client.SendAsync(Request("PUT", $"/api/locations/{missingLocationId}", LocationBody));
+
+        // Assert
+        otherOrganization.StatusCode.ShouldBe(HttpStatusCode.NotFound, "another organization's location is answered as not found");
+        missing.StatusCode.ShouldBe(HttpStatusCode.NotFound, "a missing location is not found too");
+        (await LocalizedResponses.CodeAsync(otherOrganization)).ShouldBe("location.not_found", "the code names the location");
+        (await LocalizedResponses.CodeAsync(missing)).ShouldBe("location.not_found", "another organization's location has the same code as a missing one, so nobody can tell it exists");
+        (await LocalizedResponses.MessageAsync(otherOrganization)).ShouldBe(await LocalizedResponses.MessageAsync(missing), "the title is the same too");
     }
 }

@@ -219,5 +219,21 @@ namespace RestaurantManagement.Modules.Identity.Tests
             // Assert
             exception.StatusCode.ShouldBe(403, $"a {role} has no Members = Manage, so she cannot edit anyone's access");
         }
+
+    [Fact]
+    [Trait("Rule", "T144")]
+    public async Task RequireAsync_AdminGivesALevelAboveTheirOwn_ThrowsLevelAboveOwnCode()
+    {
+        // Arrange
+        using var database = await CreateAsync();
+        await HoldAsync(database, MariaId, BatelId, AdminLevelsExceptCashier);
+        var sut = CreateRules(database, MariaId);
+
+        // Act
+        var exception = await Should.ThrowAsync<BusinessException>(() => sut.RequireAsync(BrunoId, new[] { Grant(BatelId, CashierPresetLevels) }));
+
+        // Assert
+        exception.Code.ShouldBe("access.level_above_own", "the refusal has its own code, apart from a plain access denied");
+    }
     }
 }

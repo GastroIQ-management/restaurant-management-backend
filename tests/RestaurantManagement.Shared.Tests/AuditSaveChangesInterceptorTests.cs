@@ -530,4 +530,21 @@ public class AuditSaveChangesInterceptorTests
         dish.UpdatedAt.ShouldBe(UpdateTime.UtcDateTime);
         dish.UpdatedAt.Kind.ShouldBe(DateTimeKind.Utc);
     }
+
+    [Fact]
+    [Trait("Rule", "SH61")]
+    public async Task SaveChangesAsync_NewTenantRowCarriesAnotherOrganizationId_ThrowsTenantMismatchCode()
+    {
+        // Arrange
+        using var database = new AuditTestDatabase();
+        var interceptor = AuditTestDatabase.CreateInterceptor(CreationTime, userId: MariaId, userOrganizationId: OrgA);
+        using var context = database.CreateContext(interceptor);
+        context.Dishes.Add(Margherita(OrgB));
+
+        // Act
+        var thrown = await Should.ThrowAsync<BusinessException>(() => context.SaveChangesAsync());
+
+        // Assert
+        thrown.Code.ShouldBe("tenant.mismatch", "a row for another organization is refused with the tenant mismatch code");
+    }
 }

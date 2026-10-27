@@ -61,4 +61,21 @@ public class ValidationTitleEndpointTests : IDisposable
         body["status"]!.GetValue<int>().ShouldBe(400, "the body still carries the 400 status");
         body["errors"]!.AsObject().ContainsKey("PhoneNumber").ShouldBeTrue("the body still lists the field that failed validation");
     }
+
+    [Fact]
+    [Trait("Rule", "W22")]
+    public async Task Register_InvalidRequest_AnswersValidationFailedCodeAndKeepsFieldErrors()
+    {
+        // Arrange
+        var client = _factory.CreateClient();
+        var request = Request("POST", "/api/auth/register", "pt", InvalidRegistration);
+
+        // Act
+        var response = await client.SendAsync(request);
+
+        // Assert
+        response.Content.Headers.ContentType!.MediaType.ShouldBe("application/problem+json", "a validation answer is Problem Details");
+        (await CodeAsync(response)).ShouldBe("validation.failed", "every validation refusal carries one code, whatever the language");
+        (await FieldErrorsAsync(response, "PhoneNumber")).ShouldNotBeEmpty("the field errors are kept next to the code");
+    }
 }

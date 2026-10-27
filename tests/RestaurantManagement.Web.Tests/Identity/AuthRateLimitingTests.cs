@@ -116,8 +116,8 @@ public class AuthRateLimitingTests : IDisposable
 
         var response = await PostLoginAsync(client, IpA, culture: PortugueseCulture);
 
-        var body = await response.Content.ReadFromJsonAsync<Dictionary<string, string>>();
-        body!["message"].Should().Be(PortugueseMessage, "a blocked person who asked for Portuguese must read the refusal in Portuguese");
+        var body = await LocalizedResponses.ProblemAsync(response);
+        body["title"]!.GetValue<string>().Should().Be(PortugueseMessage, "a blocked person who asked for Portuguese must read the refusal in Portuguese");
     }
 
     [Fact]
@@ -129,8 +129,8 @@ public class AuthRateLimitingTests : IDisposable
 
         var response = await PostLoginAsync(client, IpA);
 
-        var body = await response.Content.ReadFromJsonAsync<Dictionary<string, string>>();
-        body!["message"].Should().Be(EnglishMessage, "without a language choice the refusal is in English");
+        var body = await LocalizedResponses.ProblemAsync(response);
+        body["title"]!.GetValue<string>().Should().Be(EnglishMessage, "without a language choice the refusal is in English");
     }
 
     [Fact]

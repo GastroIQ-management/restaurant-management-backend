@@ -195,4 +195,33 @@ public class MenuGridAccessTests
         var exception = await act.ShouldThrowAsync<BusinessException>();
         exception.StatusCode.ShouldBe(403, "Menus Read only at Batel gives nothing at Mercado Municipal, and a list across locations needs every non-closed location");
     }
+
+    private static readonly Dictionary<string, (Func<Services, Task> Act, string Code)> Refusals = new()
+    {
+        ["edit a menu that does not exist"] = (s => s.Menus.EditMenuAsync(MariaId, Guid.NewGuid(), MenuEdit), "menu.not_found"),
+        ["create a category in a menu that does not exist"] = (s => s.Categories.CreateAsync(MariaId,
+            new CreateMenuCategoryRequest { MenuId = Guid.NewGuid(), LocationId = null, Name = "Entradas", SortOrder = 1 }), "menu.not_found"),
+        ["link a menu to a location that does not exist"] = (s => s.Menus.AttachMenuToLocationAsync(MariaId, DinnerMenuId, Guid.NewGuid()), "location.not_found")
+    };
+
+    public static TheoryData<string> RefusalNames => new(Refusals.Keys);
+
+    [Theory]
+    [MemberData(nameof(RefusalNames))]
+    [Trait("Rule", "M45")]
+    public async Task MenuAndCategoryServices_MenuOrLocationDoesNotExist_ThrowNotFoundWithTheirOwnCode(string refusal)
+    {
+        // Arrange
+        using var database = new MenuTestDatabase();
+        await SeedAsync(database);
+        var services = CreateServices(database, new AccessGridDto { IsOwner = true });
+
+        // Act
+        var act = () => Refusals[refusal].Act(services);
+
+        // Assert
+        var thrown = await Should.ThrowAsync<BusinessException>(act);
+        thrown.StatusCode.ShouldBe(404, "a missing menu or location is a 404");
+        thrown.Code.ShouldBe(Refusals[refusal].Code, "the refusal names what was not found, in a fixed English code");
+    }
 }

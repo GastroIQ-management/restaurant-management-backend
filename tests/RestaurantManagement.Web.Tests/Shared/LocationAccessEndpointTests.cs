@@ -120,4 +120,24 @@ public class LocationAccessEndpointTests : IClassFixture<PostgresDatabaseFixture
         before.StatusCode.ShouldBe(HttpStatusCode.Forbidden, "a new member has no access to any location until it is granted");
         afterGrant.StatusCode.ShouldBe(HttpStatusCode.OK, "once a level at the location is granted, the same token is accepted there");
     }
+
+    [Fact]
+    [Trait("Rule", "SH59")]
+    public async Task GetLocations_AnotherOrganizationsLocationAndALocationWithoutAccess_AnswerTheSameStatusTitleAndCode()
+    {
+        // Arrange
+        await using var factory = await CreateFactoryAsync();
+        var noAccessClient = factory.ClientFor(BiaId, CantinaId, locationHeader: MercadoMunicipal);
+        var otherOrganizationClient = factory.ClientFor(AnaId, CantinaId, locationHeader: TrattoriaCentro);
+
+        // Act
+        var noAccess = await noAccessClient.GetAsync(LocationsUrl);
+        var otherOrganization = await otherOrganizationClient.GetAsync(LocationsUrl);
+
+        // Assert
+        otherOrganization.StatusCode.ShouldBe(noAccess.StatusCode, "another organization's location gets the same status as a location without access");
+        (await LocalizedResponses.MessageAsync(otherOrganization)).ShouldBe(await LocalizedResponses.MessageAsync(noAccess), "the title never tells the two cases apart");
+        (await LocalizedResponses.CodeAsync(noAccess)).ShouldBe("location.access_denied", "a refused location carries its own code");
+        (await LocalizedResponses.CodeAsync(otherOrganization)).ShouldBe("location.access_denied", "another organization's location gets the same code, so nobody can tell it exists");
+    }
 }

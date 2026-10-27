@@ -117,4 +117,20 @@ public class AccessGuardTests
         var exception = await act.ShouldThrowAsync<BusinessException>();
         exception.StatusCode.ShouldBe(403, "an 'every location' check with no non-closed location to hold a level at passes only the Owner");
     }
+
+    [Theory]
+    [MemberData(nameof(CheckNames))]
+    [Trait("Rule", "SH58")]
+    public async Task Require_MemberWithNoStoredCells_ThrowsAccessDeniedCode(string check)
+    {
+        // Arrange
+        var guard = CreateGuard(NoCells, CantinaId, BatelId, MercadoId);
+
+        // Act
+        var act = () => Checks[check](guard);
+
+        // Assert
+        var exception = await act.ShouldThrowAsync<BusinessException>();
+        exception.Code.ShouldBe("access.denied", "every access refusal of the guard carries the access denied code");
+    }
 }

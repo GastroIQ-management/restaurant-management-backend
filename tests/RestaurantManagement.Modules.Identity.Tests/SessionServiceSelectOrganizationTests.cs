@@ -754,5 +754,25 @@ namespace RestaurantManagement.Modules.Identity.Tests
             paolos.ReplacedByTokenId.ShouldBeNull("the other user's token is not replaced");
             paolos.OrganizationId.ShouldBe(DeletedOrganizationId);
         }
+
+        [Theory]
+        [InlineData("00000000-0000-0000-0000-000000000000", "session.organization_required")]
+        [InlineData("b2b2b2b2-0000-4000-8000-000000000002", "session.not_a_member")]
+        [InlineData("c3c3c3c3-0000-4000-8000-000000000003", "session.not_a_member")]
+        [Trait("Rule", "S12")]
+        public async Task SelectOrganizationAsync_NoOrganizationNotAMemberOrUnknownOrganization_ThrowsTheirOwnCode(string organizationId, string expectedCode)
+        {
+            // Arrange
+            using var database = new IdentityTestDatabase();
+            var userId = await SeedUserAsync(database, new[] { TestMembers.Owner(Guid.Empty, CantinaId) });
+            var lookup = CreateLookup(Cantina(), Trattoria());
+
+            // Act
+            var act = () => SelectAsync(database, lookup, userId, Guid.Parse(organizationId));
+
+            // Assert
+            var thrown = await Should.ThrowAsync<BusinessException>(act);
+            thrown.Code.ShouldBe(expectedCode, "an organization that is not the user's, existing or not, gets one code, apart from a missing organization ID");
+        }
     }
 }

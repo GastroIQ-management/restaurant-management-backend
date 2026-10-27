@@ -535,5 +535,21 @@ namespace RestaurantManagement.Modules.Identity.Tests
             // Assert
             (await ReadTokensAsync(database)).ShouldAllBe(t => t.RevokedAt != null, "refusing a deactivated user also revokes their remaining tokens");
         }
+
+        [Fact]
+        [Trait("Rule", "F14")]
+        public async Task RefreshTokenAsync_UnknownToken_ThrowsSessionInvalidOrExpiredCode()
+        {
+            // Arrange
+            using var database = new IdentityTestDatabase();
+            var userId = await SeedUserAsync(database);
+            await IssueTokenAsync(database, userId);
+
+            // Act
+            var thrown = await Should.ThrowAsync<BusinessException>(() => RefreshAsync(database, "bm90LWEtcmVhbC10b2tlbi1mb3ItY2FudGluYQ=="));
+
+            // Assert
+            thrown.Code.ShouldBe("session.invalid_or_expired", "an ended or invalid session has one code the app answers by signing in again");
+        }
     }
 }
