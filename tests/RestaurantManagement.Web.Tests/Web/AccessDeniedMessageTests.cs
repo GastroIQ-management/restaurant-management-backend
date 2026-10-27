@@ -104,6 +104,7 @@ public class AccessDeniedMessageTests : IDisposable
         {
             Cells = new[] { new AccessCellDto { LocationId = trattoriaCentroId, Module = AccessModule.Members, Level = AccessLevel.Manage } }
         });
+        _factory.MemberAccess.GetAccessGridAsync(pedroId, CantinaId).Returns(new AccessGridDto());
         var client = _factory.CreateClient();
         var request = new HttpRequestMessage(HttpMethod.Get, MembersUrl);
         request.Headers.Authorization = new AuthenticationHeaderValue(
