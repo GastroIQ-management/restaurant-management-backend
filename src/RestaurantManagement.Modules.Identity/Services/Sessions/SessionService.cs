@@ -169,11 +169,12 @@ namespace RestaurantManagement.Modules.Identity.Services.Sessions
             user.UpdatedAt = DateTime.UtcNow;
             await _db.SaveChangesAsync();
 
-            // Only the caller's own cookie token may be rotated; anything else starts a new family.
+            // Only the caller's own active cookie may be rotated; starting a new session here would restart the 30 days.
             var issued = string.IsNullOrWhiteSpace(refreshToken)
                 ? null
                 : await _refreshTokens.RotateAsync(refreshToken, request.OrganizationId, userId);
-            issued ??= await _refreshTokens.IssueAsync(userId, request.OrganizationId, client.DeviceDescription, client.IpAddress);
+            if (issued == null)
+                throw InvalidSession();
 
             var memberOrganizationIds = await _organizations.GetOrganizationIdsAsync(user.Id);
             return SessionResults.Build(SessionResults.BuildAuth(user, _accessTokens.Create(user, memberOrganizationIds, request.OrganizationId)), issued);

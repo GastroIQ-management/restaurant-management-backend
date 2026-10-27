@@ -50,4 +50,4 @@ Outcomes are the backlog item's Acceptance criteria, in order:
 ## Checklist
 - [x] T1 — Session limit settings and startup checks
 - [x] T2 — Refresh tokens keep the login time; expiry from both limits
-- [ ] T3 — Choosing an organization keeps the login time
+- [x] T3 — Choosing an organization keeps the login time
