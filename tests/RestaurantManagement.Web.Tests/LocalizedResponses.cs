@@ -39,6 +39,14 @@ public static class LocalizedResponses
     public static async Task<JsonNode> ProblemAsync(HttpResponseMessage response)
         => JsonNode.Parse(await response.Content.ReadAsStringAsync())!;
 
+    /// <summary>The Problem Details body without its "traceId", which differs on every request.</summary>
+    public static async Task<string> ProblemWithoutTraceIdAsync(HttpResponseMessage response)
+    {
+        var problem = (await ProblemAsync(response)).AsObject();
+        problem.Remove("traceId");
+        return problem.ToJsonString();
+    }
+
     /// <summary>Every field error of a validation (400) body, from all fields.</summary>
     public static async Task<List<string>> FieldErrorsAsync(HttpResponseMessage response)
     {
