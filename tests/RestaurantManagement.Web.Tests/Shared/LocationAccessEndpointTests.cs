@@ -6,7 +6,7 @@ using Currency = RestaurantManagement.Modules.Organization.Entities.Currency;
 namespace RestaurantManagement.Web.Tests;
 
 /// <summary>
-/// The X-Location-Id header through the real pipeline, on GET /api/locations (any access lists the
+/// The X-Location-Id header through the real pipeline, on GET /api/v1/locations (any access lists the
 /// locations, so the answer shows the header check and not a menu rule).
 /// Cantina da Nonna has Batel and Mercado Municipal; Trattoria do Sol has Centro.
 /// Bia is a Waiter with Menus Read at Batel only; Ana holds Manager levels at both Cantina
@@ -17,7 +17,7 @@ public class LocationAccessEndpointTests : IClassFixture<PostgresDatabaseFixture
     private const string Batel = "44444444-dddd-4ddd-8ddd-000000000001";
     private const string MercadoMunicipal = "44444444-dddd-4ddd-8ddd-000000000002";
     private const string TrattoriaCentro = "44444444-dddd-4ddd-8ddd-000000000003";
-    private const string LocationsUrl = "/api/locations";
+    private const string LocationsUrl = "/api/v1/locations";
     private const string AnaText = "11111111-aaaa-4aaa-8aaa-00000000000a";
     private const string BiaText = "22222222-bbbb-4bbb-8bbb-00000000000b";
 

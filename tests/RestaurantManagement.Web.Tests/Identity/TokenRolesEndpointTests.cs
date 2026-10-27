@@ -15,7 +15,7 @@ using Xunit;
 namespace RestaurantManagement.Web.Tests;
 
 /// <summary>
-/// POST api/auth/login then a menu action, end to end on a real PostgreSQL database: the token of a
+/// POST api/v1/auth/login then a menu action, end to end on a real PostgreSQL database: the token of a
 /// user who is a member of two organizations and has not chosen one carries no organization and no
 /// role, so the action is refused.
 /// </summary>
@@ -61,10 +61,10 @@ public class TokenRolesEndpointTests : IClassFixture<PostgresDatabaseFixture>
         await tenant.AddMembershipAsync(userId, TenantApiFactory.OwnerOf(CantinaId));
         await tenant.AddMembershipAsync(userId, TenantApiFactory.MemberOf(TrattoriaId));
         var client = app.CreateClient(new WebApplicationFactoryClientOptions { HandleCookies = false });
-        var login = await client.PostAsJsonAsync("/api/auth/login", new { email = Email, password = Password });
+        var login = await client.PostAsJsonAsync("/api/v1/auth/login", new { email = Email, password = Password });
         login.StatusCode.ShouldBe(HttpStatusCode.OK, "valid credentials log the person in");
         var token = (await login.Content.ReadFromJsonAsync<JsonElement>()).GetProperty("token").GetString();
-        var request = new HttpRequestMessage(HttpMethod.Post, "/api/menus/create")
+        var request = new HttpRequestMessage(HttpMethod.Post, "/api/v1/menus/create")
         {
             Content = JsonContent.Create(new { name = "Almoço executivo" })
         };

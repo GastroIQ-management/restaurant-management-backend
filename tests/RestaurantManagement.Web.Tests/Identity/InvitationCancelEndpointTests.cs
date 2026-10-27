@@ -8,7 +8,7 @@ using static RestaurantManagement.Web.Tests.InvitationWebSupport;
 namespace RestaurantManagement.Web.Tests;
 
 /// <summary>
-/// <c>DELETE api/invitations/{invitationId}</c> on a real PostgreSQL database. Ana (Owner of Cantina da Nonna)
+/// <c>DELETE api/v1/invitations/{invitationId}</c> on a real PostgreSQL database. Ana (Owner of Cantina da Nonna)
 /// invited Rita as a Waiter at Batel; Maria is an Admin with Members = Manage at Batel.
 /// </summary>
 public class InvitationCancelEndpointTests : IClassFixture<PostgresDatabaseFixture>
@@ -27,8 +27,8 @@ public class InvitationCancelEndpointTests : IClassFixture<PostgresDatabaseFixtu
         var token = LatestTokenSentTo(factory, RitaEmail);
 
         // Act
-        var cancel = await factory.ClientFor(AnaId, CantinaId).DeleteAsync($"/api/invitations/{invitationId}");
-        var accept = await factory.ClientFor(RitaId, null).PostAsJsonAsync("/api/invitations/accept", new { token });
+        var cancel = await factory.ClientFor(AnaId, CantinaId).DeleteAsync($"/api/v1/invitations/{invitationId}");
+        var accept = await factory.ClientFor(RitaId, null).PostAsJsonAsync("/api/v1/invitations/accept", new { token });
 
         // Assert
         cancel.IsSuccessStatusCode.ShouldBeTrue("an authorized member can cancel a pending invitation");
@@ -45,7 +45,7 @@ public class InvitationCancelEndpointTests : IClassFixture<PostgresDatabaseFixtu
         var invitationId = await InviteAsync(factory, AnaId, RitaEmail, BatelId, new[] { "Waiter" });
 
         // Act
-        await factory.ClientFor(AnaId, CantinaId).DeleteAsync($"/api/invitations/{invitationId}");
+        await factory.ClientFor(AnaId, CantinaId).DeleteAsync($"/api/v1/invitations/{invitationId}");
 
         // Assert
         var entry = (await AuditEntriesAsync(factory, CantinaId, AuditActions.MemberInvitationCancelled)).ShouldHaveSingleItem("a cancellation writes one audit entry");
@@ -70,7 +70,7 @@ public class InvitationCancelEndpointTests : IClassFixture<PostgresDatabaseFixtu
         await factory.GrantAsync(caller, CantinaId, BatelId, DefaultLevelsOf(role));
 
         // Act
-        var response = await factory.ClientFor(caller, CantinaId).DeleteAsync($"/api/invitations/{invitationId}");
+        var response = await factory.ClientFor(caller, CantinaId).DeleteAsync($"/api/v1/invitations/{invitationId}");
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.Forbidden, $"a {role} has no Members = Manage, so she cannot cancel invitations");
@@ -83,11 +83,11 @@ public class InvitationCancelEndpointTests : IClassFixture<PostgresDatabaseFixtu
     {
         // Arrange
         await using var factory = await CreateFactoryAsync(_postgres);
-        var response = await factory.ClientFor(TerezaId, TrattoriaId).PostAsJsonAsync("/api/invitations", InviteBody(BrunoEmail, CentroId, new[] { "Waiter" }));
+        var response = await factory.ClientFor(TerezaId, TrattoriaId).PostAsJsonAsync("/api/v1/invitations", InviteBody(BrunoEmail, CentroId, new[] { "Waiter" }));
         var trattoriaInvitation = (await response.Content.ReadFromJsonAsync<InvitationReply>())!.Id;
 
         // Act
-        var cancel = await factory.ClientFor(AnaId, CantinaId).DeleteAsync($"/api/invitations/{trattoriaInvitation}");
+        var cancel = await factory.ClientFor(AnaId, CantinaId).DeleteAsync($"/api/v1/invitations/{trattoriaInvitation}");
 
         // Assert
         cancel.StatusCode.ShouldBe(HttpStatusCode.NotFound, "another organization's invitation is answered as if it did not exist");

@@ -16,15 +16,15 @@ using Xunit;
 namespace RestaurantManagement.Web.Tests;
 
 /// <summary>
-/// POST api/auth/change-password (signed in, no organization needed) end to end on a real PostgreSQL
+/// POST api/v1/auth/change-password (signed in, no organization needed) end to end on a real PostgreSQL
 /// database (plan T9). The user comes only from the access token: a user ID in the body is ignored.
 /// Maria (Owner of Cantina da Nonna) and João (Cashier of Cantina da Nonna) are each signed in on one device.
 /// </summary>
 public class PasswordChangeEndpointTests : IClassFixture<PostgresDatabaseFixture>
 {
-    private const string ChangeUrl = "/api/auth/change-password";
+    private const string ChangeUrl = "/api/v1/auth/change-password";
     private const string CookieName = "__Secure-refresh_token";
-    private const string CookiePath = "/api/auth";
+    private const string CookiePath = "/api/v1/auth";
     private const string MariaPassword = "Massa@Fresca2026";
     private const string JoaoPassword = "Pizza@Margherita2026";
     private const string NewPassword = "Nhoque@Batata2027";

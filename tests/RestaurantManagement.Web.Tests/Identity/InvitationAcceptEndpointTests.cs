@@ -16,8 +16,8 @@ namespace RestaurantManagement.Web.Tests;
 /// </summary>
 public class InvitationAcceptEndpointTests : IClassFixture<PostgresDatabaseFixture>
 {
-    private const string AcceptUrl = "/api/invitations/accept";
-    private const string AcceptWithAccountUrl = "/api/auth/accept-invitation";
+    private const string AcceptUrl = "/api/v1/invitations/accept";
+    private const string AcceptWithAccountUrl = "/api/v1/auth/accept-invitation";
 
     private readonly PostgresDatabaseFixture _postgres;
 
@@ -55,7 +55,7 @@ public class InvitationAcceptEndpointTests : IClassFixture<PostgresDatabaseFixtu
         await InviteAsync(factory, AnaId, RitaEmail, BatelId, new[] { "Waiter" });
 
         // Act
-        var response = await factory.ClientFor(RitaId, CantinaId).GetAsync($"/api/menus/location/{BatelId}");
+        var response = await factory.ClientFor(RitaId, CantinaId).GetAsync($"/api/v1/menus/location/{BatelId}");
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.Forbidden, "until the link is accepted the invitee has no access at all");

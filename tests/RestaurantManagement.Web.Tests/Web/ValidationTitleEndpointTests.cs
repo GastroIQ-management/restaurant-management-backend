@@ -34,7 +34,7 @@ public class ValidationTitleEndpointTests : IDisposable
     {
         // Arrange
         var client = _factory.CreateClient();
-        var request = Request("POST", "/api/auth/register", culture, InvalidRegistration);
+        var request = Request("POST", "/api/v1/auth/register", culture, InvalidRegistration);
 
         // Act
         var response = await client.SendAsync(request);
@@ -51,7 +51,7 @@ public class ValidationTitleEndpointTests : IDisposable
     {
         // Arrange
         var client = _factory.CreateClient();
-        var request = Request("POST", "/api/auth/register", "en", InvalidRegistration);
+        var request = Request("POST", "/api/v1/auth/register", "en", InvalidRegistration);
 
         // Act
         var response = await client.SendAsync(request);
@@ -68,7 +68,7 @@ public class ValidationTitleEndpointTests : IDisposable
     {
         // Arrange
         var client = _factory.CreateClient();
-        var request = Request("POST", "/api/auth/register", "pt", InvalidRegistration);
+        var request = Request("POST", "/api/v1/auth/register", "pt", InvalidRegistration);
 
         // Act
         var response = await client.SendAsync(request);

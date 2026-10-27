@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using NSubstitute;
 using RestaurantManagement.Modules.Identity.Services.Registration;
 using RestaurantManagement.Modules.Identity.Services.Sessions;
+using RestaurantManagement.Shared.Middleware;
 
 namespace RestaurantManagement.Web.Tests;
 
@@ -29,6 +30,15 @@ public class AuthApiFactory : WebApplicationFactory<Program>
         ["AuthRateLimit:Verify:PermitLimit"] = HighLimit,
         ["AuthRateLimit:Refresh:PermitLimit"] = HighLimit,
     };
+
+    /// <summary>The app version every test client sends by default; a refusal test removes it.</summary>
+    public const string AppVersion = "1.0.0";
+
+    protected override void ConfigureClient(HttpClient client)
+    {
+        base.ConfigureClient(client);
+        client.DefaultRequestHeaders.Add(AppVersionMiddleware.HeaderName, AppVersion);
+    }
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {

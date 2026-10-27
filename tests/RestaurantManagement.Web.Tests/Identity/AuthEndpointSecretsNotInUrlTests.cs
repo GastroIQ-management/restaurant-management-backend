@@ -22,7 +22,7 @@ public class AuthEndpointSecretsNotInUrlTests : IDisposable
     private List<ControllerActionDescriptor> AuthActions() =>
         _factory.Services.GetRequiredService<IActionDescriptorCollectionProvider>().ActionDescriptors.Items
             .OfType<ControllerActionDescriptor>()
-            .Where(action => action.AttributeRouteInfo!.Template!.StartsWith("api/auth", StringComparison.OrdinalIgnoreCase))
+            .Where(action => action.AttributeRouteInfo!.Template!.StartsWith("api/v1/auth", StringComparison.OrdinalIgnoreCase))
             .ToList();
 
     // A parameter with no binding source is treated as a URL read: it could be bound from the query string or route

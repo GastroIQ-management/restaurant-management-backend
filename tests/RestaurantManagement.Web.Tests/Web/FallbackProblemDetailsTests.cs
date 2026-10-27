@@ -32,7 +32,7 @@ public class FallbackProblemDetailsTests : IDisposable
     [InlineData("GET", "/api/does-not-exist", null, HttpStatusCode.NotFound, "http.not_found")]
     [InlineData("POST", "/api/test-probe/members", null, HttpStatusCode.MethodNotAllowed, "http.method_not_allowed")]
     [InlineData("GET", "/api/test-probe/bodiless-conflict", null, HttpStatusCode.Conflict, "http.conflict")]
-    [InlineData("POST", "/api/auth/login", "ana@cantinadanonna.com.br", HttpStatusCode.UnsupportedMediaType, "http.unsupported_media_type")]
+    [InlineData("POST", "/api/v1/auth/login", "ana@cantinadanonna.com.br", HttpStatusCode.UnsupportedMediaType, "http.unsupported_media_type")]
     [Trait("Rule", "W28")]
     public async Task FrameworkError_UnknownRouteWrongMethodBodilessResultWrongContentType_AnswersFallbackCodeWithATitlePerLanguage(
         string method, string url, string? plainTextBody, HttpStatusCode status, string expectedCode)

@@ -10,7 +10,7 @@ using static RestaurantManagement.Web.Tests.RoleWebSupport;
 namespace RestaurantManagement.Web.Tests;
 
 /// <summary>
-/// <c>PUT api/roles/{roleId}/levels</c> and <c>PUT api/roles/{roleId}/name</c> on a real PostgreSQL database.
+/// <c>PUT api/v1/roles/{roleId}/levels</c> and <c>PUT api/v1/roles/{roleId}/name</c> on a real PostgreSQL database.
 /// Ana is the Owner of Cantina da Nonna; Bia holds the Waiter levels at Batel; Maria is an Admin with
 /// Members = Manage at Batel and Mercado but no Cashier level; Trattoria do Sol has its own Sommelier role.
 /// </summary>
@@ -33,7 +33,7 @@ public class RoleEditEndpointTests : IClassFixture<PostgresDatabaseFixture>
         var gridBefore = await CellsAsync(factory, CantinaId, BiaId, BatelId);
 
         // Act
-        var response = await factory.ClientFor(AnaId, CantinaId).PutAsync($"/api/roles/{waiterId}/levels", Json(LevelsBody));
+        var response = await factory.ClientFor(AnaId, CantinaId).PutAsync($"/api/v1/roles/{waiterId}/levels", Json(LevelsBody));
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
@@ -49,10 +49,10 @@ public class RoleEditEndpointTests : IClassFixture<PostgresDatabaseFixture>
         await using var factory = await CreateFactoryAsync(_postgres);
         var waiterId = await RoleIdAsync(factory, CantinaId, "Waiter");
         var owner = factory.ClientFor(AnaId, CantinaId);
-        (await owner.PutAsync($"/api/roles/{waiterId}/levels", Json(LevelsBody))).EnsureSuccessStatusCode();
+        (await owner.PutAsync($"/api/v1/roles/{waiterId}/levels", Json(LevelsBody))).EnsureSuccessStatusCode();
 
         // Act
-        var invitation = await owner.PostAsJsonAsync("/api/invitations", InviteBody(BrunoEmail, MercadoId, new[] { "Waiter" }));
+        var invitation = await owner.PostAsJsonAsync("/api/v1/invitations", InviteBody(BrunoEmail, MercadoId, new[] { "Waiter" }));
 
         // Assert
         invitation.StatusCode.ShouldBe(HttpStatusCode.OK);
@@ -72,7 +72,7 @@ public class RoleEditEndpointTests : IClassFixture<PostgresDatabaseFixture>
         var client = factory.ClientFor(AnaId, CantinaId);
 
         // Act
-        var response = await client.PutAsync($"/api/roles/{waiterId}/name", Json("""{"name":"Server"}"""));
+        var response = await client.PutAsync($"/api/v1/roles/{waiterId}/name", Json("""{"name":"Server"}"""));
         var names = (await ListRolesAsync(client)).Select(r => r.Name).ToList();
 
         // Assert
@@ -94,7 +94,7 @@ public class RoleEditEndpointTests : IClassFixture<PostgresDatabaseFixture>
         var levelsBefore = await RoleLevelsAsync(factory, CantinaId, cashierId);
 
         // Act
-        var response = await factory.ClientFor(MariaId, CantinaId).PutAsync($"/api/roles/{cashierId}/{route}", Json(body));
+        var response = await factory.ClientFor(MariaId, CantinaId).PutAsync($"/api/v1/roles/{cashierId}/{route}", Json(body));
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.Forbidden, "a role holding a level above the Admin's own cannot be edited or renamed by her");
@@ -121,7 +121,7 @@ public class RoleEditEndpointTests : IClassFixture<PostgresDatabaseFixture>
         var levelsBefore = await RoleLevelsAsync(factory, CantinaId, waiterId);
 
         // Act
-        var response = await factory.ClientFor(CaioId, CantinaId).PutAsync($"/api/roles/{waiterId}/{route}", Json(body));
+        var response = await factory.ClientFor(CaioId, CantinaId).PutAsync($"/api/v1/roles/{waiterId}/{route}", Json(body));
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.Forbidden, $"a {callerRole} has no Members = Manage, so she cannot change roles");
@@ -140,7 +140,7 @@ public class RoleEditEndpointTests : IClassFixture<PostgresDatabaseFixture>
         var sommelierId = await RoleIdAsync(factory, TrattoriaId, "Sommelier");
 
         // Act
-        var response = await factory.ClientFor(AnaId, CantinaId).PutAsync($"/api/roles/{sommelierId}/{route}", Json(body));
+        var response = await factory.ClientFor(AnaId, CantinaId).PutAsync($"/api/v1/roles/{sommelierId}/{route}", Json(body));
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.NotFound, "another organization's role is answered as if it did not exist");
@@ -160,7 +160,7 @@ public class RoleEditEndpointTests : IClassFixture<PostgresDatabaseFixture>
 
         // Act
         var response = await factory.ClientFor(MariaId, CantinaId)
-            .PutAsync($"/api/roles/{waiterId}/levels", Json("""{"levels":{"Orders":"Manage","Cashier":"Manage"}}"""));
+            .PutAsync($"/api/v1/roles/{waiterId}/levels", Json("""{"levels":{"Orders":"Manage","Cashier":"Manage"}}"""));
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.Forbidden, "an Admin cannot raise a role's default above her own level in a module");
@@ -177,7 +177,7 @@ public class RoleEditEndpointTests : IClassFixture<PostgresDatabaseFixture>
         await using var factory = await CreateFactoryAsync(_postgres);
 
         // Act
-        var response = await factory.ClientFor(AnaId, CantinaId).PutAsync($"/api/roles/{Guid.NewGuid()}/{route}", Json(body));
+        var response = await factory.ClientFor(AnaId, CantinaId).PutAsync($"/api/v1/roles/{Guid.NewGuid()}/{route}", Json(body));
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.NotFound, "a role that does not exist is not found");

@@ -36,7 +36,7 @@ public class InvitationSizeLimitEndpointTests : IClassFixture<PostgresDatabaseFi
             };
 
         // Act
-        var response = await client.PostAsJsonAsync("/api/invitations", new { email = BrunoEmail, locations });
+        var response = await client.PostAsJsonAsync("/api/v1/invitations", new { email = BrunoEmail, locations });
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.BadRequest, "a body with an oversized list is refused");
@@ -56,7 +56,7 @@ public class InvitationSizeLimitEndpointTests : IClassFixture<PostgresDatabaseFi
         var before = await CellsAsync(factory, CantinaId, BiaId, BatelId);
 
         // Act
-        var response = await client.PutAsJsonAsync($"/api/members/{BiaId}/access/{BatelId}", new
+        var response = await client.PutAsJsonAsync($"/api/v1/members/{BiaId}/access/{BatelId}", new
         {
             roleNames = collection == "roleNames" ? many.Select(i => "Waiter").ToArray() : new[] { "Waiter" },
             levels = collection == "levels" ? many.ToDictionary(i => $"Module{i}", _ => "Read") : new Dictionary<string, string>()
@@ -68,8 +68,8 @@ public class InvitationSizeLimitEndpointTests : IClassFixture<PostgresDatabaseFi
     }
 
     [Theory]
-    [InlineData("/api/invitations/accept")]
-    [InlineData("/api/auth/accept-invitation")]
+    [InlineData("/api/v1/invitations/accept")]
+    [InlineData("/api/v1/auth/accept-invitation")]
     [Trait("Rule", "T85")]
     public async Task Accept_TokenLongerThanTheLimit_ReturnsBadRequest(string url)
     {
@@ -95,7 +95,7 @@ public class InvitationSizeLimitEndpointTests : IClassFixture<PostgresDatabaseFi
         var location = new { locationId = BatelId, roleNames = new[] { "Waiter" }, levels = new Dictionary<string, string>() };
 
         // Act
-        var response = await client.PostAsJsonAsync("/api/invitations", new { email = BrunoEmail, locations = new[] { location, location } });
+        var response = await client.PostAsJsonAsync("/api/v1/invitations", new { email = BrunoEmail, locations = new[] { location, location } });
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.BadRequest, "a repeated location is refused, not a database error");

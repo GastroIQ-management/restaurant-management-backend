@@ -8,7 +8,7 @@ using static RestaurantManagement.Web.Tests.InvitationWebSupport;
 namespace RestaurantManagement.Web.Tests;
 
 /// <summary>
-/// POST api/invitations picks the language of the email: the invited person's account language when they
+/// POST api/v1/invitations picks the language of the email: the invited person's account language when they
 /// have one, otherwise the Accept-Language of the inviter (English, Portuguese or French).
 /// </summary>
 public class InvitationEmailLanguageEndpointTests : IClassFixture<PostgresDatabaseFixture>
@@ -21,7 +21,7 @@ public class InvitationEmailLanguageEndpointTests : IClassFixture<PostgresDataba
     {
         var client = factory.ClientFor(AnaId, CantinaId);
         client.DefaultRequestHeaders.Add("Accept-Language", acceptLanguage);
-        return await client.PostAsJsonAsync("/api/invitations", InviteBody(email, BatelId, new[] { "Waiter" }));
+        return await client.PostAsJsonAsync("/api/v1/invitations", InviteBody(email, BatelId, new[] { "Waiter" }));
     }
 
     [Theory]

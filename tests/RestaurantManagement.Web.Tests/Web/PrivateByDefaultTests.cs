@@ -104,12 +104,12 @@ public class PrivateByDefaultTests : IDisposable
 
     // Scenario 30
     [Theory]
-    [InlineData("/api/auth/register", """{"email":"maria.souza@cantina.com.br","password":"Feijoada#2026","firstName":"Maria","lastName":"Souza"}""")]
-    [InlineData("/api/auth/login", """{"email":"maria.souza@cantina.com.br","password":"Feijoada#2026"}""")]
-    [InlineData("/api/auth/refresh", "")]
-    [InlineData("/api/auth/logout", "")]
-    [InlineData("/api/auth/verify", """{"email":"maria.souza@cantina.com.br","code":"482913"}""")]
-    [InlineData("/api/auth/resend-verification", """{"email":"maria.souza@cantina.com.br"}""")]
+    [InlineData("/api/v1/auth/register", """{"email":"maria.souza@cantina.com.br","password":"Feijoada#2026","firstName":"Maria","lastName":"Souza"}""")]
+    [InlineData("/api/v1/auth/login", """{"email":"maria.souza@cantina.com.br","password":"Feijoada#2026"}""")]
+    [InlineData("/api/v1/auth/refresh", "")]
+    [InlineData("/api/v1/auth/logout", "")]
+    [InlineData("/api/v1/auth/verify", """{"email":"maria.souza@cantina.com.br","code":"482913"}""")]
+    [InlineData("/api/v1/auth/resend-verification", """{"email":"maria.souza@cantina.com.br"}""")]
     [Trait("Rule", "T3")]
     [Trait("Rule", "W4")]
     public async Task PublicAuthEndpoint_NoAccessToken_IsNotRefusedAsUnauthorized(string url, string jsonBody)

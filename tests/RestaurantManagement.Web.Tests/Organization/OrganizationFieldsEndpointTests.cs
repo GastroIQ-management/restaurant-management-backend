@@ -48,10 +48,10 @@ public class OrganizationFieldsEndpointTests : IClassFixture<PostgresDatabaseFix
         businessDayCutoff = "05:30"
     };
 
-    /// <summary>GET api/organizations, keyed by organization name.</summary>
+    /// <summary>GET api/v1/organizations, keyed by organization name.</summary>
     private static async Task<Dictionary<string, JsonNode>> ListOrganizationsAsync(HttpClient client)
     {
-        var response = await client.GetAsync("/api/organizations");
+        var response = await client.GetAsync("/api/v1/organizations");
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
         var organizations = JsonNode.Parse(await response.Content.ReadAsStringAsync())!.AsArray();
         return organizations.ToDictionary(o => o!["name"]!.GetValue<string>(), o => o!);
@@ -72,7 +72,7 @@ public class OrganizationFieldsEndpointTests : IClassFixture<PostgresDatabaseFix
         var client = factory.ClientFor(AnaId, organizationId: null);
 
         // Act
-        var response = await client.PostAsync("/api/organizations/create", Json("""{ "name": "Pizzaria Vila Madalena" }"""));
+        var response = await client.PostAsync("/api/v1/organizations/create", Json("""{ "name": "Pizzaria Vila Madalena" }"""));
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.BadRequest, "an organization without a currency is refused");
@@ -93,7 +93,7 @@ public class OrganizationFieldsEndpointTests : IClassFixture<PostgresDatabaseFix
         var client = factory.ClientFor(AnaId, organizationId: null);
 
         // Act
-        var response = await client.PostAsync("/api/organizations/create", Json("""{ "name": "Pizzaria Vila Madalena", "currency": 1 }"""));
+        var response = await client.PostAsync("/api/v1/organizations/create", Json("""{ "name": "Pizzaria Vila Madalena", "currency": 1 }"""));
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.BadRequest, "a currency sent as a number is refused");
@@ -114,7 +114,7 @@ public class OrganizationFieldsEndpointTests : IClassFixture<PostgresDatabaseFix
         var client = factory.ClientFor(AnaId, organizationId: null);
 
         // Act
-        var response = await client.PostAsJsonAsync("/api/organizations/create", new { name = "Poutine Palace", currency = "CAD" });
+        var response = await client.PostAsJsonAsync("/api/v1/organizations/create", new { name = "Poutine Palace", currency = "CAD" });
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.OK, "an organization may be created in Canadian dollars");
@@ -132,7 +132,7 @@ public class OrganizationFieldsEndpointTests : IClassFixture<PostgresDatabaseFix
         var client = factory.ClientFor(AnaId, CantinaId);
 
         // Act
-        var response = await client.PutAsJsonAsync("/api/organizations/edit", EditBody(currency: "USD"));
+        var response = await client.PutAsJsonAsync("/api/v1/organizations/edit", EditBody(currency: "USD"));
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.OK, "an edit is accepted even when the body carries a currency");
@@ -169,7 +169,7 @@ public class OrganizationFieldsEndpointTests : IClassFixture<PostgresDatabaseFix
         var client = factory.ClientFor(AnaId, CantinaId);
 
         // Act
-        var response = await client.PutAsJsonAsync("/api/organizations/edit", EditBody());
+        var response = await client.PutAsJsonAsync("/api/v1/organizations/edit", EditBody());
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.OK, "an Owner may edit the organization settings");
@@ -189,7 +189,7 @@ public class OrganizationFieldsEndpointTests : IClassFixture<PostgresDatabaseFix
         var client = factory.ClientFor(AnaId, CantinaId);
 
         // Act
-        var response = await client.PutAsJsonAsync("/api/organizations/edit", EditBody(organizationId: MapleId));
+        var response = await client.PutAsJsonAsync("/api/v1/organizations/edit", EditBody(organizationId: MapleId));
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.OK, "the edit is accepted for the token organization");

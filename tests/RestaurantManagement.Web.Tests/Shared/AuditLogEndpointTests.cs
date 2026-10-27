@@ -10,7 +10,7 @@ using static RestaurantManagement.Web.Tests.LocalizedResponses;
 namespace RestaurantManagement.Web.Tests;
 
 /// <summary>
-/// GET api/audit-log on a real PostgreSQL database: only the token organization's entries, only
+/// GET api/v1/audit-log on a real PostgreSQL database: only the token organization's entries, only
 /// with Reports (Read or Manage) at every non-closed location of that organization or as Owner,
 /// filtered by date and action, newest first, paged. Entries are seeded at fixed times; Ana is the
 /// Owner of Cantina da Nonna and is signed in to it.
@@ -18,7 +18,7 @@ namespace RestaurantManagement.Web.Tests;
 public class AuditLogEndpointTests : IClassFixture<PostgresDatabaseFixture>
 {
     private const string Cantina = "a1a1a1a1-0000-4000-8000-000000000001";
-    private const string AuditLogUrl = "/api/audit-log";
+    private const string AuditLogUrl = "/api/v1/audit-log";
 
     private static readonly Guid AnaId = Guid.Parse("11111111-aaaa-4aaa-8aaa-00000000000a");
     private static readonly Guid CantinaId = Guid.Parse(Cantina);

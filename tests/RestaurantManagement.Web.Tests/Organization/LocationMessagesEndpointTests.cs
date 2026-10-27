@@ -15,8 +15,8 @@ namespace RestaurantManagement.Web.Tests;
 /// </summary>
 public class LocationMessagesEndpointTests : IClassFixture<PostgresDatabaseFixture>
 {
-    private const string LocationsUrl = "/api/locations";
-    private const string BatelUrl = "/api/locations/33333333-cccc-4ccc-8ccc-000000000001";
+    private const string LocationsUrl = "/api/v1/locations";
+    private const string BatelUrl = "/api/v1/locations/33333333-cccc-4ccc-8ccc-000000000001";
 
     private static readonly Guid AnaId = Guid.Parse("11111111-aaaa-4aaa-8aaa-00000000000a");
     private static readonly Guid CantinaId = Guid.Parse("a1a1a1a1-0000-4000-8000-000000000001");

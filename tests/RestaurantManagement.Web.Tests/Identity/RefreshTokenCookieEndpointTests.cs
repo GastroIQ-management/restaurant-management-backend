@@ -15,17 +15,17 @@ namespace RestaurantManagement.Web.Tests;
 
 /// <summary>
 /// The HTTP side of per-device refresh tokens: the token travels only in the refresh_token cookie
-/// (HttpOnly, Secure, SameSite=Strict, Path /api/auth) and never in a response body.
+/// (HttpOnly, Secure, SameSite=Strict, Path /api/v1/auth) and never in a response body.
 /// The session service is substituted; its rules are covered by the Identity unit tests.
 /// </summary>
 public class RefreshTokenCookieEndpointTests : IDisposable
 {
-    private const string LoginUrl = "/api/auth/login";
-    private const string RefreshUrl = "/api/auth/refresh";
-    private const string SelectOrganizationUrl = "/api/auth/select-organization";
+    private const string LoginUrl = "/api/v1/auth/login";
+    private const string RefreshUrl = "/api/v1/auth/refresh";
+    private const string SelectOrganizationUrl = "/api/v1/auth/select-organization";
     private const string CookieName = "__Secure-refresh_token";
     private const string OldCookieName = "refresh_token";
-    private const string CookiePath = "/api/auth";
+    private const string CookiePath = "/api/v1/auth";
     private const string AllowedOrigin = "https://app.cantinadanonna.com.br";
 
     private const string IssuedToken = "a2l0Y2hlbi10YWJsZXQtcmVmcmVzaC10b2tlbi0wMDAx";

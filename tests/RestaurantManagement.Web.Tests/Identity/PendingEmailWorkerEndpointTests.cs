@@ -60,7 +60,7 @@ public class PendingEmailWorkerEndpointTests : IClassFixture<PostgresDatabaseFix
         }
 
         // Act
-        var response = await factory.CreateClient().PostAsJsonAsync("/api/auth/forgot-password", new { email = MariaEmail });
+        var response = await factory.CreateClient().PostAsJsonAsync("/api/v1/auth/forgot-password", new { email = MariaEmail });
         var queued = 1;
         var deadline = DateTime.UtcNow + WaitLimit;
         while (DateTime.UtcNow < deadline)

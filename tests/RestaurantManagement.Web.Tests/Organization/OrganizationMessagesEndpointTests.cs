@@ -13,8 +13,8 @@ namespace RestaurantManagement.Web.Tests;
 /// </summary>
 public class OrganizationMessagesEndpointTests : IDisposable
 {
-    private const string CreateUrl = "/api/organizations/create";
-    private const string EditUrl = "/api/organizations/edit";
+    private const string CreateUrl = "/api/v1/organizations/create";
+    private const string EditUrl = "/api/v1/organizations/edit";
 
     private static readonly Guid AnaId = Guid.Parse("11111111-aaaa-4aaa-8aaa-00000000000a");
     private static readonly Guid CantinaId = Guid.Parse("a1a1a1a1-0000-4000-8000-000000000001");

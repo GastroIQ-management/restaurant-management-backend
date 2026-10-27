@@ -5,12 +5,12 @@ using Shouldly;
 namespace RestaurantManagement.Web.Tests;
 
 /// <summary>
-/// Browsers match cookie paths case-sensitively, and the refresh_token cookie has Path /api/auth.
+/// Browsers match cookie paths case-sensitively, and the refresh_token cookie has Path /api/v1/auth.
 /// Generated clients call the route template as written, so it must start with that exact path.
 /// </summary>
 public class AuthRoutePathTests : IDisposable
 {
-    private const string CookiePath = "/api/auth";
+    private const string CookiePath = "/api/v1/auth";
 
     private readonly AuthApiFactory _factory = new();
 
@@ -36,10 +36,10 @@ public class AuthRoutePathTests : IDisposable
         // Act
         var template = endpoints.SingleOrDefault(raw =>
             raw.EndsWith("/" + action, StringComparison.OrdinalIgnoreCase)
-            && raw.StartsWith("api/auth", StringComparison.OrdinalIgnoreCase));
+            && raw.StartsWith("api/v1/auth", StringComparison.OrdinalIgnoreCase));
 
         // Assert
-        template.ShouldNotBeNull("the auth endpoint must exist under the api/auth path");
+        template.ShouldNotBeNull("the auth endpoint must exist under the api/v1/auth path");
         ("/" + template).ShouldStartWith(CookiePath + "/", Case.Sensitive, "browsers match the refresh cookie path case-sensitively, so every auth route must start with exactly that path or the cookie is not sent");
     }
 }

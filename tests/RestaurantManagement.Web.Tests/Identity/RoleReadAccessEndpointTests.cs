@@ -24,7 +24,7 @@ public class RoleReadAccessEndpointTests : IClassFixture<PostgresDatabaseFixture
         var client = factory.ClientFor(CaioId, CantinaId);
 
         // Act
-        var response = await client.GetAsync("/api/roles");
+        var response = await client.GetAsync("/api/v1/roles");
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.Forbidden, "a member with every cell at None may not list the roles");
@@ -41,7 +41,7 @@ public class RoleReadAccessEndpointTests : IClassFixture<PostgresDatabaseFixture
         var client = factory.ClientFor(CaioId, CantinaId);
 
         // Act
-        var response = await client.GetAsync($"/api/roles/{roleId}");
+        var response = await client.GetAsync($"/api/v1/roles/{roleId}");
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.Forbidden, "a member with every cell at None may not read a role");
