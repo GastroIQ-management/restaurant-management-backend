@@ -1,6 +1,6 @@
 # Plan: Problem Details with stable error codes
 
-**Source:** backlog/offline/2026-10-26-problem-details-with-stable-error-codes.md   **Date:** 2026-10-26   **Status:** In progress
+**Source:** backlog/offline/2026-10-26-problem-details-with-stable-error-codes.md   **Date:** 2026-10-26   **Status:** Done
 **Risk:** High — new Shared contract: every error body of every endpoint changes shape, sign-in refusals included; no data or schema change
 
 ## Summary
