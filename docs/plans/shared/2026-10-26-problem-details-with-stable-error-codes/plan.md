@@ -53,7 +53,7 @@ errors 500–599), 409 "in progress" and 429 · #5 the codes appear in the OpenA
 - [x] T6 — Identity sign-in and account refusals name their codes
 - [x] T7 — Identity members, roles and invitations refusals name their codes
 - [x] T8 — Error codes and retry rule in the OpenAPI document
-- [ ] T9 — Remove the code-less error constructor
+- [x] T9 — Remove the code-less error constructor
 
 ## Assumptions
 - `title` holds the localized message (today's `message`); `detail` only holds the Development-only exception text on 500 — RFC 9457 `title` is the per-problem summary, one per code

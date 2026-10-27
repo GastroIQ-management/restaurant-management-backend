@@ -80,7 +80,7 @@ database tests in `tests/RestaurantManagement.Web.Tests/Shared/`.
 | SH54 | The error writer is called after the response has started | Writes nothing, changes nothing and never throws (the last-resort handler must not fail) | ✅ | `ProblemResponseTests.WriteAsync_ResponseAlreadyStarted_WritesNothingAndDoesNotThrow` |
 | SH55 | Every code of every module catalog | Lowercase snake_case `subject.reason`, at least the Shared and module codes, and never reused | ❌ | `ErrorCodeCatalogsAcrossModulesTests.AllCatalogs_EveryCode_HasTheSubjectDotReasonFormatAndIsUnique` |
 | SH56 | The retry flag | Set on exactly `rate_limit.exceeded`, `request.in_progress` and `server.unexpected_error`; `request.in_progress` is the only 409 retry code | ❌ | `ErrorCodeCatalogsAcrossModulesTests.AllCatalogs_RetryFlag_IsSetOnExactlyTheThreeRetryCodes` |
-| SH57 | A refusal is raised without a code | Does not compile: every public `BusinessException` constructor takes a code | ❌ | `BusinessExceptionTests.Constructors_AllPublic_RequireAnErrorCode` |
+| SH57 | A refusal is raised without a code | Does not compile: every public `BusinessException` constructor takes a code | ✅ | `BusinessExceptionTests.Constructors_AllPublic_RequireAnErrorCode` |
 
 ## 6. Configuration checks
 | ID | Case | Expected | Status | Test |
