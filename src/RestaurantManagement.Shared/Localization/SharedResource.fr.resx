@@ -234,4 +234,28 @@
   <data name="LanguageUnsupported_ValidationError" xml:space="preserve">
     <value>La langue doit être l’une des suivantes : en, pt, fr.</value>
   </data>
+  <data name="HttpBadRequestTitle" xml:space="preserve">
+    <value>La requête n'est pas valide.</value>
+  </data>
+  <data name="HttpUnauthorizedTitle" xml:space="preserve">
+    <value>Une authentification est requise.</value>
+  </data>
+  <data name="HttpForbiddenTitle" xml:space="preserve">
+    <value>Vous n'avez pas accès à cette ressource.</value>
+  </data>
+  <data name="HttpNotFoundTitle" xml:space="preserve">
+    <value>Introuvable.</value>
+  </data>
+  <data name="HttpMethodNotAllowedTitle" xml:space="preserve">
+    <value>Cette méthode n'est pas autorisée.</value>
+  </data>
+  <data name="HttpConflictTitle" xml:space="preserve">
+    <value>La requête est en conflit avec l'état actuel.</value>
+  </data>
+  <data name="HttpUnsupportedMediaTypeTitle" xml:space="preserve">
+    <value>Ce type de contenu n'est pas pris en charge.</value>
+  </data>
+  <data name="HttpTooManyRequestsTitle" xml:space="preserve">
+    <value>Trop de requêtes. Réessayez plus tard.</value>
+  </data>
 </root>

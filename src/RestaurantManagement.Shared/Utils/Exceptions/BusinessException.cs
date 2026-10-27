@@ -5,21 +5,23 @@ namespace RestaurantManagement.Shared.Utils.Exceptions
     {
         public int StatusCode { get; }
 
-        // The stable, never-translated code of the refusal. STUB: filled by T1.
-        public string Code { get; } = string.Empty;
+        // The stable, never-translated code of the refusal.
+        public string Code { get; }
 
         // Stays until T9 removes it; answers only the fallback code of its status.
         public BusinessException(string message, int statusCode = 400)
             : base(message)
         {
             StatusCode = statusCode;
+            Code = ErrorCodes.Fallback(statusCode).Value;
         }
 
-        // STUB (T1): the status comes from the code.
+        // The status comes from the code, so the two cannot disagree.
         public BusinessException(ErrorCode code, string message)
             : base(message)
         {
-            throw new NotImplementedException();
+            Code = code.Value;
+            StatusCode = code.Status;
         }
     }
 }

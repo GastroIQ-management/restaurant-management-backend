@@ -1,6 +1,6 @@
 # Plan: Problem Details with stable error codes
 
-**Source:** backlog/offline/2026-10-26-problem-details-with-stable-error-codes.md   **Date:** 2026-10-26   **Status:** Draft
+**Source:** backlog/offline/2026-10-26-problem-details-with-stable-error-codes.md   **Date:** 2026-10-26   **Status:** In progress
 **Risk:** High — new Shared contract: every error body of every endpoint changes shape, sign-in refusals included; no data or schema change
 
 ## Summary
@@ -45,7 +45,7 @@ errors 500–599), 409 "in progress" and 429 · #5 the codes appear in the OpenA
 - [ ] Backlog item only: deleted if fully solved (deletion left uncommitted for the user), or updated with what is left
 
 ## Checklist
-- [ ] T1 — Shared Problem Details answer and code catalog
+- [x] T1 — Shared Problem Details answer and code catalog
 - [ ] T2 — Shared refusals name their codes
 - [ ] T3 — Host answers as Problem Details
 - [ ] T4 — Menu refusals name their codes
