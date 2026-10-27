@@ -24,9 +24,6 @@ namespace RestaurantManagement.Modules.Identity.Services.Sessions
         private const string OrganizationRequiredKey = "OrganizationRequired";
         private const string NotMemberKey = "UserNotMemberOfOrganization";
         private const string InvalidSessionKey = "InvalidOrExpiredToken";
-        private const int BadRequestStatusCode = 400;
-        private const int UnauthorizedStatusCode = 401;
-        private const int ForbiddenStatusCode = 403;
 
         private readonly IdentityDbContext _db;
         private readonly SecurityOptions _securityOptions;
@@ -96,7 +93,7 @@ namespace RestaurantManagement.Modules.Identity.Services.Sessions
             // Unknown email, wrong password, locked, unverified and deactivated accounts all collapse into the
             // same response so none of them can be told apart from the outside.
             if (user == null || isLocked || !isPasswordValid || !user.IsVerified || !user.IsActive)
-                throw new BusinessException(_localizer["InvalidEmailOrPassword"].Value, 401);
+                throw new BusinessException(SessionErrorCodes.InvalidCredentials, _localizer["InvalidEmailOrPassword"].Value);
 
             // A correct password restarts this address's count; the account's count ages out of its window.
             await _lockout.ClearAddressAsync(user, client.IpAddress);
@@ -153,7 +150,7 @@ namespace RestaurantManagement.Modules.Identity.Services.Sessions
             Guid userId, SelectOrganizationRequest request, string? refreshToken, ClientInfo client)
         {
             if (request.OrganizationId == Guid.Empty)
-                throw new BusinessException(_localizer[OrganizationRequiredKey].Value, BadRequestStatusCode);
+                throw new BusinessException(SessionErrorCodes.SelectOrganizationRequired, _localizer[OrganizationRequiredKey].Value);
 
             var user = await _db.Users
                 .FirstOrDefaultAsync(u => u.Id == userId);
@@ -164,7 +161,7 @@ namespace RestaurantManagement.Modules.Identity.Services.Sessions
 
             // Same rejection for non-member, unknown and inactive organizations so none can be told apart.
             if (!await _organizations.CanSelectAsync(user, request.OrganizationId))
-                throw new BusinessException(_localizer[NotMemberKey].Value, ForbiddenStatusCode);
+                throw new BusinessException(SessionErrorCodes.NotAMember, _localizer[NotMemberKey].Value);
 
             user.UpdatedAt = DateTime.UtcNow;
             await _db.SaveChangesAsync();
@@ -181,7 +178,7 @@ namespace RestaurantManagement.Modules.Identity.Services.Sessions
         }
 
         private BusinessException InvalidSession()
-            => new(_localizer[InvalidSessionKey].Value, UnauthorizedStatusCode);
+            => new(SessionErrorCodes.InvalidOrExpiredSession, _localizer[InvalidSessionKey].Value);
 
         private async Task SimulateFailedAttemptAsync(bool isUnknownEmail, string? ipAddress)
         {

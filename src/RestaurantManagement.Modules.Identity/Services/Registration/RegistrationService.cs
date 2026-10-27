@@ -50,7 +50,7 @@ namespace RestaurantManagement.Modules.Identity.Services.Registration
         {
             // 1. Check if user already exits
             if (await _db.Users.AnyAsync(u => u.Email == request.Email))
-                throw new BusinessException(_localizer["EmailAlreadyRegistered"].Value, 400);
+                throw new BusinessException(RegistrationErrorCodes.EmailAlreadyRegistered, _localizer["EmailAlreadyRegistered"].Value);
 
             // 2. Hash password
             string passwordHash = _passwordHasher.Hash(request.Password);
@@ -90,7 +90,7 @@ namespace RestaurantManagement.Modules.Identity.Services.Registration
             }
             catch (DbUpdateException ex) when (IsDuplicateEmailViolation(ex))
             {
-                throw new BusinessException(_localizer["EmailAlreadyRegistered"].Value, 400);
+                throw new BusinessException(RegistrationErrorCodes.EmailAlreadyRegistered, _localizer["EmailAlreadyRegistered"].Value);
             }
 
             // Send verification email; a failure here must not fail registration, since the

@@ -62,7 +62,7 @@ accented or non-Latin characters may not fit (R6, T7; bcrypt limit, ASVS V6.2.9)
 | R14 | Rate limit exceeded | 429 with `Retry-After` | ✅ | `AuthRateLimitingTests.PublicAuthEndpoint_LimitExceeded_ReturnsTooManyRequestsWithRetryAfter` |
 | R15 | Body carries protected fields (ID, verified, active, failed attempts, memberships) | Ignored: user saved unverified, active, unlocked with no stored login failures, a member of no organization | ✅ | `RegisterEndpointTests.Register_BodyCarriesProtectedFields_UserIsStillUnverifiedActiveAndWithoutMemberships` |
 | R16 | A new account is registered | Its verification email is in the language of the registration request (en, pt or fr), English for any other | ✅ | `RegistrationEmailLanguageTests.RegisterAsync_RequestCulture_SendsVerificationEmailInThatLanguage` |
-| R17 | Email already registered | 400 `registration.email_already_registered` | ❌ | `RegistrationServiceTests.RegisterAsync_EmailAlreadyRegistered_ThrowsEmailAlreadyRegisteredCode` |
+| R17 | Email already registered | 400 `registration.email_already_registered` | ✅ | `RegistrationServiceTests.RegisterAsync_EmailAlreadyRegistered_ThrowsEmailAlreadyRegisteredCode` |
 
 ## 2. Verify email: `POST /api/auth/verify` (public)
 | ID | Case | Expected | Status | Test |
@@ -78,7 +78,7 @@ accented or non-Latin characters may not fit (R6, T7; bcrypt limit, ASVS V6.2.9)
 | V9 | Code missing, or over 6 characters | 400 | ✅ | `VerifyEmailRequestValidationTests.Validate_VerifyCodeMissingOrOverSixCharacters_ReturnsErrorOnCode`, `VerifyEmailRequestValidationTests.Validate_VerifyCodeOfSixCharacters_ReturnsNoErrorOnCode`, `VerifyEmailRequestValidationTests.Validate_ResetCodeMissingOrOverSixCharacters_ReturnsErrorOnCode` |
 | V10 | Rate limit exceeded | 429 | ✅ | `AuthRateLimitingTests.PublicAuthEndpoint_LimitExceeded_ReturnsTooManyRequestsWithRetryAfter` |
 | V11 | Locked account compared with an unknown email, on verify (resend: see RS1) | Same status and body for both; verify runs the same code lookup for a locked account, so the answer takes the same time | ✅ | `VerificationServiceTests.VerifyEmailAsync_LockedAccountAndUnknownEmail_ReturnSameStatusAndMessage`, `VerificationServiceTests.VerifyEmailAsync_LockedAccountWithCorrectCode_RunsTheCodeLookupLikeAnUnknownEmail` |
-| V12 | Unknown email and wrong code | Both 401 `auth.invalid_code` | ❌ | `VerificationServiceTests.VerifyEmailAsync_UnknownEmailAndWrongCode_BothThrowTheInvalidCodeCode` |
+| V12 | Unknown email and wrong code | Both 401 `auth.invalid_code` | ✅ | `VerificationServiceTests.VerifyEmailAsync_UnknownEmailAndWrongCode_BothThrowTheInvalidCodeCode` |
 
 ## 3. Resend verification: `POST /api/auth/resend-verification` (public)
 | ID | Case | Expected | Status | Test |
@@ -136,7 +136,7 @@ accented or non-Latin characters may not fit (R6, T7; bcrypt limit, ASVS V6.2.9)
 | L35 | One address repeating 5 wrong passwords each time its address lock expires | Adds at most 5 to the account count in the window: it never locks the whole account alone | ✅ | `SessionServiceLockoutTests.LoginAsync_OneAddressRepeatsFiveWrongPasswordsAfterEachLockExpires_NeverLocksTheAccount` |
 | L36 | Whole-account lock again after a lock email | Within 24 hours of the last lock email: no new email (even after the first was sent and removed). More than 24 hours later: a new email | ✅ | `AccountLockedEmailQueueTests.LoginAsync_AccountLockedAgainWithin24HoursOfTheLastEmail_QueuesNoNewEmail`, `AccountLockedEmailQueueTests.LoginAsync_AccountLockedAgainMoreThan24HoursAfterTheLastEmail_QueuesANewEmail` |
 | L37 | Account-locked request interrupted mid-send (app crash) | Dropped without sending again and logged by request ID only; a send that fails normally clears its own "send started" mark and retries | ✅ | `AccountLockedEmailProcessorCrashTests.ProcessDueAsync_ClaimedRequestWhoseSendAlreadyStarted_DropsItWithoutSendingAndLogsOnlyItsId`, `AccountLockedEmailProcessorCrashTests.ProcessDueAsync_SendInProgressOrFailed_MarkSetThenClearedSoRetryStillSends` |
-| L38 | Unknown email, wrong password, unverified or deactivated account | All the same 401 `auth.invalid_credentials` | ❌ | `SessionServiceLoginTests.LoginAsync_UnknownEmailWrongPasswordUnverifiedOrDeactivatedAccount_ThrowTheSameInvalidCredentialsCode` |
+| L38 | Unknown email, wrong password, unverified or deactivated account | All the same 401 `auth.invalid_credentials` | ✅ | `SessionServiceLoginTests.LoginAsync_UnknownEmailWrongPasswordUnverifiedOrDeactivatedAccount_ThrowTheSameInvalidCredentialsCode` |
 
 ## 5. Refresh: `POST /api/auth/refresh` (refresh cookie)
 | ID | Case | Expected | Status | Test |
@@ -154,7 +154,7 @@ accented or non-Latin characters may not fit (R6, T7; bcrypt limit, ASVS V6.2.9)
 | F11 | Token unused for 7 days | 401 `InvalidOrExpiredToken`; neither the token nor its family is revoked | ✅ | `RefreshTokenServiceTests.RotateAsync_TokenIdleForEightDays_ReturnsNullWithoutRevokingIt` |
 | F12 | Session 30 days past its login, however recently refreshed or even when the token has not expired (a lowered limit applies at once) | 401 `InvalidOrExpiredToken`; nothing is revoked, even for an already rotated token | ✅ | `RefreshTokenServiceTests.RotateAsync_SessionStartedOver30DaysAgoWithUnexpiredToken_ReturnsNullWithoutRevokingIt`, `RefreshTokenServiceTests.RotateAsync_RotatedTokenOfSessionPastItsLimit_ReturnsNullAndDoesNotRevokeTheFamily`, `SessionServiceRefreshTests.RefreshTokenAsync_SessionStartedOver30DaysAgoWithUnexpiredToken_ThrowsInvalidOrExpiredToken401` |
 | F13 | Login and refresh | Login stores the login time; a refresh keeps it; the new token expires at the earlier of 7 days from now and login + 30 days; refreshing again never moves the session end | ✅ | `RefreshTokenServiceTests.IssueAsync_NewSignIn_StoresTheLoginTime`, `RefreshTokenServiceTests.RotateAsync_SessionStartedTenDaysAgo_ReplacementKeepsTheLoginTime`, `RefreshTokenServiceTests.RotateAsync_SessionStarted28DaysAgo_ReplacementExpiresAtLoginPlus30Days`, `RefreshTokenServiceTests.RotateAsync_RotatedTwiceNearSessionEnd_SessionEndDoesNotMove` |
-| F14 | Unknown refresh token | 401 `session.invalid_or_expired` | ❌ | `SessionServiceRefreshTests.RefreshTokenAsync_UnknownToken_ThrowsSessionInvalidOrExpiredCode` |
+| F14 | Unknown refresh token | 401 `session.invalid_or_expired` | ✅ | `SessionServiceRefreshTests.RefreshTokenAsync_UnknownToken_ThrowsSessionInvalidOrExpiredCode` |
 
 ## 6. Choose organization: `POST /api/auth/select-organization` (signed in)
 | ID | Case | Expected | Status | Test |
@@ -170,7 +170,7 @@ accented or non-Latin characters may not fit (R6, T7; bcrypt limit, ASVS V6.2.9)
 | S9 | New login after a switch | Choice not kept: no organization claim until chosen again | ✅ | `SessionServiceSelectOrganizationTests.LoginAsync_AfterSelectingOrganization_TokenHasNoOrganizationClaimAgain`, `SessionServiceSelectOrganizationTests.RefreshTokenAsync_AfterNewLoginFollowingSelection_DoesNotRestorePreviousOrganization` |
 | S10 | One device switches organization | Other devices keep their own organization | ✅ | `SessionServiceSelectOrganizationTests.RefreshTokenAsync_LaptopSelectedTrattoria_TabletStillRefreshesIntoCantina` |
 | S11 | Switching organization late in a session | The new token keeps the login time; the session still ends 30 days after login | ✅ | `SessionServiceSelectOrganizationTests.SelectOrganizationAsync_SessionStarted28DaysAgo_NewTokenKeepsTheLoginTimeAndEndsAtLoginPlus30Days` |
-| S12 | Empty organization ID; not a member, unknown, inactive or another user's organization | 400 `session.organization_required` for the empty ID; the same 403 `session.not_a_member` for all the others | ❌ | `SessionServiceSelectOrganizationTests.SelectOrganizationAsync_NoOrganizationNotAMemberOrUnknownOrganization_ThrowsTheirOwnCode` |
+| S12 | Empty organization ID; not a member, unknown, inactive or another user's organization | 400 `session.organization_required` for the empty ID; the same 403 `session.not_a_member` for all the others | ✅ | `SessionServiceSelectOrganizationTests.SelectOrganizationAsync_NoOrganizationNotAMemberOrUnknownOrganization_ThrowsTheirOwnCode` |
 
 ## 7. Logout: `POST /api/auth/logout` and `/logout-all`
 | ID | Case | Expected | Status | Test |
@@ -228,7 +228,7 @@ accented or non-Latin characters may not fit (R6, T7; bcrypt limit, ASVS V6.2.9)
 | C8 | User missing, deactivated or unverified | 401 | ✅ | `PasswordChangeServiceTests.ChangePasswordAsync_UnknownInactiveOrUnverifiedUser_RejectedAsInvalidSession` |
 | C9 | Audit write fails | Request still succeeds; error logged | ✅ | `PasswordAuditFailureTests.ChangePasswordAsync_AuditWriteFails_SucceedsAndLogsError` |
 | C10 | Rate limit exceeded | 429 | ✅ | `AuthRateLimitingTests.PasswordEndpoint_LimitExceeded_ReturnsTooManyRequests` |
-| C11 | Wrong current password; new password equal to the current one | 400 `password.current_incorrect`; 400 `password.same_as_current` | ❌ | `PasswordChangeServiceTests.ChangePasswordAsync_WrongCurrentPasswordOrSameAsCurrent_ThrowsTheirOwnCode` |
+| C11 | Wrong current password; new password equal to the current one | 400 `password.current_incorrect`; 400 `password.same_as_current` | ✅ | `PasswordChangeServiceTests.ChangePasswordAsync_WrongCurrentPasswordOrSameAsCurrent_ThrowsTheirOwnCode` |
 
 ## 10. Tokens, secrets and platform
 | ID | Case | Expected | Status | Test |

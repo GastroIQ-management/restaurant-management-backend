@@ -50,14 +50,14 @@ namespace RestaurantManagement.Modules.Identity.Services.Registration
             // 🔒 A locked account gets the same 401 as an unknown email, so the lock never reveals the account.
             // Checked after the lookup so a locked account does the same database work and answers in the same time.
             if (user != null && user.VerificationLockedUntil.HasValue && user.VerificationLockedUntil > DateTime.UtcNow)
-                throw new BusinessException(_localizer["InvalidEmailOrCode"].Value, 401);
+                throw new BusinessException(RegistrationErrorCodes.InvalidCode, _localizer["InvalidEmailOrCode"].Value);
 
             if (user == null || verification == null || !_hasher.IsMatch(user.Id, request.Code, verification.CodeHash))
             {
                 if (user != null)
                     await RegisterFailedVerificationAttemptAsync(user); // always throws the same 401, also when the lockout trips
 
-                throw new BusinessException(_localizer["InvalidEmailOrCode"].Value, 401);
+                throw new BusinessException(RegistrationErrorCodes.InvalidCode, _localizer["InvalidEmailOrCode"].Value);
             }
 
             // ✅ Mark as verified
@@ -94,7 +94,7 @@ namespace RestaurantManagement.Modules.Identity.Services.Registration
             if (user.VerificationFailedAttempts < _securityOptions.MaxVerificationAttempts)
             {
                 await _db.SaveChangesAsync();
-                throw new BusinessException(_localizer["InvalidEmailOrCode"].Value, 401);
+                throw new BusinessException(RegistrationErrorCodes.InvalidCode, _localizer["InvalidEmailOrCode"].Value);
             }
 
             // 🔒 Max attempts reached: invalidate the current code and lock verification
@@ -111,7 +111,7 @@ namespace RestaurantManagement.Modules.Identity.Services.Registration
             }
 
             await _db.SaveChangesAsync();
-            throw new BusinessException(_localizer["InvalidEmailOrCode"].Value, 401);
+            throw new BusinessException(RegistrationErrorCodes.InvalidCode, _localizer["InvalidEmailOrCode"].Value);
         }
     }
 }
