@@ -7,6 +7,7 @@ namespace RestaurantManagement.Shared.Options
         public string Audience { get; set; } = string.Empty;
         public const string PlaceholderKey = "your-super-secret-key-at-least-32-characters-long-for-development";
         public int ExpireMinutes { get; set; } = 15;
-        public int RefreshTokenExpireDays { get; set; } = 30;
+        public int SessionInactivityDays { get; set; } = 7;
+        public int SessionAbsoluteDays { get; set; } = 30;
     }
 }

@@ -114,5 +114,19 @@ namespace RestaurantManagement.Modules.Identity.Tests
             deleted.ShouldBe(2, "both tokens expired past the retention are deleted, revoked or not");
             (await RemainingIdsAsync(database)).ShouldBe(new[] { active.Id }, ignoreOrder: false, customMessage: "only the token still valid remains");
         }
+
+        [Fact]
+        [Trait("Rule", "T9")]
+        public async Task PurgeExpiredAsync_RotatedTokenWithinItsSevenDayLife_KeepsItForReuseDetection()
+        {
+            var rotated = Token(Now.AddDays(3), revokedAt: Now.AddDays(-4));
+            rotated.CreatedAt = Now.AddDays(-4);
+            using var database = await CreateDatabaseAsync(rotated);
+
+            var deleted = await PurgeAsync(database);
+
+            deleted.ShouldBe(0, "a rotated token that is still inside its 7-day life is not deleted");
+            (await RemainingIdsAsync(database)).ShouldBe(new[] { rotated.Id }, ignoreOrder: false, customMessage: "the rotated token stays stored while it can still trigger reuse detection");
+        }
     }
 }

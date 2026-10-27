@@ -168,6 +168,8 @@ When work fully solves an item, agents commit the fix and delete the item file, 
 the deletion: the user checks and commits it. Agents never push.
 
 ### Terminal output
-The reviewer reads the files in `docs/`, not the terminal. When a step finishes, show the
+The reviewer reads the files in `docs/`, not the terminal. The spec writer, planner, tester
+and implementer end with only the decisions the user must make (options and a
+recommendation), or one "ready" line when there are none. When a step finishes, show the
 agent's final message exactly as returned. Never summarize, rebuild or add sections from the
 spec, plan, batch or scenarios files.

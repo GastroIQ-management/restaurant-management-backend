@@ -695,6 +695,10 @@ namespace RestaurantManagement.Modules.Identity.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("revoked_at");
 
+                    b.Property<DateTime>("SessionStartedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("session_started_at");
+
                     b.Property<string>("TokenHash")
                         .IsRequired()
                         .HasColumnType("text")

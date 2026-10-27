@@ -22,7 +22,7 @@ namespace RestaurantManagement.Modules.Identity.Services.Sessions
 
         public async Task<IssuedRefreshToken> IssueAsync(Guid userId, Guid? organizationId, string? deviceDescription, string? ipAddress)
         {
-            var (row, issued) = BuildRow(userId, organizationId, Guid.NewGuid(), deviceDescription, ipAddress);
+            var (row, issued) = BuildRow(userId, organizationId, Guid.NewGuid(), deviceDescription, ipAddress, DateTime.UtcNow);
             _db.RefreshTokens.Add(row);
             await _db.SaveChangesAsync();
             return issued;
@@ -32,7 +32,8 @@ namespace RestaurantManagement.Modules.Identity.Services.Sessions
         {
             var existing = await FindAsync(rawToken);
             var now = DateTime.UtcNow;
-            if (existing == null || existing.ExpiresAt <= now)
+            if (existing == null || existing.ExpiresAt <= now
+                || now >= existing.SessionStartedAt.AddDays(_jwtOptions.SessionAbsoluteDays))
             {
                 return null;
             }
@@ -94,7 +95,7 @@ namespace RestaurantManagement.Modules.Identity.Services.Sessions
         {
             var (row, issued) = BuildRow(
                 existing.UserId, organizationId ?? existing.OrganizationId, existing.FamilyId,
-                existing.DeviceDescription, existing.IpAddress);
+                existing.DeviceDescription, existing.IpAddress, existing.SessionStartedAt);
 
             await using var transaction = await _db.Database.BeginTransactionAsync();
             var changed = await _db.RefreshTokens
@@ -138,11 +139,14 @@ namespace RestaurantManagement.Modules.Identity.Services.Sessions
         }
 
         private (RefreshToken Row, IssuedRefreshToken Issued) BuildRow(
-            Guid userId, Guid? organizationId, Guid familyId, string? deviceDescription, string? ipAddress)
+            Guid userId, Guid? organizationId, Guid familyId, string? deviceDescription, string? ipAddress,
+            DateTime sessionStartedAt)
         {
             var rawToken = Convert.ToBase64String(RandomNumberGenerator.GetBytes(64));
             var now = DateTime.UtcNow;
-            var expiresAt = now.AddDays(_jwtOptions.RefreshTokenExpireDays);
+            var inactivityEnd = now.AddDays(_jwtOptions.SessionInactivityDays);
+            var absoluteEnd = sessionStartedAt.AddDays(_jwtOptions.SessionAbsoluteDays);
+            var expiresAt = inactivityEnd < absoluteEnd ? inactivityEnd : absoluteEnd;
             var row = new RefreshToken
             {
                 Id = Guid.NewGuid(),
@@ -151,6 +155,7 @@ namespace RestaurantManagement.Modules.Identity.Services.Sessions
                 FamilyId = familyId,
                 TokenHash = Fingerprint(rawToken),
                 CreatedAt = now,
+                SessionStartedAt = sessionStartedAt,
                 ExpiresAt = expiresAt,
                 DeviceDescription = Truncate(deviceDescription, RefreshToken.DeviceDescriptionMaxLength),
                 IpAddress = Truncate(ipAddress, RefreshToken.IpAddressMaxLength)

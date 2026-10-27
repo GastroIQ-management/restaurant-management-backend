@@ -20,7 +20,7 @@ proof of something the code already does.
 | # | Risk | ASVS | Status | Gap | Related rows |
 |---|---|---|---|---|---|
 | 1 | High | V6.3.3 | Missing | No multi-factor authentication, and no documented rationale for going without it. ASVS L2 requires one or the other. Owners and Admins control money and staff | — |
-| 2 | High | V7.3.2 | Missing | No absolute session lifetime. Each refresh sets a new 30-day expiry, so a stolen refresh cookie works for as long as it keeps being used, unless reuse is detected | F1, T17 |
+| 2 | High | V7.3.2 | Covered | Absolute session lifetime: a session ends 30 days after login, and a refresh never moves that end | F1, F12, F13, T17 |
 | 3 | High | V6.2.12 | Missing | New passwords are not checked against breached-password lists (register, reset, change) | R6–R9, P11, C4 |
 | 4 | High | V6.2.4 | Missing | New passwords are not checked against a list of common passwords (top 3000) | R6–R9 |
 | 5 | Medium | V16.3.1 | Missing | Logins are not logged, successful or failed. Only the lockout is reported (Sentry), so credential stuffing spread across accounts goes unseen | L18, L16 |
@@ -32,7 +32,7 @@ proof of something the code already does.
 | 11 | Medium | V7.5.2 | Partial | Users can end every session (logout-all) but cannot see their sessions or end one other device. Ending sessions does not ask for the password again | O5, L15 |
 | 12 | Medium | V6.2.5 | Missing (conflicts) | ASVS forbids composition rules. R7 and R8 require an uppercase letter, a digit and a symbol. Product decision | R7, R8 |
 | 13 | Medium | V16.3.3 | Partial | Rate-limit rejections are logged (L16). Verify and reset lockouts are not, and neither are other attempts to get past a control | L16, V4, P8 |
-| 14 | Low | V7.3.1, V7.1.1, V7.1.2 | Partial | Inactivity timeout (30 days of not refreshing) and session count (unlimited devices) are in the matrix but with no risk decision or NIST justification. Shared restaurant tablets make this matter | L15, T17 |
+| 14 | Low | V7.3.1, V7.1.1, V7.1.2 | Partial | Inactivity (7 days) and absolute (30 days) limits are decided and documented (user decision of 2026-10-16, shared restaurant tablets). Session count (unlimited devices) still has no decision | L15, T17, F11 |
 | 15 | Low | V7.2.4 | Covered | Proven by matrix row L20 | L20 |
 | 16 | Low | V6.2.9 | Partial | 64-character passwords are accepted only within 72 bytes (bcrypt limit). 64 accented or non-Latin characters are refused | R6, R9, T7 |
 | 17 | Low | V3.3.1, V3.3.3 | Partial | Refresh cookie is `Secure` but named `refresh_token`, with no `__Secure-` prefix. `__Host-` cannot be used with `Path=/api/auth`; that deviation is not recorded | L2, T10 |
@@ -93,15 +93,15 @@ It is fixed (commit 9b7bcbc).
 
 | ASVS | L | Requirement (short) | Status | Evidence or gap |
 |---|---|---|---|---|
-| V7.1.1 | 2 | Inactivity and absolute lifetime documented and justified | Partial | Summary #14 |
+| V7.1.1 | 2 | Inactivity and absolute lifetime documented and justified | Covered | Matrix header; user decision of 2026-10-16 (summary #14) |
 | V7.1.2 | 2 | Concurrent-session limit documented | Partial | L15 allows unlimited devices; no stated decision (summary #14) |
 | V7.1.3 | 2 | Federated session coordination documented | Not applicable | No federation |
 | V7.2.1 | 1 | Tokens verified by the backend | Covered | T1, T2, T15, W2 |
 | V7.2.2 | 1 | Dynamic tokens, not static keys | Covered | L1, F1 |
 | V7.2.3 | 1 | Reference tokens unique, secure random, 128+ bits | Partial | Unique: T8. 512-bit random value is code only (summary #22) |
 | V7.2.4 | 1 | New token on login, old one ended | Covered | L20 |
-| V7.3.1 | 2 | Inactivity timeout | Partial | 30 days without refreshing (T17), no risk decision (summary #14) |
-| V7.3.2 | 2 | Absolute maximum session lifetime | Missing | Summary #2 |
+| V7.3.1 | 2 | Inactivity timeout | Covered | 7 days without a refresh (F11, T17) |
+| V7.3.2 | 2 | Absolute maximum session lifetime | Covered | 30 days after login (F12, F13, T17) |
 | V7.4.1 | 1 | Ended session cannot be used | Partial | Refresh side proven (O2, O3, O5). Access token still works up to 15 min (summary #6) |
 | V7.4.2 | 1 | All sessions end when an account is disabled or deleted | Partial | Refresh refused for deactivated users (F4); tokens deleted with the user (T12). Access token survives up to 15 min (summary #6) |
 | V7.4.3 | 2 | Option to end other sessions after a password change | Covered | C5, P6 end every session automatically |
