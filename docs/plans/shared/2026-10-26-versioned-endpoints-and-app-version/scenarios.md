@@ -20,7 +20,7 @@ Paths: `tests/RestaurantManagement.Shared.Tests/Middleware/` = SM; `tests/Restau
 | 11 | T1 | Happy | The refusal title is translated (Portuguese, French) while the code stays the same | `Write_WithoutAppVersion_TitleFollowsTheLanguageAndCodeStaysTheSame` | `WT/Shared/AppVersionEndpointTests.cs` |
 | 12 | T1 | Guard | A read without an app version is not refused for it (an anonymous read still answers 401) | `Read_WithoutAppVersion_AnswersAsBefore` | `WT/Shared/AppVersionEndpointTests.cs` |
 | 13 | T1 | Happy | A write with a valid app version reaches the endpoint (the test client sends one by default). Uses `/api/v1/auth/logout-all`, so it turns green only after T5 | `Write_WithAValidAppVersion_ReachesTheEndpoint` | `WT/Shared/AppVersionEndpointTests.cs` |
-| 14 | T2 | Failure | The audit log at the old path `/api/audit-log` answers 404 | `UnversionedPath_AuditLog_Answers404` | `WT/Shared/AuditLogVersionedRouteTests.cs` |
+| 14 | T2 | Failure | The audit log at the old path `/api/audit-log` answers 404 to a signed-in caller | `UnversionedPath_AuditLog_Answers404` | `WT/Shared/AuditLogVersionedRouteTests.cs` |
 | 15 | T3 | Failure | Organization and location endpoints at the old paths answer 404 | `UnversionedPath_OrganizationEndpoints_Answer404` | `WT/Organization/OrganizationVersionedRouteTests.cs` |
 | 16 | T4 | Failure | Menu and category endpoints at the old paths answer 404 | `UnversionedPath_MenuEndpoints_Answer404` | `WT/Menu/MenuVersionedRouteTests.cs` |
 | 17 | T5 | Failure | Identity endpoints (auth, roles, invitations, users, members) at the old paths answer 404 | `UnversionedPath_IdentityEndpoints_Answer404` | `WT/Identity/IdentityVersionedRouteTests.cs` |
@@ -63,4 +63,4 @@ Forced by the plan; no new scenario.
 - Empty header value (`X-App-Version:`) is not tested: it reads as missing or invalid, both 400.
 - The test-only `/api/test-probe` routes stay unversioned: they exist only in `PermissionProbeApiFactory`, which the route guard (scenario 18) does not use.
 - Scenarios 21 and 25 (and 12) pass today (Guard): they protect behaviour that must survive the change.
-- Scenarios 14–17 send each request to the old path with the default test client; 404 does not depend on sign-in because routing finds no endpoint.
+- Scenarios 14–17 send each request to the old path signed in (a valid access pass for a random user). The fallback policy (`RequireAuthenticatedUser`) answers 401 to an anonymous caller before a missing route can answer 404, so the 404 holds only for a signed-in caller. This includes the anonymous-by-design Identity routes (`/api/auth/login`): they are signed in too, because at the old path no endpoint exists to allow anonymous access.
