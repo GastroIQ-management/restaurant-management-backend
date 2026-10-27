@@ -12,7 +12,7 @@ using RestaurantManagement.Modules.Menu.Services;
 namespace RestaurantManagement.Modules.Menu.Controllers
 {
     [ApiController]
-    [Route("api/menus")]
+    [Route("api/v1/menus")]
     public class MenuController : ControllerBase
     {
         private readonly IMenuService _menuService;

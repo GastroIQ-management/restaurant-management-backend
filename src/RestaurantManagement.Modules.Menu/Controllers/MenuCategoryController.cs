@@ -10,7 +10,7 @@ using RestaurantManagement.Modules.Menu.Services;
 namespace RestaurantManagement.Modules.Menu.Controllers
 {
     [ApiController]
-    [Route("api")]
+    [Route("api/v1")]
     [Authorize]
     public class MenuCategoryController : ControllerBase
     {
