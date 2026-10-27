@@ -24,9 +24,23 @@ namespace RestaurantManagement.Shared.Options
             if (options.ExpireMinutes <= 0)
                 failures.Add("Jwt:ExpireMinutes must be greater than zero.");
 
+            ValidateSessionLimits(options, failures);
+
             return failures.Count == 0
                 ? ValidateOptionsResult.Success
                 : ValidateOptionsResult.Fail(failures);
+        }
+
+        private static void ValidateSessionLimits(JwtOptions options, List<string> failures)
+        {
+            if (options.SessionInactivityDays <= 0)
+                failures.Add("Jwt:SessionInactivityDays must be greater than zero.");
+
+            if (options.SessionAbsoluteDays <= 0)
+                failures.Add("Jwt:SessionAbsoluteDays must be greater than zero.");
+
+            if (options.SessionInactivityDays > options.SessionAbsoluteDays)
+                failures.Add("Jwt:SessionInactivityDays must not be greater than Jwt:SessionAbsoluteDays.");
         }
 
         private void ValidateKey(string? key, List<string> failures)

@@ -1,6 +1,6 @@
 # Plan: Sessions end after 7 days unused or 30 days after login
 
-**Source:** backlog/improvements/2026-10-16-session-inactivity-and-absolute-limit.md   **Date:** 2026-10-26   **Status:** Draft
+**Source:** backlog/improvements/2026-10-16-session-inactivity-and-absolute-limit.md   **Date:** 2026-10-26   **Status:** In progress
 **Risk:** High — session lifetime rules change, a required column is added to `refresh_tokens`, and select-organization gets a new 401 refusal
 
 ## Summary
@@ -48,6 +48,6 @@ Outcomes are the backlog item's Acceptance criteria, in order:
 - [ ] Backlog item only: deleted if fully solved (deletion left uncommitted for the user), or updated with what is left
 
 ## Checklist
-- [ ] T1 — Session limit settings and startup checks
+- [x] T1 — Session limit settings and startup checks
 - [ ] T2 — Refresh tokens keep the login time; expiry from both limits
 - [ ] T3 — Choosing an organization keeps the login time
