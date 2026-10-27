@@ -48,7 +48,7 @@ namespace RestaurantManagement.Modules.Organization.Services
             // 2. Create Location
             var location = new Location
             {
-                Id = Guid.NewGuid(),
+                Id = request.Id,
                 OrganizationId = organizationId,
                 Name = request.Name,
                 Address = request.Address,
@@ -191,6 +191,10 @@ namespace RestaurantManagement.Modules.Organization.Services
             try
             {
                 await _orgDb.SaveChangesAsync();
+            }
+            catch (DbUpdateException ex) when (PrimaryKeyViolation.Matches(ex))
+            {
+                throw new BusinessException(ErrorCodes.IdAlreadyUsed, _localizer["IdAlreadyUsed"].Value);
             }
             catch (DbUpdateException ex) when (ex.InnerException is PostgresException { SqlState: PostgresErrorCodes.UniqueViolation })
             {
