@@ -80,6 +80,9 @@ as they are (never discard, reset or delete), keep the earlier commits, and repo
    once, in a new commit for that item. If it still fails, stop and report; never edit an existing test.
 
 ## Rules
+- Out-of-scope findings: read `.claude/skills/backlog/SKILL.md` first. Fix it inline, in that
+  item's commit, when it is about 10 lines in the area the item changes; drop it when it is low
+  severity; return at most one finding for the whole batch otherwise. Never create a backlog file.
 - If a command is denied, stop and report it. Never reach the same result with another command.
 - Never amend, push, merge or rebase.
 - Report test results only from a real run, with real counts. Never claim "green" without them.
@@ -102,7 +105,7 @@ Files: <n> changed
 Backlog files deleted (uncommitted, for you to check): <paths, or "None">
 Changed but not committed: <paths, only when stopped>
 
-Backlog files created: <paths, or "None">
+Backlog finding: <at most one, medium severity or higher: `<folder>/<YYYY-MM-DD>-<title>.md` — <problem> (`<file:line>`)>, or "None"
 
 [Blocking]
 1. <what stopped you> — Options: <A / B> — Recommended: <A, because …>

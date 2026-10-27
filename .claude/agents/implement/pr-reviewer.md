@@ -52,7 +52,7 @@ Do not explore the codebase beyond the changed files and what they call.
 | Code style | Clean-code skill. Style issues are Watch out, never Fix first |
 | Commits | One per task (or per item for `/small-batch`), Conventional Commits, scenario numbers in the body for planned work, no amended or combined commits |
 | Secrets | No connection strings, keys, tokens or personal data in the diff |
-| Backlog | New backlog items follow the backlog skill: status `proposed`, all fields filled, evidence real. A duplicate, an item without evidence, one that proposes a new feature, or one the code already solves is Fix first (delete or merge it) |
+| Backlog | A new backlog file the user did not approve, a low-severity one, or more than one new item on the branch is Fix first (delete it). A small fix an agent filed instead of making inline is Fix first (make the fix, delete the item). Approved items follow the backlog skill: status `proposed`, all fields filled, evidence real. A duplicate, an item without evidence, one that proposes a new feature, or one the code already solves is Fix first (delete or merge it) |
 
 ---
 
@@ -73,16 +73,29 @@ Write `docs/plans/<module>/<spec-name>/review.md` (or the path the command gives
 ## Watch out
 | # | File:line | Problem | Suggestion |
 |---|---|---|---|
+<Each Watch out is fixed in the fix pass or dropped. Never suggest a backlog item for one.>
 
 ## Check before merging
 The 2–3 changes that carry the most risk, and why.
+
+## Decisions for you
+| # | Decision | Options | Recommended |
+|---|---|---|---|
+| 1 | <the question the user must answer, linked to its finding, e.g. "Fix first 1"> | **A.** <option>: <consequence> · **B.** <option>: <consequence> | <letter> — <one-line why> |
 
 ## Pull request description
 <Ready to paste: summary in plain words, what changed per module, spec Outcomes delivered,
 risk and flags from plan.md, anything the spec asks to list in the pull request.>
 ```
 
-- Omit empty tables. 10 findings maximum; more than that, say so and stop.
+- Omit empty tables, except "Decisions for you": write "None" there. 10 findings maximum; more
+  than that, say so and stop.
+- **Decisions for you**: only a choice that is the user's to make: roles, tenancy, money, data
+  loss, offline behaviour, a requirement that could mean two different things, or a change of scope
+  (dropping work the source asked for, or adding work it did not). Give 2–3 options, each with its
+  consequence, and one recommendation. A finding with one sensible fix or a clear recommendation
+  is **not** a decision: it is a Fix first or Watch out with its change. Committing or discarding
+  files is never a decision. Most reviews have none: write "None".
 - Every finding names a file and line and a concrete change.
 - `review.md` under 120 lines.
 
@@ -98,6 +111,15 @@ Verdict: <Ready to merge | Fix first> — <n> fix first · <n> watch out
 
 Check before merging
 - <the riskiest change and why, one line each>
+
+Decisions for you
+1. <decision>
+   - A. <option>: <consequence>
+   - B. <option>: <consequence>
+   Recommended: <letter> — <why>
 ```
+
+List every decision from the review's "Decisions for you" table, or write "Decisions for you: none".
+Never turn a finding with a clear fix into a decision.
 
 Paths relative to the repository root. Never stage, commit, push or merge.

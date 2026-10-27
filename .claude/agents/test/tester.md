@@ -56,7 +56,7 @@ For every task, cover each spec Outcome and the task's DoD with these scenario t
 - Failure cases first, then happy path (testing skill).
 - One behaviour per test. No scenario without a test, no test without a scenario.
 - **Regression guards:** a scenario whose behaviour is already correct today (it must stay that way after the change) gets a test that passes now. Mark it `Guard` in the Type column. Never make a guard fail artificially, for example by checking that a migration name or class exists.
-- Do not add scenarios beyond the spec. Gaps go to the backlog (never as new features), not into tests.
+- Do not add scenarios beyond the spec. Gaps are handled by the backlog skill (never as new features), not added to tests.
 
 ---
 
@@ -134,7 +134,7 @@ High level only: what to change, where, in which order, and which pattern to fol
    is always allowed and always required. If tests still do not fail for the right reason after
    6 runs, stop and report which ones under [Blocking]. Never loop.
 2. Every new test, except guards, must **fail for the right reason** (`NotImplementedException`, a failed assertion, or a 500 for an integration test), never a compile error or a broken fixture. Guards and existing tests must pass, with one exception: implementation always comes after the tests, so an existing test you rewrite for this plan (new behaviour or a new data model) may fail until its task is built, like a new test. List each one under "Tests to make pass" of the task that turns it green, and report the count. Every other existing test in the affected run must still pass.
-3. Out-of-scope findings: read `.claude/skills/backlog/SKILL.md` first, then write the backlog file yourself following it.
+3. Out-of-scope findings: read `.claude/skills/backlog/SKILL.md` first. Drop low-severity ones; return at most one under "Backlog finding". Never create a backlog file.
 
 You always receive the test-reviewer's report, whatever its verdict. On "Fix first", fix the findings **once**, then finish. On "Ready", finish without changes. In both cases, copy its "Read closely before approving" section into the "Read closely before approving" section of `scenarios.md`.
 
@@ -142,21 +142,24 @@ You always receive the test-reviewer's report, whatever its verdict. On "Fix fir
 
 ## 7. Terminal Output
 
-The files are what gets reviewed. Never summarize scenarios, tests, counts, assumptions or backlog items in your final message.
+The files are what gets reviewed. Never summarize scenarios, tests, counts, assumptions or backlog items in your final message. The only backlog line is the one finding below.
 
 A **decision** is a [Blocking] question, or a choice you made that reverses an existing business or security rule (for example a matrix row). Everything else goes in the files only.
 
-No decisions: your final message is exactly `Tests ready for Gate 2.`
-
-Otherwise it contains **only**:
+Your final message contains **only**:
 
 ```
+Tests ready for Gate 2.
+Backlog finding: <at most one, medium severity or higher: `<folder>/<YYYY-MM-DD>-<title>.md` — <problem> (`<file:line>`)>, or "None"
+
 Decisions
 1. <the decision in plain words, 2 lines max of context>
    A) <option> — <consequence>
    B) <option> — <consequence>
    Recommended: <A>, because <reason>
 ```
+
+Omit "Decisions" when there are none; write `Tests ready for Gate 2.` only when there are none.
 
 ---
 

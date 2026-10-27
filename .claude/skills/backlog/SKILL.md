@@ -1,25 +1,33 @@
 ---
 name: backlog
-description: Rules for recording work found outside the current task — when to fix inline, when it blocks, when to write a backlog item, how to avoid duplicates, and the required file format. Read it only when you are about to create or update a backlog item.
+description: Rules for work found outside the current task — when to fix inline, when it blocks, when to drop it, when to return it as a backlog finding, how to avoid duplicates, and the required file format. Read it when you have a finding outside the task, or are about to create or update a backlog item.
 ---
 
 # Backlog rules
 
-Capture, don't chase: work found outside the current task is recorded, not fixed on the side.
-But not everything deserves a ticket. Decide in this order:
+Fix it or drop it; the backlog is the last resort. Every item is work someone must read, decide
+and finish, so a task should add **zero** items most of the time. Decide in this order:
 
-Agents never decide what to build. A backlog item is only ever one of: a bug found, technical
-debt, or an improvement to security, performance, scalability, code clarity or reusability.
-Never write an item that proposes a new feature or capability: the user decides features.
+**Never create a backlog file without asking the user in the chat first.** An agent returns
+the finding in its final message, one line: path, problem, evidence; it never writes it to a
+file. The main session asks the user in the chat whether to create it, and writes it only after
+the user says yes, following this skill. Updating or deleting an item the current work solves
+(Section 5) needs no approval.
+
+**Agents never decide what to build.** Agents record only problems in what exists or is being
+built: bugs, technical debt, and improvements to security, performance, scalability, code clarity
+or reusability. A new capability, endpoint, flow, option or business rule is never an agent's
+backlog item, however useful it looks: only the user adds those.
 
 ## 1. Decide what to do with a finding
 
 | Finding | Action |
 |---|---|
 | It breaks the current spec's Outcomes or the current task's DoD (Definition of Done) | **Blocking.** Fix it in this task, or stop and report it as [Blocking]. Never send it to the backlog. |
-| **Too small to ticket:** a typo, a wrong name, a missing or wrong comment, or a one-line fix with no behaviour change, in a file this task already changes | **Fix inline** (implementer and small-feature only) and mention it in the Delivered note or final message. Never in test files after Gate 2. |
-| A missing feature or new capability | **Never record it.** No backlog item, no note in the spec or plan. |
-| A bug, technical debt, or a security, performance, scalability, clarity or reusability improvement outside the task's scope | **Backlog item** (below) |
+| **Small fix:** about 10 lines or fewer, in the area this task already changes (same folder or the code it calls), with no new package, no breaking public API or contract change and nothing high risk | **Fix inline** (implementer, small-feature, small-batch) with a test when behaviour changes, and mention it in the Delivered note or final message. Never in test files after Gate 2. |
+| **A feature idea:** a new capability, endpoint, flow, option or business rule nobody asked for | **Drop it.** Never write it to `features/` or disguise it as an improvement. The spec writer may list it under the spec's "Out of Scope"; other agents drop it |
+| **Low severity:** style, naming, docs, test hygiene, "the rule could cover more", any reviewer Watch out | **Drop it.** Never a backlog item |
+| **Worth a ticket:** a bug users will hit, a security or data problem, or something that blocks a planned feature, and too big to fix inline | **Return it** in the final message only. The file is written only after the user says yes in the chat (above) |
 
 ## 2. Search before creating
 
@@ -75,7 +83,7 @@ What is wrong or missing, in plain words.
 
 ## 5. Status
 
-- Agents always write **`proposed`**. Only the user changes it to **`accepted`**, merges items, or
+- New items are always written as **`proposed`**. Only the user changes it to **`accepted`**, merges items, or
   deletes them.
 - When work fully solves an item, commit the fix with `Refs: <backlog file path>` in the body,
   then delete the item file but **never commit the
@@ -86,6 +94,7 @@ What is wrong or missing, in plain words.
 
 ## 6. Limits
 
-- Never more than 3 new backlog items from one task. More than that means the task's scope was
-  wrong: say so in your output instead.
-- Never write a backlog item for something you are not sure is a problem. Check it first.
+- At most **one** finding per task, across every agent in the workflow (spec, plan, tests,
+  implementation, review). More than one means the task's scope was wrong: say so instead.
+- Severity `low` is never filed. Only `medium`, `high` or `critical` (Section 4).
+- Never propose a backlog item for something you are not sure is a problem. Check it first.

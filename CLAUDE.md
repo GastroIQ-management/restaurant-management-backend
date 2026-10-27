@@ -160,10 +160,18 @@ After Gate 2, test files are read-only: never edit, delete, skip or weaken a tes
 looks wrong, stop and say why.
 
 ### Backlog
-Rules in `.claude/skills/backlog/SKILL.md`, read only when about to write an item. In short: a
-finding that breaks the current task blocks it; a tiny fix in a file already being changed is made
-inline; anything else becomes a backlog item written by the agent that found it, after searching
-for duplicates. Agents write items as `proposed`; only the user accepts or merges them.
+Rules in `.claude/skills/backlog/SKILL.md`, read when handling a finding outside the task. Fix
+it or drop it; the backlog is the last resort, and most tasks add zero items. In short: a finding
+that breaks the current task blocks it; a fix of about 10 lines in the area being changed (no new
+package, no breaking contract, nothing high risk) is made inline; feature ideas and low-severity
+findings (style, naming, docs, test hygiene, reviewer Watch outs) are dropped. Only a bug users
+will hit, a security or data problem, or a blocker for a planned feature, too big to fix inline,
+is returned in the agent's final message, never written as a file: at most one per task across
+the whole workflow, severity medium or higher. No agent writes a backlog file. The main session
+shows the agents' messages, then asks the user in the chat whether to create each finding, even
+when a command says to add nothing before or after the messages; a backlog file is created only
+after a yes, after searching for duplicates, with status `proposed`. Only the user accepts or
+merges items. Updating or deleting an item the current work solves needs no approval.
 When work fully solves an item, agents commit the fix and delete the item file, but never commit
 the deletion: the user checks and commits it. Agents never push.
 
