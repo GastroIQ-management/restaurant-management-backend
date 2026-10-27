@@ -39,15 +39,15 @@ namespace RestaurantManagement.Shared.Middleware
             }
 
             if (!Guid.TryParse(header.ToString(), out var locationId))
-                throw new BusinessException(localizer["InvalidLocationId"], 400);
+                throw new BusinessException(ErrorCodes.LocationInvalidId, localizer["InvalidLocationId"]);
 
             var organizationId = currentUser.OrganizationId
-                ?? throw new BusinessException(localizer["LocationAccessDenied"], 403);
+                ?? throw new BusinessException(ErrorCodes.LocationAccessDenied, localizer["LocationAccessDenied"]);
 
             var location = await organizationLookup.GetLocationAsync(locationId);
             if (location is null || location.OrganizationId != organizationId
                 || !await WorksAtAsync(memberAccessLookup, currentUser.UserId!.Value, organizationId, locationId))
-                throw new BusinessException(localizer["LocationAccessDenied"], 403);
+                throw new BusinessException(ErrorCodes.LocationAccessDenied, localizer["LocationAccessDenied"]);
 
             selectedLocation.LocationId = locationId;
             await _next(context);

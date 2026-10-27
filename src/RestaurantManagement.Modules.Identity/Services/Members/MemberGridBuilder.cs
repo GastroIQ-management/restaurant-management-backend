@@ -1,3 +1,4 @@
+using RestaurantManagement.Modules.Identity.Services.Roles;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Localization;
 using RestaurantManagement.Modules.Identity.Data;
@@ -26,7 +27,7 @@ namespace RestaurantManagement.Modules.Identity.Services.Members
                 .Where(r => r.OrganizationId == organizationId && names.Contains(r.Name))
                 .ToListAsync();
             if (roles.Count != names.Count)
-                throw new BusinessException(_localizer["RoleNotFound"].Value, 404);
+                throw new BusinessException(RoleErrorCodes.NotFound, _localizer["RoleNotFound"].Value);
 
             var roleIds = roles.Select(r => r.Id).ToList();
             var defaults = await _db.OrganizationRoleLevels

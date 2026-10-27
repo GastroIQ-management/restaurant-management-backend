@@ -146,10 +146,10 @@ public class LoginLockoutEndpointTests : IClassFixture<PostgresDatabaseFixture>
         var accountLocked = await LoginAsync(client, LaptopIp, CorrectPassword, "ana@cantinadanonna.com.br");
 
         // Assert
-        var expectedBody = await wrongPassword.Content.ReadAsStringAsync();
+        var expectedBody = await LocalizedResponses.ProblemWithoutTraceIdAsync(wrongPassword);
         addressLocked.StatusCode.ShouldBe(wrongPassword.StatusCode, "an address lock is answered like a wrong password");
         accountLocked.StatusCode.ShouldBe(wrongPassword.StatusCode, "an account lock is answered like a wrong password");
-        (await addressLocked.Content.ReadAsStringAsync()).ShouldBe(expectedBody, "nothing in the body reveals an address lock");
-        (await accountLocked.Content.ReadAsStringAsync()).ShouldBe(expectedBody, "nothing in the body reveals an account lock");
+        (await LocalizedResponses.ProblemWithoutTraceIdAsync(addressLocked)).ShouldBe(expectedBody, "nothing in the body but the per-request traceId reveals an address lock");
+        (await LocalizedResponses.ProblemWithoutTraceIdAsync(accountLocked)).ShouldBe(expectedBody, "nothing in the body but the per-request traceId reveals an account lock");
     }
 }

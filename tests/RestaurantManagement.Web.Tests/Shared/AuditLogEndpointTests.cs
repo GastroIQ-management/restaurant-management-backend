@@ -311,4 +311,21 @@ public class AuditLogEndpointTests : IClassFixture<PostgresDatabaseFixture>
         page.PageSize.ShouldBe(expectedPageSize);
         page.TotalCount.ShouldBe(101);
     }
+
+    [Theory]
+    [InlineData("from=2026-10-14T00:00:00Z&to=2026-10-10T00:00:00Z", "audit_log.invalid_date_range")]
+    [InlineData("action=order.cancelled", "audit_log.unknown_action")]
+    [Trait("Rule", "SH60")]
+    public async Task GetAuditLog_InvalidFilter_AnswersItsOwnCode(string query, string expectedCode)
+    {
+        // Arrange
+        await using var factory = await CreateFactoryWithEntriesAsync();
+        var client = factory.ClientFor(AnaId, CantinaId);
+
+        // Act
+        var response = await client.GetAsync($"{AuditLogUrl}?{query}");
+
+        // Assert
+        (await CodeAsync(response)).ShouldBe(expectedCode, "each refused filter has its own code");
+    }
 }

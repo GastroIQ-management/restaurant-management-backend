@@ -144,13 +144,13 @@ namespace RestaurantManagement.Modules.Identity.Services.Roles
         private Guid RequireOrganizationId()
         {
             return _tenantContext.OrganizationId
-                ?? throw new BusinessException(_localizer["OrganizationRequired"].Value, 403);
+                ?? throw new BusinessException(ErrorCodes.OrganizationRequired, _localizer["OrganizationRequired"].Value);
         }
 
         private async Task<(OrganizationRole Role, List<OrganizationRoleLevel> Levels)> LoadRoleAsync(Guid roleId, Guid organizationId)
         {
             var role = await _db.OrganizationRoles.FirstOrDefaultAsync(r => r.Id == roleId && r.OrganizationId == organizationId)
-                ?? throw new BusinessException(_localizer["RoleNotFound"].Value, 404);
+                ?? throw new BusinessException(RoleErrorCodes.NotFound, _localizer["RoleNotFound"].Value);
             var levels = await _db.OrganizationRoleLevels.Where(l => l.RoleId == roleId && l.OrganizationId == organizationId).ToListAsync();
             return (role, levels);
         }
@@ -160,7 +160,7 @@ namespace RestaurantManagement.Modules.Identity.Services.Roles
             var name = (rawName ?? string.Empty).Trim();
             if (name.Length == 0 || name.Length > OrganizationRole.NameMaxLength
                 || string.Equals(name, OwnerRoleName, StringComparison.OrdinalIgnoreCase))
-                throw new BusinessException(_localizer["RoleNameInvalid"].Value, 400);
+                throw new BusinessException(RoleErrorCodes.NameInvalid, _localizer["RoleNameInvalid"].Value);
 
             return name;
         }
@@ -171,7 +171,7 @@ namespace RestaurantManagement.Modules.Identity.Services.Roles
             var used = await _db.OrganizationRoles
                 .AnyAsync(r => r.OrganizationId == organizationId && r.Id != ownRoleId && r.Name.ToLower() == lowered);
             if (used)
-                throw new BusinessException(_localizer["RoleNameAlreadyUsed"].Value, 400);
+                throw new BusinessException(RoleErrorCodes.NameAlreadyUsed, _localizer["RoleNameAlreadyUsed"].Value);
         }
 
         // The index is the real guard against two simultaneous creates; the check above is a fast path.
@@ -183,7 +183,7 @@ namespace RestaurantManagement.Modules.Identity.Services.Roles
             }
             catch (DbUpdateException ex) when (IsDuplicateNameViolation(ex))
             {
-                throw new BusinessException(_localizer["RoleNameAlreadyUsed"].Value, 400);
+                throw new BusinessException(RoleErrorCodes.NameAlreadyUsed, _localizer["RoleNameAlreadyUsed"].Value);
             }
         }
 

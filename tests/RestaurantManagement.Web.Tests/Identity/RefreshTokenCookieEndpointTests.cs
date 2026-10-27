@@ -7,6 +7,7 @@ using Microsoft.Net.Http.Headers;
 using NSubstitute;
 using NSubstitute.ExceptionExtensions;
 using RestaurantManagement.Modules.Identity.Models.Sessions;
+using RestaurantManagement.Modules.Identity.Services.Sessions;
 using RestaurantManagement.Shared.Utils.Exceptions;
 using Shouldly;
 
@@ -98,7 +99,7 @@ public class RefreshTokenCookieEndpointTests : IDisposable
     {
         // Arrange
         _factory.SessionService.RefreshTokenAsync(Arg.Is<string?>(t => t == null))
-            .Throws(new BusinessException("InvalidOrExpiredToken", 401));
+            .Throws(new BusinessException(SessionErrorCodes.InvalidOrExpiredSession, "InvalidOrExpiredToken"));
         var client = CreateClient();
 
         // Act
@@ -147,7 +148,7 @@ public class RefreshTokenCookieEndpointTests : IDisposable
     {
         // Arrange
         _factory.SessionService.RefreshTokenAsync(Arg.Is<string?>(t => t == null))
-            .Throws(new BusinessException("InvalidOrExpiredToken", 401));
+            .Throws(new BusinessException(SessionErrorCodes.InvalidOrExpiredSession, "InvalidOrExpiredToken"));
         var client = CreateClient();
         var request = new HttpRequestMessage(HttpMethod.Post, RefreshUrl);
         request.Headers.Add("Cookie", $"{OldCookieName}={CurrentCookieToken}");

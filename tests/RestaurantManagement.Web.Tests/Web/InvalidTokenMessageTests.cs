@@ -110,4 +110,24 @@ public class InvalidTokenMessageTests : IDisposable
         response.StatusCode.ShouldBe(HttpStatusCode.Unauthorized, "an expired token must be refused");
         (await LocalizedResponses.MessageAsync(response)).ShouldBe(EnglishInvalidTokenMessage, "an expired token gets the same message as a forged one, so the answer never says why");
     }
+
+    [Fact]
+    [Trait("Rule", "W2")]
+    public async Task ProtectedEndpoint_ForgedAndExpiredToken_AnswerTheSameStatusTitleAndInvalidTokenCode()
+    {
+        // Arrange
+        var forgedToken = ForgedToken();
+        var expiredToken = ExpiredToken();
+
+        // Act
+        var forged = await GetWithAsync(forgedToken);
+        var expired = await GetWithAsync(expiredToken);
+
+        // Assert
+        forged.Content.Headers.ContentType!.MediaType.ShouldBe("application/problem+json", "a refused token is answered as Problem Details");
+        expired.StatusCode.ShouldBe(forged.StatusCode, "an expired token gets the same status as a forged one");
+        (await LocalizedResponses.CodeAsync(forged)).ShouldBe("auth.invalid_token", "a forged token carries the invalid token code");
+        (await LocalizedResponses.CodeAsync(expired)).ShouldBe("auth.invalid_token", "an expired token carries the same code, so the answer never says why");
+        (await LocalizedResponses.MessageAsync(expired)).ShouldBe(await LocalizedResponses.MessageAsync(forged), "the title is the same too");
+    }
 }

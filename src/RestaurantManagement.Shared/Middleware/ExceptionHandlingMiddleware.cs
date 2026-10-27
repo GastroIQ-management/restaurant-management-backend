@@ -1,5 +1,3 @@
-using System.Net;
-using System.Text.Json;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -34,11 +32,7 @@ namespace RestaurantManagement.Shared.Middleware
                 // ✅ Business error: skip Sentry
                 _logger.LogWarning(bex, "Business exception");
 
-                context.Response.StatusCode = bex.StatusCode;
-                context.Response.ContentType = "application/json";
-
-                var errorResponse = new { message = bex.Message };
-                await context.Response.WriteAsync(JsonSerializer.Serialize(errorResponse));
+                await ProblemResponse.WriteAsync(context, new ErrorCode(bex.Code, bex.StatusCode), bex.Message);
             }
             catch (Exception ex)
             {
@@ -46,18 +40,11 @@ namespace RestaurantManagement.Shared.Middleware
                 SentrySdk.CaptureException(ex);
                 _logger.LogError(ex, "Unhandled exception");
 
-                context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
-                context.Response.ContentType = "application/json";
-
                 // The last-resort handler must not throw, so fall back to English without a localizer.
                 var localizer = context.RequestServices?.GetService<IStringLocalizer<SharedResource>>();
-                var errorResponse = new
-                {
-                    message = localizer?["UnexpectedError"].Value ?? "An unexpected error occurred.",
-                    detail = _env.IsDevelopment() ? ex.Message : null
-                };
+                var title = localizer?["UnexpectedError"].Value ?? "An unexpected error occurred.";
 
-                await context.Response.WriteAsync(JsonSerializer.Serialize(errorResponse));
+                await ProblemResponse.WriteAsync(context, ErrorCodes.ServerUnexpectedError, title, _env.IsDevelopment() ? ex.Message : null);
             }
         }
 

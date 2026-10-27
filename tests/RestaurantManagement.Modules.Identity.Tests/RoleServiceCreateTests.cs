@@ -96,5 +96,20 @@ namespace RestaurantManagement.Modules.Identity.Tests
             exception.StatusCode.ShouldBe(400, "a module or level that does not exist is a bad request");
             StoredRoleNames(database, CantinaId).ShouldBe(DefaultRoles.OrderBy(n => n), ignoreOrder: true, customMessage: "nothing is stored for a bad request");
         }
+
+        [Fact]
+        [Trait("Rule", "T146")]
+        public async Task CreateAsync_NameUsedInAnotherLetterCase_ThrowsRoleNameAlreadyUsedCode()
+        {
+            // Arrange
+            using var database = await CreateDatabaseAsync(DefaultRoles);
+            var sut = CreateRoleService(database);
+
+            // Act
+            var exception = await Should.ThrowAsync<BusinessException>(() => sut.CreateAsync(new CreateRoleRequest { Name = "waiter" }));
+
+            // Assert
+            exception.Code.ShouldBe("role.name_already_used", "a taken role name has its own code for the form");
+        }
     }
 }

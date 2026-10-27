@@ -76,7 +76,7 @@ namespace RestaurantManagement.Modules.Organization.Services
         {
             var location = await _orgDb.Locations.FirstOrDefaultAsync(l => l.Id == locationId);
             if (location == null)
-                throw new BusinessException(_localizer["LocationNotFound"].Value, 404);
+                throw new BusinessException(ErrorCodes.LocationNotFound, _localizer["LocationNotFound"].Value);
 
             await RequireManageLocationAsync(location, request.Status);
 
@@ -105,7 +105,7 @@ namespace RestaurantManagement.Modules.Organization.Services
         {
             var location = await _orgDb.Locations.FirstOrDefaultAsync(l => l.Id == locationId);
             if (location == null)
-                throw new BusinessException(_localizer["LocationNotFound"].Value, 404);
+                throw new BusinessException(ErrorCodes.LocationNotFound, _localizer["LocationNotFound"].Value);
 
             await RequireOwnerAsync();
 
@@ -182,7 +182,7 @@ namespace RestaurantManagement.Modules.Organization.Services
         {
             var taken = await _orgDb.Locations.AnyAsync(l => l.Code == code && l.Id != ignoredLocationId);
             if (taken)
-                throw new BusinessException(_localizer["LocationCodeAlreadyUsed"].Value, 400);
+                throw new BusinessException(OrganizationErrorCodes.LocationCodeAlreadyUsed, _localizer["LocationCodeAlreadyUsed"].Value);
         }
 
         // A concurrent request can pass the check above; the unique index then rejects the second one.
@@ -194,13 +194,13 @@ namespace RestaurantManagement.Modules.Organization.Services
             }
             catch (DbUpdateException ex) when (ex.InnerException is PostgresException { SqlState: PostgresErrorCodes.UniqueViolation })
             {
-                throw new BusinessException(_localizer["LocationCodeAlreadyUsed"].Value, 400);
+                throw new BusinessException(OrganizationErrorCodes.LocationCodeAlreadyUsed, _localizer["LocationCodeAlreadyUsed"].Value);
             }
         }
 
         private Guid RequireOrganizationId()
             => _tenantContext.OrganizationId
-                ?? throw new BusinessException(_localizer["OrganizationRequired"].Value, 403);
+                ?? throw new BusinessException(ErrorCodes.OrganizationRequired, _localizer["OrganizationRequired"].Value);
 
         private static LocationResponse MapToResponse(Location location)
         {

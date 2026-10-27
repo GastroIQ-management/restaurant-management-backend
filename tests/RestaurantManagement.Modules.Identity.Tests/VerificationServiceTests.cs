@@ -697,5 +697,39 @@ namespace RestaurantManagement.Modules.Identity.Tests
             reloaded.IsVerified.Should().BeTrue("a correct code verifies the account");
             reloaded.VerificationFailedAttempts.Should().Be(0, "a correct code leaves the failed-attempt counter at zero");
         }
+
+        [Fact]
+        [Trait("Rule", "V12")]
+        public async Task VerifyEmailAsync_UnknownEmailAndWrongCode_BothThrowTheInvalidCodeCode()
+        {
+            // Arrange
+            using var database = new IdentityTestDatabase();
+            using var seedContext = database.CreateContext();
+            var user = new User { Email = "user@test.com", PasswordHash = "hash", FirstName = "A", LastName = "B", IsVerified = false };
+            seedContext.Users.Add(user);
+            seedContext.UserVerificationCodes.Add(new UserVerificationCode
+            {
+                UserId = user.Id,
+                CodeHash = Hasher.ComputeHash(user.Id, "123456"),
+                ExpiresAt = DateTime.UtcNow.AddMinutes(15),
+                IsUsed = false
+            });
+            await seedContext.SaveChangesAsync();
+
+            using var unknownContext = database.CreateContext();
+            var unknownSut = CreateSut(unknownContext, Substitute.For<IEmailService>());
+            using var wrongCodeContext = database.CreateContext();
+            var wrongCodeSut = CreateSut(wrongCodeContext, Substitute.For<IEmailService>());
+
+            // Act
+            var unknownEmailAct = () => unknownSut.VerifyEmailAsync(new VerifyEmailRequest { Email = "nobody@test.com", Code = "654321" });
+            var wrongCodeAct = () => wrongCodeSut.VerifyEmailAsync(new VerifyEmailRequest { Email = "user@test.com", Code = "654321" });
+
+            // Assert
+            var unknownEmailThrown = await Should.ThrowAsync<BusinessException>(unknownEmailAct);
+            var wrongCodeThrown = await Should.ThrowAsync<BusinessException>(wrongCodeAct);
+            unknownEmailThrown.Code.ShouldBe("auth.invalid_code", "an unknown email carries the invalid code code");
+            wrongCodeThrown.Code.ShouldBe("auth.invalid_code", "a wrong code carries the same code, so nobody can tell which emails have an account");
+        }
     }
 }

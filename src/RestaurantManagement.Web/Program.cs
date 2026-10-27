@@ -19,6 +19,7 @@ using RestaurantManagement.Shared.Services.AuditLog;
 using RestaurantManagement.Shared.Services.Email;
 using RestaurantManagement.Shared.Services.Identity;
 using RestaurantManagement.Shared.Services.Organization;
+using RestaurantManagement.Shared.Utils.Exceptions;
 using RestaurantManagement.Shared.Utils.Localization;
 using RestaurantManagement.Web.Auth;
 using RestaurantManagement.Web.Hosting;
@@ -91,39 +92,23 @@ builder.Services.AddAuthentication(options =>
 
     options.Events = new JwtBearerEvents
     {
+        // Forged and expired tokens answer alike, so the body never says why.
         OnAuthenticationFailed = async ctx =>
         {
             ctx.NoResult();
-            ctx.Response.StatusCode = StatusCodes.Status401Unauthorized;
-            ctx.Response.ContentType = "application/json";
-            var loc = ctx.HttpContext.RequestServices.GetRequiredService<IStringLocalizer<SharedResource>>();
-            var msg = loc["InvalidToken"].Value;
-            await ctx.Response.WriteAsJsonAsync(new { message = msg });
+            await ctx.HttpContext.WriteProblemAsync(ErrorCodes.InvalidToken, "InvalidToken");
         },
         OnChallenge = async ctx =>
         {
             ctx.HandleResponse();
-            if (!ctx.Response.HasStarted)
-            {
-                ctx.Response.StatusCode = StatusCodes.Status401Unauthorized;
-                ctx.Response.ContentType = "application/json";
-                var loc = ctx.HttpContext.RequestServices.GetRequiredService<IStringLocalizer<SharedResource>>();
-                var msg = loc["UnauthorizedMessage"].Value;
-                await ctx.Response.WriteAsJsonAsync(new { message = msg });
-            }
+            await ctx.HttpContext.WriteProblemAsync(ErrorCodes.Unauthorized, "UnauthorizedMessage");
         },
-        OnForbidden = async ctx =>
-        {
-            ctx.Response.StatusCode = StatusCodes.Status403Forbidden;
-            ctx.Response.ContentType = "application/json";
-            var loc = ctx.HttpContext.RequestServices.GetRequiredService<IStringLocalizer<SharedResource>>();
-            var msg = loc["AccessDenied"].Value;
-            await ctx.Response.WriteAsJsonAsync(new { message = msg });
-        }
+        OnForbidden = ctx => ctx.HttpContext.WriteProblemAsync(ErrorCodes.AccessDenied, "AccessDenied")
     };
 });
 
 builder.Services.AddPermissionPolicies();
+builder.Services.AddFallbackProblemDetails();
 builder.Services.AddLocalizedValidationTitle();
 
 // ---------------------------------------------
@@ -220,6 +205,15 @@ builder.Services.AddSwaggerGen(c =>
         Scheme = "bearer",
         BearerFormat = "JWT"
     });
+
+    // Every code of every catalog, read from the registered modules' assemblies
+    c.DocumentFilter<RestaurantManagement.Web.OpenApi.ErrorCodesDocumentFilter>(new object[] { new System.Reflection.Assembly[]
+    {
+        typeof(ErrorCodes).Assembly,
+        typeof(RestaurantManagement.Modules.Identity.Controllers.AuthController).Assembly,
+        typeof(RestaurantManagement.Modules.Menu.Controllers.MenuController).Assembly,
+        typeof(RestaurantManagement.Modules.Organization.Controllers.OrganizationController).Assembly
+    } });
 
     c.AddSecurityRequirement(new Microsoft.OpenApi.Models.OpenApiSecurityRequirement
     {
@@ -331,6 +325,7 @@ if (app.Environment.IsDevelopment())
 app.UseForwardedHeaders();
 app.UseRequestLocalization(app.Services.GetRequiredService<IOptions<RequestLocalizationOptions>>().Value);
 app.UseMiddleware<ExceptionHandlingMiddleware>();
+app.UseStatusCodePages();
 app.UseHttpsRedirection();
 app.UseCors("DefaultCorsPolicy");
 app.UseRateLimiter();

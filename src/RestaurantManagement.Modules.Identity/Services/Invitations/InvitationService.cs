@@ -77,7 +77,7 @@ namespace RestaurantManagement.Modules.Identity.Services.Invitations
         public async Task<InvitationResponse> CreateAsync(CreateInvitationRequest request, string language)
         {
             var organizationId = _tenantContext.OrganizationId
-                ?? throw new BusinessException(_localizer["OrganizationRequired"].Value, 403);
+                ?? throw new BusinessException(ErrorCodes.OrganizationRequired, _localizer["OrganizationRequired"].Value);
             var email = request.Email.Trim().ToLowerInvariant();
             RequireWellFormedLocations(email, request);
 
@@ -107,7 +107,7 @@ namespace RestaurantManagement.Modules.Identity.Services.Invitations
         {
             if (email.Length == 0 || request.Locations.Count == 0 || request.Locations.Any(l => l is null)
                 || request.Locations.Select(l => l.LocationId).Distinct().Count() != request.Locations.Count)
-                throw new BusinessException(_localizer["ValidationFailed"].Value, 400);
+                throw new BusinessException(ErrorCodes.ValidationFailed, _localizer["ValidationFailed"].Value);
         }
 
         // Two requests for the same address at once: the open-email index lets only one win.
@@ -119,7 +119,7 @@ namespace RestaurantManagement.Modules.Identity.Services.Invitations
             }
             catch (DbUpdateException ex) when (ex.InnerException is PostgresException { ConstraintName: IdentityDbContext.OpenInvitationIndexName })
             {
-                throw new BusinessException(_localizer["ValidationFailed"].Value, 409);
+                throw new BusinessException(InvitationErrorCodes.AlreadyOpen, _localizer["ValidationFailed"].Value);
             }
         }
 
@@ -131,7 +131,7 @@ namespace RestaurantManagement.Modules.Identity.Services.Invitations
                 where member.OrganizationId == organizationId && user.Email.ToLower() == email
                 select member.Id).AnyAsync();
             if (isMember)
-                throw new BusinessException(_localizer["AlreadyMemberOfOrganization"].Value, 400);
+                throw new BusinessException(MemberErrorCodes.AlreadyMember, _localizer["AlreadyMemberOfOrganization"].Value);
         }
 
         private async Task<List<LocationGridPlan>> BuildGridsAsync(CreateInvitationRequest request, Guid organizationId)
@@ -141,12 +141,12 @@ namespace RestaurantManagement.Modules.Identity.Services.Invitations
             {
                 var summary = await _organizationLookup.GetLocationAsync(location.LocationId);
                 if (summary is null || summary.OrganizationId != organizationId)
-                    throw new BusinessException(_localizer["LocationNotFound"].Value, 404);
+                    throw new BusinessException(ErrorCodes.LocationNotFound, _localizer["LocationNotFound"].Value);
 
                 var grid = await _gridBuilder.BuildAsync(organizationId, location.RoleNames, InvitationGrids.ParseLevels(location.Levels, _localizer));
                 // A location with no roles and no levels stores no rows, so a cancel could not find it.
                 if (grid.Roles.Count == 0 && grid.Levels.Count == 0)
-                    throw new BusinessException(_localizer["ValidationFailed"].Value, 400);
+                    throw new BusinessException(ErrorCodes.ValidationFailed, _localizer["ValidationFailed"].Value);
 
                 grids.Add(new LocationGridPlan(location.LocationId, summary.Name, grid));
             }
@@ -248,10 +248,10 @@ namespace RestaurantManagement.Modules.Identity.Services.Invitations
         public async Task CancelAsync(Guid invitationId)
         {
             var organizationId = _tenantContext.OrganizationId
-                ?? throw new BusinessException(_localizer["OrganizationRequired"].Value, 403);
+                ?? throw new BusinessException(ErrorCodes.OrganizationRequired, _localizer["OrganizationRequired"].Value);
             var invitation = await _db.OrganizationInvitations.FirstOrDefaultAsync(i => i.Id == invitationId
                     && i.OrganizationId == organizationId && i.UsedAt == null && i.CancelledAt == null && i.ReplacedAt == null)
-                ?? throw new BusinessException(_localizer["InvitationNotFound"].Value, 404);
+                ?? throw new BusinessException(InvitationErrorCodes.NotFound, _localizer["InvitationNotFound"].Value);
 
             // Only the Members = Manage check applies to a cancel, so the cap never refuses it.
             var locationIds = await _db.OrganizationInvitationLevels.Where(l => l.InvitationId == invitation.Id)

@@ -43,14 +43,14 @@ namespace RestaurantManagement.Modules.Identity.Services.Passwords
         {
             var user = await _db.Users.FirstOrDefaultAsync(u => u.Id == userId);
             if (user == null || !user.IsActive || !user.IsVerified)
-                throw new BusinessException(_localizer["UnauthorizedMessage"].Value, 401);
+                throw new BusinessException(ErrorCodes.Unauthorized, _localizer["UnauthorizedMessage"].Value);
 
             // A wrong current password is not counted toward the login lockout: the caller already holds a valid session.
             if (!_passwordHasher.Verify(request.CurrentPassword, user.PasswordHash))
-                throw new BusinessException(_localizer["CurrentPasswordIncorrect"].Value, 400);
+                throw new BusinessException(PasswordErrorCodes.CurrentPasswordIncorrect, _localizer["CurrentPasswordIncorrect"].Value);
 
             if (request.NewPassword == request.CurrentPassword)
-                throw new BusinessException(_localizer["NewPasswordSameAsCurrent"].Value, 400);
+                throw new BusinessException(PasswordErrorCodes.NewPasswordSameAsCurrent, _localizer["NewPasswordSameAsCurrent"].Value);
 
             await ReplacePasswordAsync(user, request.NewPassword);
             await RecordAuditAsync(user.Id);

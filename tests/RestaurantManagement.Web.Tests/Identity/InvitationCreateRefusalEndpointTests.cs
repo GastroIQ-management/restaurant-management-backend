@@ -62,4 +62,23 @@ public class InvitationCreateRefusalEndpointTests : IClassFixture<PostgresDataba
         (await InvitationsAsync(factory, CantinaId)).Count(i => i.UsedAt == null && i.CancelledAt == null && i.ReplacedAt == null)
             .ShouldBe(1, "only one open invitation exists for the address");
     }
+
+    [Fact]
+    [Trait("Rule", "T145")]
+    public async Task CreateInvitation_SameEmailAtTheSameMoment_EveryLoserAnswersTheLastingConflictCode()
+    {
+        // Arrange
+        await using var factory = await CreateFactoryAsync(_postgres);
+        var body = InviteBody(BrunoEmail, BatelId, new[] { "Waiter" });
+
+        // Act
+        var responses = await Task.WhenAll(Enumerable.Range(0, 8)
+            .Select(_ => factory.ClientFor(AnaId, CantinaId).PostAsJsonAsync("/api/invitations", body)));
+
+        // Assert
+        var losers = responses.Where(r => !r.IsSuccessStatusCode).ToList();
+        losers.ShouldAllBe(r => r.StatusCode == HttpStatusCode.Conflict, "the loser of the race gets a 409");
+        var codes = await Task.WhenAll(losers.Select(LocalizedResponses.CodeAsync));
+        codes.ShouldAllBe(code => code == "invitation.already_open", "the 409 is a lasting conflict, never a retry code and not validation.failed");
+    }
 }

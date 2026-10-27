@@ -23,7 +23,7 @@ namespace RestaurantManagement.Modules.Identity.Services.Invitations
             {
                 if (!Enum.TryParse<AccessModule>(moduleName, true, out var module) || !Enum.IsDefined(module)
                     || !Enum.TryParse<AccessLevel>(levelName, true, out var level) || !Enum.IsDefined(level))
-                    throw new BusinessException(localizer["ValidationFailed"].Value, 400);
+                    throw new BusinessException(ErrorCodes.ValidationFailed, localizer["ValidationFailed"].Value);
 
                 parsed[module] = level;
             }

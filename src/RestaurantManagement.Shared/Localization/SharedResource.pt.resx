@@ -234,4 +234,28 @@
   <data name="LanguageUnsupported_ValidationError" xml:space="preserve">
     <value>O idioma deve ser um destes: en, pt, fr.</value>
   </data>
+  <data name="HttpBadRequestTitle" xml:space="preserve">
+    <value>O pedido não é válido.</value>
+  </data>
+  <data name="HttpUnauthorizedTitle" xml:space="preserve">
+    <value>É necessário autenticar-se.</value>
+  </data>
+  <data name="HttpForbiddenTitle" xml:space="preserve">
+    <value>Você não tem acesso a isto.</value>
+  </data>
+  <data name="HttpNotFoundTitle" xml:space="preserve">
+    <value>Não encontrado.</value>
+  </data>
+  <data name="HttpMethodNotAllowedTitle" xml:space="preserve">
+    <value>Este método não é permitido.</value>
+  </data>
+  <data name="HttpConflictTitle" xml:space="preserve">
+    <value>O pedido entra em conflito com o estado atual.</value>
+  </data>
+  <data name="HttpUnsupportedMediaTypeTitle" xml:space="preserve">
+    <value>Este tipo de conteúdo não é suportado.</value>
+  </data>
+  <data name="HttpTooManyRequestsTitle" xml:space="preserve">
+    <value>Muitos pedidos. Tente novamente mais tarde.</value>
+  </data>
 </root>

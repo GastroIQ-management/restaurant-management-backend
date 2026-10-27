@@ -2,11 +2,11 @@ using System.Net;
 using System.Threading.RateLimiting;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.RateLimiting;
-using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Options;
-using RestaurantManagement.Shared;
 using RestaurantManagement.Shared.Options;
 using RestaurantManagement.Shared.RateLimiting;
+using RestaurantManagement.Shared.Utils.Exceptions;
+using RestaurantManagement.Web.Hosting;
 
 namespace RestaurantManagement.Web.RateLimiting
 {
@@ -98,10 +98,8 @@ namespace RestaurantManagement.Web.RateLimiting
             httpContext.RequestServices.GetRequiredService<IRateLimitRejectionReporter>()
                 .Report(httpContext.Request.Path, GetClientIp(httpContext), retryAfter);
 
-            var localizer = httpContext.RequestServices.GetRequiredService<IStringLocalizer<SharedResource>>();
-            httpContext.Response.StatusCode = StatusCodes.Status429TooManyRequests;
             httpContext.Response.Headers.RetryAfter = retryAfterSeconds.ToString();
-            await httpContext.Response.WriteAsJsonAsync(new { message = localizer[TooManyRequestsMessageKey].Value }, cancellationToken);
+            await httpContext.WriteProblemAsync(ErrorCodes.RateLimitExceeded, TooManyRequestsMessageKey);
         }
 
         private static string GetClientIp(HttpContext httpContext)

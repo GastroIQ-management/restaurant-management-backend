@@ -150,4 +150,20 @@ public class OrganizationGridEndpointTests : IClassFixture<PostgresDatabaseFixtu
         ownerCount.ShouldBe(1, "the creator is the Owner of the new organization");
         roleNames.ShouldBe(new[] { "Admin", "Manager", "Cashier", "Waiter", "Kitchen" }, ignoreOrder: true, customMessage: "a new organization has the five default roles and no Owner role");
     }
+
+    [Fact]
+    [Trait("Rule", "OR47")]
+    public async Task EditLocation_MemberWithoutLocationsManage_AnswersAccessDeniedCode()
+    {
+        // Arrange
+        await using var factory = await CreateFactoryAsync();
+        var client = factory.ClientFor(CaioId, CantinaId);
+
+        // Act
+        var response = await client.PutAsJsonAsync($"/api/locations/{BatelId}", LocationBody("Unidade Batel Reformada", "BATEL"));
+
+        // Assert
+        response.StatusCode.ShouldBe(HttpStatusCode.Forbidden, "a new Admin has no access to Locations until the Owner grants it");
+        (await LocalizedResponses.CodeAsync(response)).ShouldBe("access.denied", "the refusal carries the access denied code");
+    }
 }

@@ -195,5 +195,21 @@ namespace RestaurantManagement.Modules.Identity.Tests
             (await readContext.Set<LoginFailure>().CountAsync()).ShouldBe(0, "a wrong current password on change-password must not count toward the login lock");
             maria.LockedUntil.ShouldBeNull("repeated wrong current passwords on change-password must never lock the login");
         }
+
+        [Theory]
+        [InlineData("Pizza@Errada2025", NewPassword, "password.current_incorrect")]
+        [InlineData(OldPassword, OldPassword, "password.same_as_current")]
+        [Trait("Rule", "C11")]
+        public async Task ChangePasswordAsync_WrongCurrentPasswordOrSameAsCurrent_ThrowsTheirOwnCode(string current, string next, string expectedCode)
+        {
+            // Arrange
+            using var database = await CreateDatabaseAsync();
+
+            // Act
+            var rejection = await Should.ThrowAsync<BusinessException>(() => ChangeAsync(database, MariaId, current, next));
+
+            // Assert
+            rejection.Code.ShouldBe(expectedCode, "each refused password change has its own code");
+        }
     }
 }

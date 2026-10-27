@@ -199,13 +199,24 @@ namespace RestaurantManagement.Modules.Identity.Tests
             var now = new DateTime(2026, 10, 20, 18, 30, 0, DateTimeKind.Utc);
             context.Set<MemberLocationRole>().Add(new MemberLocationRole
             {
-                Id = Guid.NewGuid(), OrganizationId = CantinaId, UserId = MariaId, LocationId = BatelId, RoleId = waiterId,
-                CreatedAt = now, UpdatedAt = now
+                Id = Guid.NewGuid(),
+                OrganizationId = CantinaId,
+                UserId = MariaId,
+                LocationId = BatelId,
+                RoleId = waiterId,
+                CreatedAt = now,
+                UpdatedAt = now
             });
             context.Set<MemberLocationLevel>().Add(new MemberLocationLevel
             {
-                Id = Guid.NewGuid(), OrganizationId = CantinaId, UserId = MariaId, LocationId = BatelId,
-                Module = AccessModule.Orders, Level = AccessLevel.Manage, CreatedAt = now, UpdatedAt = now
+                Id = Guid.NewGuid(),
+                OrganizationId = CantinaId,
+                UserId = MariaId,
+                LocationId = BatelId,
+                Module = AccessModule.Orders,
+                Level = AccessLevel.Manage,
+                CreatedAt = now,
+                UpdatedAt = now
             });
             await context.SaveChangesAsync();
         }

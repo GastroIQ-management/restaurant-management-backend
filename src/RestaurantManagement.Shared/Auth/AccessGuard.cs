@@ -70,9 +70,9 @@ namespace RestaurantManagement.Shared.Auth
             }
 
             var organizationId = _currentUser.OrganizationId
-                ?? throw new BusinessException(_localizer["OrganizationRequired"], 403);
+                ?? throw new BusinessException(ErrorCodes.OrganizationRequired, _localizer["OrganizationRequired"]);
             var userId = _currentUser.UserId
-                ?? throw new BusinessException(_localizer["AccessDenied"], 403);
+                ?? throw new BusinessException(ErrorCodes.AccessDenied, _localizer["AccessDenied"]);
 
             _grid = await _memberAccessLookup.GetAccessGridAsync(userId, organizationId);
             return _grid;
@@ -82,7 +82,7 @@ namespace RestaurantManagement.Shared.Auth
         {
             if (!allowed)
             {
-                throw new BusinessException(_localizer["AccessDenied"], 403);
+                throw new BusinessException(ErrorCodes.AccessDenied, _localizer["AccessDenied"]);
             }
         }
     }

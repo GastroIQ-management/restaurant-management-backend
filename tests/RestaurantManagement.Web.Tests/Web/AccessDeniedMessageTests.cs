@@ -77,4 +77,46 @@ public class AccessDeniedMessageTests : IDisposable
         response.StatusCode.ShouldBe(HttpStatusCode.Forbidden, "a waiter holds no level in the Members module");
         (await LocalizedResponses.MessageAsync(response)).ShouldBe(PortugueseAccessDeniedMessage, "the access denied answer follows the caller's language");
     }
+
+    [Fact]
+    [Trait("Rule", "W3")]
+    public async Task MembersManagePolicy_WaiterWithoutMembersAccess_AnswersAccessDeniedCode()
+    {
+        // Arrange
+        // Act
+        var response = await WaiterGetsMembersAsync();
+
+        // Assert
+        response.Content.Headers.ContentType!.MediaType.ShouldBe("application/problem+json", "a refused permission is answered as Problem Details");
+        (await LocalizedResponses.CodeAsync(response)).ShouldBe("access.denied", "a member without the level gets the access denied code");
+    }
+
+    [Fact]
+    [Trait("Rule", "W26")]
+    public async Task MembersManagePolicy_ManageInAnotherOrganizationOnly_AnswersTheSameBodyAndCodeAsAWaiter()
+    {
+        // Arrange
+        var pedroId = Guid.Parse("33333333-cccc-4ccc-8ccc-00000000000c");
+        var trattoriaId = Guid.Parse("b2b2b2b2-0000-4000-8000-000000000002");
+        var trattoriaCentroId = Guid.Parse("44444444-dddd-4ddd-8ddd-000000000003");
+        _factory.Organizations.GetNonClosedLocationIdsAsync(trattoriaId).Returns(new List<Guid> { trattoriaCentroId });
+        _factory.MemberAccess.GetAccessGridAsync(pedroId, trattoriaId).Returns(new AccessGridDto
+        {
+            Cells = new[] { new AccessCellDto { LocationId = trattoriaCentroId, Module = AccessModule.Members, Level = AccessLevel.Manage } }
+        });
+        _factory.MemberAccess.GetAccessGridAsync(pedroId, CantinaId).Returns(new AccessGridDto());
+        var client = _factory.CreateClient();
+        var request = new HttpRequestMessage(HttpMethod.Get, MembersUrl);
+        request.Headers.Authorization = new AuthenticationHeaderValue(
+            "Bearer", TestAccessTokens.Create(_factory.Services, pedroId, CantinaId));
+
+        // Act
+        var waiter = await WaiterGetsMembersAsync();
+        var pedro = await client.SendAsync(request);
+
+        // Assert
+        pedro.StatusCode.ShouldBe(waiter.StatusCode, "Manage in another organization gives no access in this one");
+        (await LocalizedResponses.CodeAsync(pedro)).ShouldBe("access.denied", "the refusal carries the access denied code");
+        (await LocalizedResponses.MessageAsync(pedro)).ShouldBe(await LocalizedResponses.MessageAsync(waiter), "the other organization's access changes nothing in the answer");
+    }
 }

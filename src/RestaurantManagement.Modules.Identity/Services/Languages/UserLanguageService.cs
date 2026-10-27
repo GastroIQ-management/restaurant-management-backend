@@ -22,7 +22,7 @@ namespace RestaurantManagement.Modules.Identity.Services.Languages
         {
             var user = await _db.Users.FirstOrDefaultAsync(u => u.Id == userId);
             if (user == null || !user.IsActive || !user.IsVerified)
-                throw new BusinessException(_localizer["UnauthorizedMessage"].Value, 401);
+                throw new BusinessException(ErrorCodes.Unauthorized, _localizer["UnauthorizedMessage"].Value);
 
             user.PreferredLanguage = request.Language;
             user.UpdatedAt = DateTime.UtcNow;

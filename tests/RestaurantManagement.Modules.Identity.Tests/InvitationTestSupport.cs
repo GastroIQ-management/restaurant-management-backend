@@ -133,8 +133,14 @@ namespace RestaurantManagement.Modules.Identity.Tests
             foreach (var (module, level) in levels)
                 context.Set<MemberLocationLevel>().Add(new MemberLocationLevel
                 {
-                    Id = Guid.NewGuid(), OrganizationId = CantinaId, UserId = userId, LocationId = locationId,
-                    Module = module, Level = level, CreatedAt = now, UpdatedAt = now
+                    Id = Guid.NewGuid(),
+                    OrganizationId = CantinaId,
+                    UserId = userId,
+                    LocationId = locationId,
+                    Module = module,
+                    Level = level,
+                    CreatedAt = now,
+                    UpdatedAt = now
                 });
             await context.SaveChangesAsync();
         }
