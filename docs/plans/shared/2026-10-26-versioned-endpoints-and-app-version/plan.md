@@ -43,7 +43,7 @@ least 30 days after the next one ships · #4 the OpenAPI document is published p
 - [x] T3 — Organization endpoints under `/api/v1/`
 - [x] T4 — Menu endpoints under `/api/v1/`
 - [x] T5 — Identity endpoints and refresh cookie under `/api/v1/`
-- [ ] T6 — One OpenAPI document per version, route guard and version rules
+- [x] T6 — One OpenAPI document per version, route guard and version rules
 - [ ] T7 — OpenAPI declares the app version header on writes
 
 ## Assumptions

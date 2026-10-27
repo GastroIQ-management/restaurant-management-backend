@@ -61,3 +61,11 @@ one subfolder exists no file stays loose.
 - One responsibility per class; if a class does two jobs, split it
 - SOLID (Single responsibility, Open/closed, Liskov substitution, Interface segregation,
   Dependency inversion): services depend on interfaces; cross-module contracts stay small
+
+## 6. API versions
+- Every endpoint route starts with `api/v<n>/` of a supported version (list in `Web/OpenApi/ApiVersions.cs`); a test fails for any other route
+- Each version has its own OpenAPI document at `/swagger/<version>/swagger.json`
+- A breaking change ships as a new version: new route prefix, own document
+- Inside a version, changes are additive only: new endpoints, new optional fields
+- An old version stays served at least 30 days after the next one ships (longer than the 7-day offline limit)
+- Both rules apply from launch

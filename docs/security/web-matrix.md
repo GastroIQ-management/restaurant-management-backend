@@ -66,9 +66,9 @@ for one module (rate limits on sign-in endpoints, the refresh cookie) are in tha
 | W25 | Rate-limited (429) answer to an allowed origin | The page may read `Retry-After`, so it knows how long to wait | ✅ | `CorsRetryAfterTests.Register_RateLimitedFromAllowedOrigin_ExposesRetryAfter` |
 | W27 | Rate-limited request | 429 `rate_limit.exceeded` as Problem Details with `Retry-After` kept | ✅ | `CorsRetryAfterTests.Register_RateLimited_AnswersProblemDetailsWithRateLimitCodeAndRetryAfter` |
 | W28 | Error made by the framework: bodiless error result, unknown route, wrong method, wrong content type | Problem Details with the fallback code of the status (`http.conflict`, `http.not_found`, `http.method_not_allowed`, `http.unsupported_media_type`) and a title in the caller's language; status unchanged | ✅ | `FallbackProblemDetailsTests.FrameworkError_UnknownRouteWrongMethodBodilessResultWrongContentType_AnswersFallbackCodeWithATitlePerLanguage` |
-| W29 | Any endpoint route of the app | Starts with `api/v<n>/` of a supported API version (today `v1`); an endpoint outside every supported version fails the build | ❌ | `ApiVersionRoutesTests.EveryEndpoint_RouteTemplate_StartsWithASupportedApiVersion` |
-| W30 | The OpenAPI document of a version | Holds only that version's paths and every one of its operations | ❌ | `ApiVersionDocumentsTests.V1Document_InDevelopment_ListsOnlyV1PathsAndEveryV1Operation` |
-| W31 | The OpenAPI document of a version that is not supported | Not served (404) | ❌ | `ApiVersionDocumentsTests.Document_VersionThatIsNotSupported_IsNotServed` |
+| W29 | Any endpoint route of the app | Starts with `api/v<n>/` of a supported API version (today `v1`); an endpoint outside every supported version fails the build | ✅ | `ApiVersionRoutesTests.EveryEndpoint_RouteTemplate_StartsWithASupportedApiVersion` |
+| W30 | The OpenAPI document of a version | Holds only that version's paths and every one of its operations | ✅ | `ApiVersionDocumentsTests.V1Document_InDevelopment_ListsOnlyV1PathsAndEveryV1Operation` |
+| W31 | The OpenAPI document of a version that is not supported | Not served (404) | ✅ | `ApiVersionDocumentsTests.Document_VersionThatIsNotSupported_IsNotServed` |
 
 ## 6. Wiring tests
 These protect the app setup rather than a rule users meet.
