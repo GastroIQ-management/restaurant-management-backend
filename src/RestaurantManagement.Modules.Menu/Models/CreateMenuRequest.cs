@@ -6,6 +6,8 @@ namespace RestaurantManagement.Modules.Menu.Models
 {
     public class CreateMenuRequest
     {
+        public Guid Id { get; set; }
+
         [Required(ErrorMessage = "RequiredAttribute_ValidationError")]
         [MaxLength(100, ErrorMessage = "MaxLengthAttribute_ValidationError")]
         public string Name { get; set; } = string.Empty;

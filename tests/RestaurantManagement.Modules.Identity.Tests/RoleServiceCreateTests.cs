@@ -29,6 +29,7 @@ namespace RestaurantManagement.Modules.Identity.Tests
             var sut = CreateRoleService(database);
             var request = new CreateRoleRequest
             {
+                Id = Guid.NewGuid(),
                 Name = "  Marketing ",
                 Levels = new Dictionary<string, string> { ["Menus"] = "Manage", ["Reports"] = "Read", ["Orders"] = "None" }
             };

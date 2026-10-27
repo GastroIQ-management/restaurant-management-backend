@@ -44,7 +44,7 @@ public class MenuGridEndpointTests : IClassFixture<PostgresDatabaseFixture>
 
     public MenuGridEndpointTests(PostgresDatabaseFixture postgres) => _postgres = postgres;
 
-    private static readonly object MenuBody = new { name = "Almoço executivo", description = "Prato feito com arroz, feijão e bife", isActive = true };
+    private static readonly object MenuBody = new { id = Guid.Parse("01933b2e-7c10-7a55-9d3e-5b1f0c2a4eb1"), name = "Almoço executivo", description = "Prato feito com arroz, feijão e bife", isActive = true };
 
     private async Task<TenantApiFactory> CreateFactoryAsync()
     {
@@ -176,7 +176,7 @@ public class MenuGridEndpointTests : IClassFixture<PostgresDatabaseFixture>
         var client = factory.ClientFor(DoraId, CantinaId);
         var request = new HttpRequestMessage(new HttpMethod(method), url)
         {
-            Content = JsonContent.Create(new { menuId = DinnerMenuId, name = "Almoço executivo", description = "Alterado", isActive = false, sortOrder = 2, locationIds = new[] { BatelId } })
+            Content = JsonContent.Create(new { id = Guid.NewGuid(), menuId = DinnerMenuId, name = "Almoço executivo", description = "Alterado", isActive = false, sortOrder = 2, locationIds = new[] { BatelId } })
         };
 
         // Act

@@ -130,9 +130,10 @@ internal static class InvitationWebSupport
         => factory.InOrganizationAsync<IdentityDbContext, List<OrganizationInvitation>>(organizationId,
             db => db.Set<OrganizationInvitation>().ToListAsync());
 
-    public static object InviteBody(string email, Guid locationId, string[] roleNames, Dictionary<string, string>? levels = null)
+    public static object InviteBody(string email, Guid locationId, string[] roleNames, Dictionary<string, string>? levels = null, Guid? id = null)
         => new
         {
+            id = id ?? Guid.NewGuid(),
             email,
             locations = new[] { new { locationId, roleNames, levels = levels ?? new Dictionary<string, string>() } },
             isOwner = true

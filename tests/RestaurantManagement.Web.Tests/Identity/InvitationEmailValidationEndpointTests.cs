@@ -29,6 +29,7 @@ public class InvitationEmailValidationEndpointTests : IClassFixture<PostgresData
         // Act
         var response = await client.PostAsJsonAsync("/api/v1/invitations", new
         {
+            id = Guid.NewGuid(),
             email,
             locations = new[] { new { locationId = BatelId, roleNames = new[] { "Waiter" }, levels = new Dictionary<string, string>() } }
         });

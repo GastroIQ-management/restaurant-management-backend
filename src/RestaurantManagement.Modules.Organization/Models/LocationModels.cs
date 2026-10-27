@@ -5,6 +5,8 @@ namespace RestaurantManagement.Modules.Organization.Models
 {
     public class CreateLocationRequest
     {
+        public Guid Id { get; set; }
+
         [Required(ErrorMessage = "RequiredAttribute_ValidationError")]
         [MaxLength(100, ErrorMessage = "MaxLengthAttribute_ValidationError")]
         public string Name { get; set; } = string.Empty;

@@ -4,6 +4,8 @@ namespace RestaurantManagement.Modules.Organization.Models
 {
     public class CreateOrganizationRequest
     {
+        public Guid Id { get; set; }
+
         private string _name = string.Empty;
         private string? _description;
         private string? _logoUrl;

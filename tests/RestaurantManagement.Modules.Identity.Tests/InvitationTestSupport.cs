@@ -121,6 +121,7 @@ namespace RestaurantManagement.Modules.Identity.Tests
 
         public static CreateInvitationRequest Invite(string email, params (Guid LocationId, string[] RoleNames)[] locations) => new()
         {
+            Id = Guid.NewGuid(),
             Email = email,
             Locations = locations.Select(l => new InvitationLocationRequest { LocationId = l.LocationId, RoleNames = l.RoleNames.ToList() }).ToList()
         };

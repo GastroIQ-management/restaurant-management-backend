@@ -108,6 +108,7 @@ public class MenuLocationEndpointTests : IClassFixture<PostgresDatabaseFixture>
         // Act
         var response = await client.PostAsJsonAsync("/api/v1/menus/create", new
         {
+            id = Guid.NewGuid(),
             name = "Almoço executivo",
             description = "Prato feito com arroz, feijão e bife",
             locationIds = new[] { CantinaCentroId, TrattoriaCentroId }

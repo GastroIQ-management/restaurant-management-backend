@@ -94,7 +94,7 @@ namespace RestaurantManagement.Modules.Organization.Tests
                 TestTenant.None, TestLocalizer.Create(), Substitute.For<ILogger<OrganizationService>>(), Substitute.For<IAuditLog>());
 
             // Act
-            var created = await sut.CreateOrganizationAsync(userId, new CreateOrganizationRequest { Name = "Maple Leaf Bistro", Currency = "CAD" });
+            var created = await sut.CreateOrganizationAsync(userId, new CreateOrganizationRequest { Id = Guid.NewGuid(), Name = "Maple Leaf Bistro", Currency = "CAD" });
 
             // Assert: read the stored settings back through the organization list
             memberLookup.GetOrganizationIdsForUserAsync(userId).Returns(new List<Guid> { created.Id });

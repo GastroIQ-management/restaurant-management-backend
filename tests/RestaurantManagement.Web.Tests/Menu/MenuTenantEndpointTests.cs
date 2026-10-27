@@ -116,7 +116,7 @@ public class MenuTenantEndpointTests : IClassFixture<PostgresDatabaseFixture>
         // Arrange
         await using var factory = await CreateFactoryWithTwoOrganizationsAsync();
         var client = factory.ClientFor(AnaId, organizationId: null);
-        var body = new { menuId = CantinaDinnerMenuId, name = "Almoço executivo" };
+        var body = new { id = Guid.NewGuid(), menuId = CantinaDinnerMenuId, name = "Almoço executivo" };
 
         // Act
         var response = await client.SendAsync(Request(method, url, body));
@@ -140,7 +140,7 @@ public class MenuTenantEndpointTests : IClassFixture<PostgresDatabaseFixture>
 
         // Act
         var response = await client.PostAsJsonAsync("/api/v1/menus/create",
-            new { organizationId = TrattoriaId, name = "Almoço executivo", description = "Prato feito com arroz, feijão e bife" });
+            new { id = Guid.NewGuid(), organizationId = TrattoriaId, name = "Almoço executivo", description = "Prato feito com arroz, feijão e bife" });
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.OK, "the menu is created");
@@ -158,7 +158,7 @@ public class MenuTenantEndpointTests : IClassFixture<PostgresDatabaseFixture>
 
         // Act
         var response = await client.PostAsJsonAsync("/api/v1/menu-categories",
-            new { menuId = CantinaDinnerMenuId, organizationId = TrattoriaId, name = "Sobremesas", sortOrder = 2 });
+            new { id = Guid.NewGuid(), menuId = CantinaDinnerMenuId, organizationId = TrattoriaId, name = "Sobremesas", sortOrder = 2 });
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.Created, "the category is created");

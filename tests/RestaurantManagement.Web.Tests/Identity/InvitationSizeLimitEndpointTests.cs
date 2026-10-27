@@ -36,7 +36,7 @@ public class InvitationSizeLimitEndpointTests : IClassFixture<PostgresDatabaseFi
             };
 
         // Act
-        var response = await client.PostAsJsonAsync("/api/v1/invitations", new { email = BrunoEmail, locations });
+        var response = await client.PostAsJsonAsync("/api/v1/invitations", new { id = Guid.NewGuid(), email = BrunoEmail, locations });
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.BadRequest, "a body with an oversized list is refused");
@@ -95,7 +95,7 @@ public class InvitationSizeLimitEndpointTests : IClassFixture<PostgresDatabaseFi
         var location = new { locationId = BatelId, roleNames = new[] { "Waiter" }, levels = new Dictionary<string, string>() };
 
         // Act
-        var response = await client.PostAsJsonAsync("/api/v1/invitations", new { email = BrunoEmail, locations = new[] { location, location } });
+        var response = await client.PostAsJsonAsync("/api/v1/invitations", new { id = Guid.NewGuid(), email = BrunoEmail, locations = new[] { location, location } });
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.BadRequest, "a repeated location is refused, not a database error");

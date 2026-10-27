@@ -85,3 +85,4 @@ These protect the app setup rather than a rule users meet.
 | WD8 | `AppVersionHeaderOpenApiTests.V1Document_EveryWriteOperation_DeclaresTheRequiredAppVersionHeader` | Generated clients send `X-App-Version` on every write |
 | WD9 | `AppVersionHeaderOpenApiTests.V1Document_ReadOperations_DoNotDeclareTheAppVersionHeader` | Reads do not ask for it |
 | WD10 | `AppVersionHeaderOpenApiTests.V1Document_AppVersionHeader_DeclaresItsFormatLengthAndPurpose` | The header shows its format, 32-character limit and purpose |
+| WD11 | `ClientIdOpenApiTests.V1Document_CreateRequest_ShowsIdAsRequiredUuid` | The OpenAPI document shows `id` (uuid, required) on the six create requests that take the client's ID |

@@ -36,6 +36,7 @@ public class LocationCodeEndpointTests : IClassFixture<PostgresDatabaseFixture>
 
     private static object LocationBody(string name, string code) => new
     {
+        id = Guid.NewGuid(),
         name,
         address = "Rua Augusta, 1200",
         city = "São Paulo",

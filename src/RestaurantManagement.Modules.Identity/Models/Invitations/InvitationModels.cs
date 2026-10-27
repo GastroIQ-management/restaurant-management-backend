@@ -17,6 +17,8 @@ namespace RestaurantManagement.Modules.Identity.Models.Invitations
 
     public class CreateInvitationRequest
     {
+        public Guid Id { get; set; }
+
         [Required(ErrorMessage = "RequiredAttribute_ValidationError")]
         [EmailAddress(ErrorMessage = "EmailAddressAttribute_ValidationError")]
         [MaxLength(320, ErrorMessage = "MaxLengthAttribute_ValidationError")]

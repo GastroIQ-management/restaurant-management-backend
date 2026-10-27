@@ -114,7 +114,7 @@ public class OrganizationFieldsEndpointTests : IClassFixture<PostgresDatabaseFix
         var client = factory.ClientFor(AnaId, organizationId: null);
 
         // Act
-        var response = await client.PostAsJsonAsync("/api/v1/organizations/create", new { name = "Poutine Palace", currency = "CAD" });
+        var response = await client.PostAsJsonAsync("/api/v1/organizations/create", new { id = Guid.NewGuid(), name = "Poutine Palace", currency = "CAD" });
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.OK, "an organization may be created in Canadian dollars");
