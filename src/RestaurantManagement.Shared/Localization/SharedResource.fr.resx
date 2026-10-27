@@ -231,6 +231,9 @@
   <data name="PasswordChangeSucceeded" xml:space="preserve">
     <value>Mot de passe modifié. Reconnectez-vous sur vos appareils.</value>
   </data>
+  <data name="IdAlreadyUsed" xml:space="preserve">
+    <value>Cet identifiant est déjà utilisé.</value>
+  </data>
   <data name="RoleNameAlreadyUsed" xml:space="preserve">
     <value>Un rôle portant ce nom existe déjà.</value>
   </data>

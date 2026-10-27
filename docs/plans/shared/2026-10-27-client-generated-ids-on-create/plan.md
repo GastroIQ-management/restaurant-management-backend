@@ -1,6 +1,6 @@
 # Plan: Client-generated IDs on create endpoints
 
-**Source:** backlog/offline/2026-10-26-client-generated-ids-on-create.md   **Date:** 2026-10-27   **Status:** Draft
+**Source:** backlog/offline/2026-10-26-client-generated-ids-on-create.md   **Date:** 2026-10-27   **Status:** In progress
 **Risk:** High — clients choose the primary key on six create endpoints; a careless 409 (HTTP Conflict) could reveal another organization's records.
 
 ## Summary
@@ -36,7 +36,7 @@
 - [ ] Backlog item only: deleted if fully solved (deletion left uncommitted for the user), or updated with what is left
 
 ## Checklist
-- [ ] T1 — Shared "ID already used" code and primary key clash check
+- [x] T1 — Shared "ID already used" code and primary key clash check
 - [ ] T2 — Menu create takes the client's ID
 - [ ] T3 — Menu category create takes the client's ID
 - [ ] T4 — Location create takes the client's ID
