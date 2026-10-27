@@ -89,22 +89,22 @@ When every task in `plan.md` is ticked:
 
 ## 7. Terminal Output
 
-Your final message contains **only**:
+The batch files and commits are what gets reviewed. Never list commits, test counts, files or backlog items in your final message.
+
+A **decision** is a [Blocking] item: something that stopped you and needs the user's choice.
+
+No decisions: your final message is exactly `Batch B<n> done.`
+
+Otherwise it contains **only**:
 
 ```
-Batch B<n>: <done | stopped>
-- T1 — <short name> — <commit hash> ✓
-- T2 — <short name> — not started
-Tests (affected): <project> <passed>/<failed>, <project> <passed>/<failed>, … · failing only for later tasks: <yes | no>
-Overall DoD: <n>/<n> ticked   (last batch only; name any unticked item and why)
-
-Backlog files created: <paths, or "None">
-
-[Blocking]
-1. <what stopped you, in plain words> — Options: <A / B> — Recommended: <A, because …>
+Batch B<n> stopped.
+Decisions
+1. <what stopped you, in plain words, 2 lines max of context>
+   A) <option> — <consequence>
+   B) <option> — <consequence>
+   Recommended: <A>, because <reason>
 ```
-
-Paths relative to the repository root. Omit empty sections.
 
 ---
 

@@ -88,6 +88,12 @@ For every task, cover each spec Outcome and the task's DoD with these scenario t
 | Outcome | Scenarios |
 |---|---|
 | #1 <outcome in plain words> | 1, 2 |
+
+## Read closely before approving
+- Scenario #<n> — <why it carries the most risk> (from the test-reviewer)
+
+## Assumptions
+- <assumption> — <reason>
 ```
 
 Every spec Outcome appears in the coverage table. An Outcome checked outside tests (for example at review) says where.
@@ -130,4 +136,36 @@ High level only: what to change, where, in which order, and which pattern to fol
 2. Every new test, except guards, must **fail for the right reason** (`NotImplementedException`, a failed assertion, or a 500 for an integration test), never a compile error or a broken fixture. Guards and existing tests must pass, with one exception: implementation always comes after the tests, so an existing test you rewrite for this plan (new behaviour or a new data model) may fail until its task is built, like a new test. List each one under "Tests to make pass" of the task that turns it green, and report the count. Every other existing test in the affected run must still pass.
 3. Out-of-scope findings: read `.claude/skills/backlog/SKILL.md` first, then write the backlog file yourself following it.
 
-You always receive the test-reviewer's report, whatever its verdict. On "Fix first", fix the findings **once**, then finish. On "Ready", finish without changes. In both cases, copy its "Read closely before approving" section
+You always receive the test-reviewer's report, whatever its verdict. On "Fix first", fix the findings **once**, then finish. On "Ready", finish without changes. In both cases, copy its "Read closely before approving" section into the "Read closely before approving" section of `scenarios.md`.
+
+---
+
+## 7. Terminal Output
+
+The files are what gets reviewed. Never summarize scenarios, tests, counts, assumptions or backlog items in your final message.
+
+A **decision** is a [Blocking] question, or a choice you made that reverses an existing business or security rule (for example a matrix row). Everything else goes in the files only.
+
+No decisions: your final message is exactly `Tests ready for Gate 2.`
+
+Otherwise it contains **only**:
+
+```
+Decisions
+1. <the decision in plain words, 2 lines max of context>
+   A) <option> — <consequence>
+   B) <option> — <consequence>
+   Recommended: <A>, because <reason>
+```
+
+---
+
+## 8. Final Check
+
+- [ ] Every task and spec Outcome has scenarios; every scenario has exactly one test
+- [ ] Happy, edge, failure and security cases covered where they apply
+- [ ] Stubs compile and contain no logic
+- [ ] Every new test fails for the right reason, except guards; guards and existing tests pass
+- [ ] Implementation guide added to every task; no other batch-file field changed
+- [ ] Read closely and Assumptions written in `scenarios.md`
+- [ ] Terminal output follows Section 7

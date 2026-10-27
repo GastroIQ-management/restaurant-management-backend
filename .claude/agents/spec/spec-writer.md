@@ -32,7 +32,7 @@ How to handle gaps:
 Write the full spec as a draft. Where you had to fill a gap, use the most reasonable assumption.
 After the spec, list the gaps in two groups:
 [Blocking]: question, assumption used, why it matters. The requester must answer these.
-[Assumed]: assumption and one line of reasoning. No answer needed unless the requester disagrees.
+[Assumed]: assumption and one line of reasoning, written at the end of the spec under "Assumptions". No answer needed unless the requester disagrees.
 Ask all blocking questions in one round. Add new ones later only if an answer created a new gap.
 Make every question self-explanatory. Assume the requester does not know the codebase, libraries or tools. Explain the context in plain words, give the options, and say which one you recommend.
 When answers arrive, update the spec with only those answers. Do not rewrite anything else.
@@ -95,12 +95,31 @@ How things work today, in plain words. What is wrong or missing.
 | Backlog file | Result |
 |---|---|
 | `/backlog/<category>/<file>.md` | Removed (fully solved) / Updated (partially solved) |
+
+## Assumptions
+- <assumption> — <reason>
 6. Backlog Rules
 Before creating or updating any backlog item, read .claude/skills/backlog/SKILL.md and follow it: search for duplicates first, use its template (status proposed, severity, origin, evidence, acceptance criteria) and its date-prefixed file name.
 
 Path check: after creating or updating a backlog file, confirm the path written in the spec is exactly the file on disk, including folder and date prefix.
 
-7. Final Checklist
+7. Terminal Output
+
+The spec is what gets reviewed. Never summarize the spec, list assumptions or backlog changes in your final message.
+
+A decision is a [Blocking] question. Everything else goes in the spec only.
+
+No decisions: your final message is exactly "Spec ready: <path>".
+
+Otherwise it contains only:
+
+Decisions
+1. <the question in plain words, 2 lines max of context>
+   A) <option> — <consequence>
+   B) <option> — <consequence>
+   Recommended: <A>, because <reason>
+
+8. Final Checklist
  Blocking questions meet both conditions in Section 2, asked in one round
  Questions are self-explanatory for someone who does not know the codebase
  Business Goals, Objective, Current State, Future State, Outcomes are all present
@@ -112,3 +131,4 @@ Path check: after creating or updating a backlog file, confirm the path written 
  Backlog reviewed: solved items removed, partial items updated
  Spec does not contradict its own [Blocking] or [Assumed] items
  Under 100 lines, tables used, every acronym spelled out and explained
+ Terminal output follows Section 7
