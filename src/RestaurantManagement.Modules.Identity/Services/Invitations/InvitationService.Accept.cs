@@ -1,3 +1,4 @@
+using RestaurantManagement.Modules.Identity.Services.Members;
 using Microsoft.EntityFrameworkCore;
 using Npgsql;
 using RestaurantManagement.Modules.Identity.Data;
@@ -16,11 +17,11 @@ namespace RestaurantManagement.Modules.Identity.Services.Invitations
         public async Task AcceptAsync(AcceptInvitationRequest request)
         {
             var invitation = await FindOpenAsync(request.Token);
-            var userId = _currentUser.UserId ?? throw new BusinessException(_localizer["AccessDenied"].Value, 403);
+            var userId = _currentUser.UserId ?? throw new BusinessException(ErrorCodes.AccessDenied, _localizer["AccessDenied"].Value);
             var user = await _db.Users.FirstOrDefaultAsync(u => u.Id == userId)
-                ?? throw new BusinessException(_localizer["AccessDenied"].Value, 403);
+                ?? throw new BusinessException(ErrorCodes.AccessDenied, _localizer["AccessDenied"].Value);
             if (!string.Equals(user.Email, invitation.Email, StringComparison.OrdinalIgnoreCase))
-                throw new BusinessException(_localizer["InvitationForAnotherAccount"].Value, 403);
+                throw new BusinessException(InvitationErrorCodes.ForAnotherAccount, _localizer["InvitationForAnotherAccount"].Value);
 
             await JoinAsync(invitation, user.Id, newUser: null);
         }
@@ -29,7 +30,7 @@ namespace RestaurantManagement.Modules.Identity.Services.Invitations
         {
             var invitation = await FindOpenAsync(request.Token);
             if (await _db.Users.AnyAsync(u => u.Email.ToLower() == invitation.Email))
-                throw new BusinessException(_localizer["InvitationAccountExistsSignIn"].Value, 400);
+                throw new BusinessException(InvitationErrorCodes.AccountExists, _localizer["InvitationAccountExistsSignIn"].Value);
 
             var now = _timeProvider.GetUtcNow().UtcDateTime;
             var user = new User
@@ -50,7 +51,7 @@ namespace RestaurantManagement.Modules.Identity.Services.Invitations
             }
             catch (DbUpdateException ex) when (ex.InnerException is PostgresException { ConstraintName: IdentityDbContext.UniqueEmailIndexName })
             {
-                throw new BusinessException(_localizer["InvitationAccountExistsSignIn"].Value, 400);
+                throw new BusinessException(InvitationErrorCodes.AccountExists, _localizer["InvitationAccountExistsSignIn"].Value);
             }
         }
 
@@ -61,7 +62,7 @@ namespace RestaurantManagement.Modules.Identity.Services.Invitations
             var hash = InvitationTokens.Hash(token ?? string.Empty);
             return await _db.OrganizationInvitations.AsNoTracking().FirstOrDefaultAsync(i => i.TokenHash == hash
                     && i.UsedAt == null && i.CancelledAt == null && i.ReplacedAt == null && i.ExpiresAt > now)
-                ?? throw new BusinessException(_localizer["InvitationLinkInvalid"].Value, 400);
+                ?? throw new BusinessException(InvitationErrorCodes.LinkInvalid, _localizer["InvitationLinkInvalid"].Value);
         }
 
         private async Task JoinAsync(OrganizationInvitation invitation, Guid userId, User? newUser)
@@ -69,7 +70,7 @@ namespace RestaurantManagement.Modules.Identity.Services.Invitations
             using var scope = _tenantScope.Begin(invitation.OrganizationId);
             await using var transaction = await _db.Database.BeginTransactionAsync();
             if (await _db.OrganizationMembers.AnyAsync(m => m.UserId == userId && m.OrganizationId == invitation.OrganizationId))
-                throw new BusinessException(_localizer["AlreadyMemberOfOrganization"].Value, 400);
+                throw new BusinessException(MemberErrorCodes.AlreadyMember, _localizer["AlreadyMemberOfOrganization"].Value);
 
             // One conditional update claims the link, so two requests at once join once.
             var now = _timeProvider.GetUtcNow().UtcDateTime;
@@ -77,7 +78,7 @@ namespace RestaurantManagement.Modules.Identity.Services.Invitations
                     && i.UsedAt == null && i.CancelledAt == null && i.ReplacedAt == null && i.ExpiresAt > now)
                 .ExecuteUpdateAsync(s => s.SetProperty(i => i.UsedAt, now).SetProperty(i => i.UpdatedAt, now));
             if (claimed != 1)
-                throw new BusinessException(_localizer["InvitationLinkInvalid"].Value, 400);
+                throw new BusinessException(InvitationErrorCodes.LinkInvalid, _localizer["InvitationLinkInvalid"].Value);
 
             if (newUser is not null)
                 _db.Users.Add(newUser);

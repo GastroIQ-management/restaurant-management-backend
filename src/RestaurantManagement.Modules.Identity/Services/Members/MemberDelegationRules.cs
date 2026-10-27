@@ -27,36 +27,38 @@ namespace RestaurantManagement.Modules.Identity.Services.Members
         public async Task RequireAsync(Guid? targetUserId, IReadOnlyCollection<LocationGrant> grants)
         {
             var organizationId = _tenantContext.OrganizationId
-                ?? throw new BusinessException(_localizer["OrganizationRequired"].Value, 403);
+                ?? throw new BusinessException(ErrorCodes.OrganizationRequired, _localizer["OrganizationRequired"].Value);
             var callerId = _currentUser.UserId
-                ?? throw new BusinessException(_localizer["AccessDenied"].Value, 403);
-
-            if (targetUserId == callerId)
-                throw new BusinessException(_localizer["CannotChangeOwnAccess"].Value, 403);
-            if (targetUserId is not null && await IsOwnerAsync(targetUserId.Value, organizationId))
-                throw new BusinessException(_localizer["AccessDenied"].Value, 403);
+                ?? throw new BusinessException(ErrorCodes.AccessDenied, _localizer["AccessDenied"].Value);
 
             var caller = await _db.OrganizationMembers
                 .FirstOrDefaultAsync(m => m.UserId == callerId && m.OrganizationId == organizationId)
-                ?? throw new BusinessException(_localizer["AccessDenied"].Value, 403);
+                ?? throw new BusinessException(ErrorCodes.AccessDenied, _localizer["AccessDenied"].Value);
+            var callerCells = caller.IsOwner ? new List<(Guid, AccessModule, AccessLevel)>() : await LoadCellsAsync(callerId, organizationId);
+
+            // A caller without Members Manage is refused as such, before any refusal that names the target.
+            if (!caller.IsOwner)
+                foreach (var grant in grants)
+                {
+                    if (LevelOf(callerCells, grant.LocationId, AccessModule.Members) != AccessLevel.Manage)
+                        throw new BusinessException(ErrorCodes.AccessDenied, _localizer["AccessDenied"].Value);
+                }
+
+            if (targetUserId == callerId)
+                throw new BusinessException(MemberErrorCodes.CannotChangeOwnAccess, _localizer["CannotChangeOwnAccess"].Value);
+            if (targetUserId is not null && await IsOwnerAsync(targetUserId.Value, organizationId))
+                throw new BusinessException(ErrorCodes.AccessDenied, _localizer["AccessDenied"].Value);
             if (caller.IsOwner)
                 return;
 
-            var callerCells = await LoadCellsAsync(callerId, organizationId);
             var targetCells = targetUserId is null ? new List<(Guid, AccessModule, AccessLevel)>() : await LoadCellsAsync(targetUserId.Value, organizationId);
-
-            foreach (var grant in grants)
-            {
-                if (LevelOf(callerCells, grant.LocationId, AccessModule.Members) != AccessLevel.Manage)
-                    throw new BusinessException(_localizer["AccessDenied"].Value, 403);
-            }
 
             foreach (var grant in grants)
                 foreach (var (module, level) in grant.Levels)
                 {
                     var isRaise = level > LevelOf(targetCells, grant.LocationId, module);
                     if (isRaise && level > LevelOf(callerCells, grant.LocationId, module))
-                        throw new BusinessException(_localizer["CannotGrantAboveOwnLevel"].Value, 403);
+                        throw new BusinessException(MemberErrorCodes.LevelAboveOwn, _localizer["CannotGrantAboveOwnLevel"].Value);
                 }
         }
 

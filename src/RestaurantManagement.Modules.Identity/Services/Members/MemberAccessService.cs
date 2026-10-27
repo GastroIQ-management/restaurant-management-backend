@@ -101,7 +101,7 @@ namespace RestaurantManagement.Modules.Identity.Services.Members
         private Guid RequireOrganizationId()
         {
             return _tenantContext.OrganizationId
-                ?? throw new BusinessException(_localizer["OrganizationRequired"].Value, 403);
+                ?? throw new BusinessException(ErrorCodes.OrganizationRequired, _localizer["OrganizationRequired"].Value);
         }
 
         private async Task RequireEditableMemberAsync(Guid userId, Guid organizationId)
@@ -109,18 +109,18 @@ namespace RestaurantManagement.Modules.Identity.Services.Members
             var member = await _db.OrganizationMembers
                 .FirstOrDefaultAsync(m => m.UserId == userId && m.OrganizationId == organizationId);
             if (member is null)
-                throw new BusinessException(_localizer["UserNotMemberOfOrganization"].Value, 404);
+                throw new BusinessException(MemberErrorCodes.NotFound, _localizer["UserNotMemberOfOrganization"].Value);
 
             // The Owner is never restricted, so no grid change may touch the Owner.
             if (member.IsOwner)
-                throw new BusinessException(_localizer["AccessDenied"].Value, 403);
+                throw new BusinessException(ErrorCodes.AccessDenied, _localizer["AccessDenied"].Value);
         }
 
         private async Task RequireLocationAsync(Guid locationId, Guid organizationId)
         {
             var location = await _organizationLookup.GetLocationAsync(locationId);
             if (location is null || location.OrganizationId != organizationId)
-                throw new BusinessException(_localizer["LocationNotFound"].Value, 404);
+                throw new BusinessException(ErrorCodes.LocationNotFound, _localizer["LocationNotFound"].Value);
         }
 
         // Rows are updated in place: deleting and re-adding the same cell in one save would hit the unique index.
