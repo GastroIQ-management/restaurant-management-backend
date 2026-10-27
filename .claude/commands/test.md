@@ -13,7 +13,7 @@ which would reload everything), whatever the verdict. On "Fix first", the tester
 findings once. In both cases, the tester copies the reviewer's "Read closely" section into
 `scenarios.md` and returns its final message.
 
-Show me only the tester's final message: the decisions I must make with their options, or
-`Tests ready for Gate 2.` when there are none. Add nothing else. Then stop and wait (Gate 2).
+Show me only the tester's final message: its backlog finding line, and the decisions I must
+make with their options, or `Tests ready for Gate 2.` when there are none. Add nothing else. Then stop and wait (Gate 2).
 
 If I give changes, send them to the tester. Do not implement features.

@@ -58,7 +58,7 @@ Never tick a task whose DoD fails. Never put two tasks in one commit.
 | Design | One responsibility per class; SOLID; controllers HTTP only; business rules in `Services/` |
 | Comments | Only "why" comments; no commented-out code; no `TODO` without a backlog file (clean-code skill) |
 | Security | Tenant queries scoped by `OrganizationId` from claims; permission policies declared (never role names); no secrets, tokens or personal data in code, logs or responses (security skill) |
-| Scope | Only what the task asks; nothing outside the plan, except "too small to ticket" fixes allowed by the backlog skill, listed in the Delivered note |
+| Scope | Only what the task asks; nothing outside the plan, except small fixes (about 10 lines, same area) allowed by the backlog skill, listed in the Delivered note |
 
 ---
 
@@ -78,7 +78,7 @@ When every task in `plan.md` is ticked:
 - **Stay in the plan.** If a task needs a file, folder, migration or package the plan does not list, stop and report it as [Blocking].
 - **Migrations:** generate them with the ef-migration skill. Never hand-edit, except a flagged `migrationBuilder.Sql` backfill.
 - **Secrets:** never write connection strings, keys, tokens or passwords. Use user-secrets locally and environment variables in deployment; `appsettings.json` holds placeholders only.
-- **Out of scope:** read `.claude/skills/backlog/SKILL.md` first. It decides whether a finding blocks this task, is fixed inline (too small to ticket), or becomes a backlog item, and how to write it.
+- **Out of scope:** read `.claude/skills/backlog/SKILL.md` first. It decides whether a finding blocks this task, is fixed inline (small fix), is dropped (low severity), or is returned as the task's one finding. Never create a backlog file.
 - **Two failed attempts** at making the same test pass: stop and report what you tried. Do not keep guessing.
 - **A denied command:** stop and report it. Never reach the same result with another command.
 - **Never discard work:** never discard, reset or delete files to get out of a problem, and never touch files you did not change. Stop and report instead.
@@ -89,22 +89,24 @@ When every task in `plan.md` is ticked:
 
 ## 7. Terminal Output
 
-The batch files and commits are what gets reviewed. Never list commits, test counts, files or backlog items in your final message.
+The batch files and commits are what gets reviewed. Never list commits, test counts, files or backlog items in your final message. The only backlog line is the one finding below.
 
 A **decision** is a [Blocking] item: something that stopped you and needs the user's choice.
 
-No decisions: your final message is exactly `Batch B<n> done.`
-
-Otherwise it contains **only**:
+Your final message contains **only**:
 
 ```
-Batch B<n> stopped.
+Batch B<n> <done | stopped>.
+Backlog finding: <at most one, medium severity or higher: `<folder>/<YYYY-MM-DD>-<title>.md` — <problem> (`<file:line>`)>, or "None"
+
 Decisions
 1. <what stopped you, in plain words, 2 lines max of context>
    A) <option> — <consequence>
    B) <option> — <consequence>
    Recommended: <A>, because <reason>
 ```
+
+Omit "Decisions" when there are none.
 
 ---
 

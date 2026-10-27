@@ -57,7 +57,7 @@ Only after the size check passes: read `.claude/skills/architecture/SKILL.md`, `
 4. **Self-check the diff:** location, size limits, one responsibility per class, only "why" comments, no secrets, nothing beyond the request.
 5. **Security matrix:** change to a module with a matrix (root `CLAUDE.md`, "Security matrices"): update `docs/security/<module>-matrix.md` in the same commit — a row for every new or changed behaviour, ✅ only with the name of a passing test, every new test of that module named in a row and tagged `[Trait("Rule", "<row ID>")]`, with rule messages on its key assertions. Run `python3 .claude/scripts/check-security-matrices.py` before committing.
 6. **Commit once**, staging only the files you changed, by path (never `git add -A` or `git add .`). Conventional Commits (root `CLAUDE.md`).
-7. Out-of-scope findings: read `.claude/skills/backlog/SKILL.md` first. It decides whether to fix inline, stop, or write a backlog item, and how.
+7. Out-of-scope findings: read `.claude/skills/backlog/SKILL.md` first. Fix it inline when it is about 10 lines in the area you are changing; drop it when it is low severity; return at most one finding otherwise. Never create a backlog file.
 
 ---
 
@@ -86,7 +86,7 @@ Files: <n> changed (say "mechanical rename" when the exception applies)
 
 Changed but not committed: <paths, only when stopped after editing>
 
-Backlog files created: <paths, or "None">
+Backlog finding: <at most one, medium severity or higher: `<folder>/<YYYY-MM-DD>-<title>.md` — <problem> (`<file:line>`)>, or "None"
 
 [Blocking]
 1. <what stopped you> — Options: <A / B> — Recommended: <A, because …>

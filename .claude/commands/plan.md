@@ -15,8 +15,8 @@ If no input was given, ask me for it and stop.
   and writes the plan folder `docs/plans/<module>/<YYYY-MM-DD>-<item-name>/` (today's date, the
   backlog file name without its date and `.md`), so `/test` and `/implement` work on it as usual.
 
-Show me only the planner's final message: the decisions I must make with their options, or
-`Plan ready.` when there are none. Add nothing else. Then stop and wait.
+Show me only the planner's final message: its backlog finding line, and the decisions I must
+make with their options, or `Plan ready.` when there are none. Add nothing else. Then stop and wait.
 
 If I give changes, send them to the planner. The planner may create only its plan folder
-(plan.md and batches/) and backlog files.
+(plan.md and batches/), never backlog files.
