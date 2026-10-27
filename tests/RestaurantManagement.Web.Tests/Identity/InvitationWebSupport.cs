@@ -100,7 +100,10 @@ internal static class InvitationWebSupport
             var role = await db.Set<OrganizationRole>().SingleAsync(r => r.OrganizationId == organizationId && r.Name == roleName);
             db.Set<MemberLocationRole>().Add(new MemberLocationRole
             {
-                OrganizationId = organizationId, UserId = userId, LocationId = locationId, RoleId = role.Id
+                OrganizationId = organizationId,
+                UserId = userId,
+                LocationId = locationId,
+                RoleId = role.Id
             });
             await db.SaveChangesAsync();
             return true;
