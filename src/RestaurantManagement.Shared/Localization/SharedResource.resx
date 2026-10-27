@@ -132,6 +132,12 @@
   <data name="OrganizationRequired" xml:space="preserve">
     <value>An organization is required to save this record.</value>
   </data>
+  <data name="AppVersionRequired" xml:space="preserve">
+    <value>The app version is required on this request.</value>
+  </data>
+  <data name="AppVersionInvalid" xml:space="preserve">
+    <value>The app version is not valid.</value>
+  </data>
   <data name="InvalidLocationId" xml:space="preserve">
     <value>The selected location is not valid.</value>
   </data>

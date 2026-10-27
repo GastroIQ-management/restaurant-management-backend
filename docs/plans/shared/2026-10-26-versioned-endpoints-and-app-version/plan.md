@@ -1,6 +1,6 @@
 # Plan: Versioned endpoints and app version on writes
 
-**Source:** backlog/offline/2026-10-26-versioned-endpoints-and-app-version.md   **Date:** 2026-10-26   **Status:** Draft
+**Source:** backlog/offline/2026-10-26-versioned-endpoints-and-app-version.md   **Date:** 2026-10-26   **Status:** In progress
 **Risk:** High — every URL and every write's contract change, and the refresh cookie path (auth) changes; no data or schema change, easy to undo before launch
 
 ## Summary
@@ -38,7 +38,7 @@ least 30 days after the next one ships · #4 the OpenAPI document is published p
 - [ ] Backlog item only: deleted if fully solved (deletion left uncommitted for the user), or updated with what is left
 
 ## Checklist
-- [ ] T1 — Writes require the app version header
+- [x] T1 — Writes require the app version header
 - [ ] T2 — Audit log under `/api/v1/`
 - [ ] T3 — Organization endpoints under `/api/v1/`
 - [ ] T4 — Menu endpoints under `/api/v1/`
