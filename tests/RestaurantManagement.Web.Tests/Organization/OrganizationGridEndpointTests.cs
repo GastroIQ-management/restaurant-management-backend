@@ -31,6 +31,7 @@ public class OrganizationGridEndpointTests : IClassFixture<PostgresDatabaseFixtu
     // Carries the location and the organization settings, so one body passes validation on every endpoint below.
     private static object LocationBody(string name, string code) => new
     {
+        id = Guid.NewGuid(),
         name,
         address = "Av. Sete de Setembro, 1865",
         city = "Curitiba",
@@ -139,7 +140,7 @@ public class OrganizationGridEndpointTests : IClassFixture<PostgresDatabaseFixtu
         var client = factory.ClientFor(RitaId, organizationId: null);
 
         // Act
-        var response = await client.PostAsJsonAsync("/api/v1/organizations/create", new { name = "Pizzaria da Rita", currency = "BRL" });
+        var response = await client.PostAsJsonAsync("/api/v1/organizations/create", new { id = Guid.NewGuid(), name = "Pizzaria da Rita", currency = "BRL" });
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.OK, "a user with no organization may create one");

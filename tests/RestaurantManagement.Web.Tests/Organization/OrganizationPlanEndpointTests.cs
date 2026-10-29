@@ -27,6 +27,7 @@ public class OrganizationPlanEndpointTests : IClassFixture<PostgresDatabaseFixtu
         var client = factory.ClientFor(AnaId, organizationId: null);
         var body = """
             {
+              "id": "01933b2e-7c10-7a55-9d3e-5b1f0c2a4eaa",
               "name": "Pizzaria Vila Madalena",
               "currency": "BRL",
               "planType": "ENTERPRISE",

@@ -17,7 +17,7 @@ public class OrganizationUserIdentifierEndpointTests : IClassFixture<PostgresDat
     private const string CreateUrl = "/api/v1/organizations/create";
     private const string EditUrl = "/api/v1/organizations/edit";
 
-    private const string CreateJson = """{ "name": "Trattoria do Sol", "currency": "BRL" }""";
+    private const string CreateJson = """{ "id": "01933b2e-7c10-7a55-9d3e-5b1f0c2a4e99", "name": "Trattoria do Sol", "currency": "BRL" }""";
 
     private const string EditJson = """
         {

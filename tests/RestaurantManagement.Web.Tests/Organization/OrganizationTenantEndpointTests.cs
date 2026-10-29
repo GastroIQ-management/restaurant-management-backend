@@ -26,6 +26,7 @@ public class OrganizationTenantEndpointTests : IClassFixture<PostgresDatabaseFix
     // Also carries the organization settings, so the same body passes validation on PUT api/v1/organizations/edit.
     private static readonly object LocationBody = new
     {
+        id = Guid.Parse("01933b2e-7c10-7a55-9d3e-5b1f0c2a4e88"),
         organizationId = TrattoriaId,
         name = "Unidade Mercado Municipal",
         address = "Av. Sete de Setembro, 1865",

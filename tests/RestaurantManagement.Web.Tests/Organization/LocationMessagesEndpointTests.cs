@@ -24,6 +24,7 @@ public class LocationMessagesEndpointTests : IClassFixture<PostgresDatabaseFixtu
 
     private const string ValidLocationJson = """
         {
+          "id": "33333333-cccc-4ccc-8ccc-0000000000f1",
           "name": "Unidade Batel",
           "address": "Avenida do Batel, 1550",
           "city": "Curitiba",

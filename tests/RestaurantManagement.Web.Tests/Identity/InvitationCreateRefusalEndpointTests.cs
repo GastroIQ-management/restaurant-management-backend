@@ -37,7 +37,7 @@ public class InvitationCreateRefusalEndpointTests : IClassFixture<PostgresDataba
         var client = factory.ClientFor(AnaId, CantinaId);
 
         // Act
-        var response = await client.PostAsJsonAsync("/api/v1/invitations", new { email = BrunoEmail, locations = new object?[] { null } });
+        var response = await client.PostAsJsonAsync("/api/v1/invitations", new { id = Guid.NewGuid(), email = BrunoEmail, locations = new object?[] { null } });
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.BadRequest, "a null location is refused, not a server error");
@@ -50,11 +50,10 @@ public class InvitationCreateRefusalEndpointTests : IClassFixture<PostgresDataba
     {
         // Arrange
         await using var factory = await CreateFactoryAsync(_postgres);
-        var body = InviteBody(BrunoEmail, BatelId, new[] { "Waiter" });
-
+        // Each request has its own ID: the race is about the open invitation, not about a reused ID.
         // Act
         var responses = await Task.WhenAll(Enumerable.Range(0, 8)
-            .Select(_ => factory.ClientFor(AnaId, CantinaId).PostAsJsonAsync("/api/v1/invitations", body)));
+            .Select(_ => factory.ClientFor(AnaId, CantinaId).PostAsJsonAsync("/api/v1/invitations", InviteBody(BrunoEmail, BatelId, new[] { "Waiter" }))));
 
         // Assert
         responses.ShouldAllBe(r => r.IsSuccessStatusCode || r.StatusCode == HttpStatusCode.Conflict, "the loser of the race gets a refusal, not a server error");
@@ -69,11 +68,10 @@ public class InvitationCreateRefusalEndpointTests : IClassFixture<PostgresDataba
     {
         // Arrange
         await using var factory = await CreateFactoryAsync(_postgres);
-        var body = InviteBody(BrunoEmail, BatelId, new[] { "Waiter" });
-
+        // Each request has its own ID: the race is about the open invitation, not about a reused ID.
         // Act
         var responses = await Task.WhenAll(Enumerable.Range(0, 8)
-            .Select(_ => factory.ClientFor(AnaId, CantinaId).PostAsJsonAsync("/api/v1/invitations", body)));
+            .Select(_ => factory.ClientFor(AnaId, CantinaId).PostAsJsonAsync("/api/v1/invitations", InviteBody(BrunoEmail, BatelId, new[] { "Waiter" }))));
 
         // Assert
         var losers = responses.Where(r => !r.IsSuccessStatusCode).ToList();

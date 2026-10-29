@@ -53,7 +53,7 @@ namespace RestaurantManagement.Modules.Menu.Services
 
             var category = new MenuCategory
             {
-                Id = Guid.NewGuid(),
+                Id = request.Id,
                 MenuId = request.MenuId,
                 OrganizationId = organizationId,
                 LocationId = request.LocationId,
@@ -64,7 +64,14 @@ namespace RestaurantManagement.Modules.Menu.Services
             };
 
             _context.MenuCategories.Add(category);
-            await _context.SaveChangesAsync();
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException ex) when (PrimaryKeyViolation.Matches(ex))
+            {
+                throw new BusinessException(ErrorCodes.IdAlreadyUsed, _localizer["IdAlreadyUsed"].Value);
+            }
 
             return MapToResponse(category);
         }

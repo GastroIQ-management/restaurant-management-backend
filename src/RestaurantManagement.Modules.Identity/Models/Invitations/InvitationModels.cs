@@ -1,5 +1,7 @@
 using RestaurantManagement.Modules.Identity.Models.Passwords;
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
+using RestaurantManagement.Shared.Models;
 
 namespace RestaurantManagement.Modules.Identity.Models.Invitations
 {
@@ -17,6 +19,10 @@ namespace RestaurantManagement.Modules.Identity.Models.Invitations
 
     public class CreateInvitationRequest
     {
+        [RequiredId(ErrorMessage = "RequiredAttribute_ValidationError")]
+        [JsonConverter(typeof(LenientGuidConverter))]
+        public Guid Id { get; set; }
+
         [Required(ErrorMessage = "RequiredAttribute_ValidationError")]
         [EmailAddress(ErrorMessage = "EmailAddressAttribute_ValidationError")]
         [MaxLength(320, ErrorMessage = "MaxLengthAttribute_ValidationError")]

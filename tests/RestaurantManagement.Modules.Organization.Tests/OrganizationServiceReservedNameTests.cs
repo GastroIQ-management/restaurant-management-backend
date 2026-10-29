@@ -31,7 +31,7 @@ namespace RestaurantManagement.Modules.Organization.Tests
             var logger = Substitute.For<ILogger<OrganizationService>>();
             using var context = database.CreateContext();
             var sut = new OrganizationService(context, memberLookup, accessSetup, TestAccess.Permissive(), new TenantScope(), TestTenant.None, TestLocalizer.Create(), logger, Substitute.For<IAuditLog>());
-            var request = new CreateOrganizationRequest { Name = name, Currency = "BRL" };
+            var request = new CreateOrganizationRequest { Id = Guid.NewGuid(), Name = name, Currency = "BRL" };
 
             // Act
             var response = await sut.CreateOrganizationAsync(userId, request);

@@ -238,7 +238,7 @@ public class MenuMessagesEndpointTests : IClassFixture<PostgresDatabaseFixture>
         await using var factory = await CreateFactoryAsync();
         var client = AnaSignedInToCantina(factory);
         var name = new string('a', 255);
-        var request = Request("POST", "/api/v1/menu-categories", "pt", new { menuId = CantinaDinnerMenuId, name, sortOrder = 1 });
+        var request = Request("POST", "/api/v1/menu-categories", "pt", new { id = Guid.NewGuid(), menuId = CantinaDinnerMenuId, name, sortOrder = 1 });
 
         // Act
         var response = await client.SendAsync(request);

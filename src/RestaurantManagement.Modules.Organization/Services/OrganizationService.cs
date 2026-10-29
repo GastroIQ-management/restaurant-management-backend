@@ -78,12 +78,16 @@ namespace RestaurantManagement.Modules.Organization.Services
                 throw new BusinessException(OrganizationErrorCodes.TrialLimitReached, _localizer["TrialOrganizationsCannotCreateNew"].Value);
             }
 
+            // The user's own organizations are tracked, so EF Core would fail on a reused ID before the database.
+            if (userOrgs.Any(o => o.Id == request.Id))
+                throw new BusinessException(ErrorCodes.IdAlreadyUsed, _localizer["IdAlreadyUsed"].Value);
+
             using var tx = await _orgDb.Database.BeginTransactionAsync();
 
             // 1. Create Organization
             var org = new Entities.Organization
             {
-                Id = Guid.NewGuid(),
+                Id = request.Id,
                 Name = request.Name,
                 Description = request.Description,
                 LogoUrl = request.LogoUrl,
@@ -127,6 +131,8 @@ namespace RestaurantManagement.Modules.Organization.Services
             catch (Exception ex)
             {
                 await RollbackAsync(tx, ex);
+                if (ex is DbUpdateException dbEx && PrimaryKeyViolation.Matches(dbEx))
+                    throw new BusinessException(ErrorCodes.IdAlreadyUsed, _localizer["IdAlreadyUsed"].Value);
                 var innerMessage = ex.InnerException?.Message ?? ex.Message;
                 throw new Exception($"Failed to create organization: {innerMessage}", ex);
             }

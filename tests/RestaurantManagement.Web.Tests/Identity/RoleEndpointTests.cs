@@ -19,7 +19,7 @@ public class RoleEndpointTests : IClassFixture<PostgresDatabaseFixture>
 
     public RoleEndpointTests(PostgresDatabaseFixture postgres) => _postgres = postgres;
 
-    private const string MarketingBody = """{"name":"Marketing","levels":{"Menus":"Manage","Reports":"Read"}}""";
+    private const string MarketingBody = """{"id":"01933b2e-7c10-7a55-9d3e-5b1f0c2a4ec1","name":"Marketing","levels":{"Menus":"Manage","Reports":"Read"}}""";
 
     [Fact]
     [Trait("Rule", "T112")]
@@ -67,8 +67,8 @@ public class RoleEndpointTests : IClassFixture<PostgresDatabaseFixture>
 
         // Act
         var responses = await Task.WhenAll(
-            first.PostAsync("/api/v1/roles", Json("""{"name":"Marketing"}""")),
-            second.PostAsync("/api/v1/roles", Json("""{"name":"marketing"}""")));
+            first.PostAsync("/api/v1/roles", Json("""{"id":"01933b2e-7c10-7a55-9d3e-5b1f0c2a4ec1","name":"Marketing"}""")),
+            second.PostAsync("/api/v1/roles", Json("""{"id":"01933b2e-7c10-7a55-9d3e-5b1f0c2a4ec2","name":"marketing"}""")));
 
         // Assert
         responses.Select(r => (int)r.StatusCode).Order().ToList().ShouldBe(new List<int> { 200, 400 }, ignoreOrder: false, customMessage: "one request wins and the other gets the same 400 as a plain duplicate, never a 500");
@@ -86,7 +86,7 @@ public class RoleEndpointTests : IClassFixture<PostgresDatabaseFixture>
         var client = factory.ClientFor(MariaId, CantinaId);
 
         // Act
-        var response = await client.PostAsync("/api/v1/roles", Json("""{"name":"Marketing","levels":{"Cashier":"Manage"}}"""));
+        var response = await client.PostAsync("/api/v1/roles", Json("""{"id":"01933b2e-7c10-7a55-9d3e-5b1f0c2a4ec1","name":"Marketing","levels":{"Cashier":"Manage"}}"""));
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.Forbidden, "an Admin cannot create a role stronger than her own access");
@@ -103,7 +103,7 @@ public class RoleEndpointTests : IClassFixture<PostgresDatabaseFixture>
 
         // Act
         var response = await factory.ClientFor(MariaId, CantinaId)
-            .PostAsync("/api/v1/roles", Json("""{"name":"Marketing","levels":{"Menus":"Manage","Orders":"Read"}}"""));
+            .PostAsync("/api/v1/roles", Json("""{"id":"01933b2e-7c10-7a55-9d3e-5b1f0c2a4ec1","name":"Marketing","levels":{"Menus":"Manage","Orders":"Read"}}"""));
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.OK, "an Admin may create a role at or below her own levels");
@@ -123,7 +123,7 @@ public class RoleEndpointTests : IClassFixture<PostgresDatabaseFixture>
         await SeedCaioWithRoleAsync(factory, role);
 
         // Act
-        var response = await factory.ClientFor(CaioId, CantinaId).PostAsync("/api/v1/roles", Json("""{"name":"Marketing"}"""));
+        var response = await factory.ClientFor(CaioId, CantinaId).PostAsync("/api/v1/roles", Json("""{"id":"01933b2e-7c10-7a55-9d3e-5b1f0c2a4ec1","name":"Marketing"}"""));
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.Forbidden, $"a {role} has no Members = Manage, so she cannot create roles");

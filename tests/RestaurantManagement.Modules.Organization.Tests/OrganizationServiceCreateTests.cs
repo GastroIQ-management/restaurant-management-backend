@@ -15,6 +15,7 @@ namespace RestaurantManagement.Modules.Organization.Tests
     {
         private static CreateOrganizationRequest ValidRequest => new()
         {
+            Id = Guid.NewGuid(),
             Name = "Test Restaurant",
             Currency = "BRL"
         };

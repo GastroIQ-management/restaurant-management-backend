@@ -58,7 +58,7 @@ namespace RestaurantManagement.Modules.Menu.Services
             // 3. Create Menu
             var menu = new Entities.Menu
             {
-                Id = Guid.NewGuid(),
+                Id = request.Id,
                 OrganizationId = organizationId,
                 Name = request.Name,
                 Description = request.Description,
@@ -70,7 +70,15 @@ namespace RestaurantManagement.Modules.Menu.Services
             using var transaction = await _menuDb.Database.BeginTransactionAsync();
 
             _menuDb.Menus.Add(menu);
-            await _menuDb.SaveChangesAsync();
+            try
+            {
+                await _menuDb.SaveChangesAsync();
+            }
+            catch (DbUpdateException ex) when (PrimaryKeyViolation.Matches(ex))
+            {
+                // Same answer whichever organization owns the ID; leaving the scope rolls the transaction back.
+                throw new BusinessException(ErrorCodes.IdAlreadyUsed, _localizer["IdAlreadyUsed"].Value);
+            }
 
             // 4. If locations are provided, attach the menu
             if (namedLocations.Count > 0)

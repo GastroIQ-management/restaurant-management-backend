@@ -68,11 +68,12 @@ namespace RestaurantManagement.Modules.Identity.Services.Roles
             var organizationId = RequireOrganizationId();
             var name = RequireValidName(request.Name);
             var proposed = InvitationGrids.ParseLevels(request.Levels, _localizer);
-            await RequireNameFreeAsync(name, organizationId, null);
             await _rules.RequireAsync(new Dictionary<AccessModule, AccessLevel>(), proposed);
+            await RequireIdFreeInOrganizationAsync(request.Id, organizationId);
+            await RequireNameFreeAsync(name, organizationId, null);
 
             var now = DateTime.UtcNow;
-            var role = new OrganizationRole { Id = Guid.NewGuid(), OrganizationId = organizationId, Name = name, CreatedAt = now, UpdatedAt = now };
+            var role = new OrganizationRole { Id = request.Id, OrganizationId = organizationId, Name = name, CreatedAt = now, UpdatedAt = now };
             _db.OrganizationRoles.Add(role);
             foreach (var (module, level) in proposed.Where(p => p.Value != AccessLevel.None))
                 _db.OrganizationRoleLevels.Add(NewLevel(role.Id, organizationId, module, level));
@@ -165,6 +166,14 @@ namespace RestaurantManagement.Modules.Identity.Services.Roles
             return name;
         }
 
+        // A retry carries the same ID and name; answering the ID clash first keeps it a 409 instead of a name error.
+        // Only the token organization is searched: other organizations' clashes are decided by the primary key.
+        private async Task RequireIdFreeInOrganizationAsync(Guid roleId, Guid organizationId)
+        {
+            if (await _db.OrganizationRoles.AnyAsync(r => r.Id == roleId && r.OrganizationId == organizationId))
+                throw new BusinessException(ErrorCodes.IdAlreadyUsed, _localizer["IdAlreadyUsed"].Value);
+        }
+
         private async Task RequireNameFreeAsync(string name, Guid organizationId, Guid? ownRoleId)
         {
             var lowered = name.ToLower();
@@ -184,6 +193,11 @@ namespace RestaurantManagement.Modules.Identity.Services.Roles
             catch (DbUpdateException ex) when (IsDuplicateNameViolation(ex))
             {
                 throw new BusinessException(RoleErrorCodes.NameAlreadyUsed, _localizer["RoleNameAlreadyUsed"].Value);
+            }
+            catch (DbUpdateException ex) when (PrimaryKeyViolation.Matches(ex))
+            {
+                // Same answer whichever organization owns the ID.
+                throw new BusinessException(ErrorCodes.IdAlreadyUsed, _localizer["IdAlreadyUsed"].Value);
             }
         }
 

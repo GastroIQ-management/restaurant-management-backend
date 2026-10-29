@@ -48,7 +48,7 @@ namespace RestaurantManagement.Modules.Organization.Services
             // 2. Create Location
             var location = new Location
             {
-                Id = Guid.NewGuid(),
+                Id = request.Id,
                 OrganizationId = organizationId,
                 Name = request.Name,
                 Address = request.Address,
@@ -65,6 +65,10 @@ namespace RestaurantManagement.Modules.Organization.Services
                 UpdatedAt = DateTime.UtcNow
             };
 
+            // A retry carries the same ID and code; answer the ID clash first so it stays a 409, not a code error.
+            // The query filter limits this to the token organization; other organizations' clashes reach the primary key.
+            if (await _orgDb.Locations.AnyAsync(l => l.Id == location.Id))
+                throw new BusinessException(ErrorCodes.IdAlreadyUsed, _localizer["IdAlreadyUsed"].Value);
             await EnsureCodeIsFreeAsync(location.Code, null);
             _orgDb.Locations.Add(location);
             await SaveAsync();
@@ -191,6 +195,10 @@ namespace RestaurantManagement.Modules.Organization.Services
             try
             {
                 await _orgDb.SaveChangesAsync();
+            }
+            catch (DbUpdateException ex) when (PrimaryKeyViolation.Matches(ex))
+            {
+                throw new BusinessException(ErrorCodes.IdAlreadyUsed, _localizer["IdAlreadyUsed"].Value);
             }
             catch (DbUpdateException ex) when (ex.InnerException is PostgresException { SqlState: PostgresErrorCodes.UniqueViolation })
             {

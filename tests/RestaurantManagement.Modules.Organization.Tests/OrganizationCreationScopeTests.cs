@@ -21,7 +21,7 @@ namespace RestaurantManagement.Modules.Organization.Tests
 
         private static readonly DateTimeOffset CreationTime = new(2026, 3, 14, 18, 30, 0, TimeSpan.Zero);
 
-        private static CreateOrganizationRequest CantinaDaNonna => new() { Name = "Cantina da Nonna", Currency = "BRL" };
+        private static CreateOrganizationRequest CantinaDaNonna => new() { Id = Guid.NewGuid(), Name = "Cantina da Nonna", Currency = "BRL" };
 
         private sealed class FixedTimeProvider : TimeProvider
         {

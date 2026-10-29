@@ -66,7 +66,7 @@ public class TokenRolesEndpointTests : IClassFixture<PostgresDatabaseFixture>
         var token = (await login.Content.ReadFromJsonAsync<JsonElement>()).GetProperty("token").GetString();
         var request = new HttpRequestMessage(HttpMethod.Post, "/api/v1/menus/create")
         {
-            Content = JsonContent.Create(new { name = "Almoço executivo" })
+            Content = JsonContent.Create(new { id = Guid.NewGuid(), name = "Almoço executivo" })
         };
         request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
 

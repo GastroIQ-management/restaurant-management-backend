@@ -231,6 +231,9 @@
   <data name="PasswordChangeSucceeded" xml:space="preserve">
     <value>Senha alterada. Entre novamente nos seus dispositivos.</value>
   </data>
+  <data name="IdAlreadyUsed" xml:space="preserve">
+    <value>Este ID já está em uso.</value>
+  </data>
   <data name="RoleNameAlreadyUsed" xml:space="preserve">
     <value>Já existe um cargo com este nome.</value>
   </data>

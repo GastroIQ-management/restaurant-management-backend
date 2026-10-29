@@ -57,6 +57,9 @@ namespace RestaurantManagement.Shared.Utils.Exceptions
         // "tenant.mismatch", 403
         public static ErrorCode TenantMismatch { get; } = new("tenant.mismatch", 403);
 
+        // "id.already_used", 409
+        public static ErrorCode IdAlreadyUsed { get; } = new("id.already_used", 409);
+
         // "http.bad_request", 400
         public static ErrorCode HttpBadRequest { get; } = new("http.bad_request", 400);
 

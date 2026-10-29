@@ -8,6 +8,10 @@ namespace RestaurantManagement.Modules.Menu.Models
     {
         [RequiredId(ErrorMessage = "RequiredAttribute_ValidationError")]
         [JsonConverter(typeof(LenientGuidConverter))]
+        public Guid Id { get; set; }
+
+        [RequiredId(ErrorMessage = "RequiredAttribute_ValidationError")]
+        [JsonConverter(typeof(LenientGuidConverter))]
         public Guid MenuId { get; set; }
 
         public Guid? LocationId { get; set; }

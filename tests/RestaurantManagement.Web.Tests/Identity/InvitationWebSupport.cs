@@ -128,11 +128,12 @@ internal static class InvitationWebSupport
 
     public static Task<List<OrganizationInvitation>> InvitationsAsync(TenantApiFactory factory, Guid organizationId)
         => factory.InOrganizationAsync<IdentityDbContext, List<OrganizationInvitation>>(organizationId,
-            db => db.Set<OrganizationInvitation>().ToListAsync());
+            db => db.Set<OrganizationInvitation>().Where(i => i.OrganizationId == organizationId).ToListAsync());
 
-    public static object InviteBody(string email, Guid locationId, string[] roleNames, Dictionary<string, string>? levels = null)
+    public static object InviteBody(string email, Guid locationId, string[] roleNames, Dictionary<string, string>? levels = null, Guid? id = null)
         => new
         {
+            id = id ?? Guid.NewGuid(),
             email,
             locations = new[] { new { locationId, roleNames, levels = levels ?? new Dictionary<string, string>() } },
             isOwner = true

@@ -24,6 +24,7 @@ namespace RestaurantManagement.Modules.Organization.Tests
 
         private static CreateLocationRequest CreateRequest(string? timeZone, string? type, string? code) => new()
         {
+            Id = Guid.NewGuid(),
             Name = "Unidade Paulista",
             Address = "Av. Paulista, 1578",
             City = "São Paulo",
