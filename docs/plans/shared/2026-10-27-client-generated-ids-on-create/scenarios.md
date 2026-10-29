@@ -1,7 +1,7 @@
 # Scenarios: Client-generated IDs on create endpoints
 
 **Plan:** docs/plans/shared/2026-10-27-client-generated-ids-on-create/plan.md
-**Coverage:** 36 scenarios — 9 happy · 3 edge · 12 failure · 6 security · 6 guard
+**Coverage:** 38 scenarios — 9 happy · 3 edge · 14 failure · 6 security · 6 guard
 
 Failure and security scenarios fail today (the ID is ignored). Guard scenarios (#9, #14, #19, #24, #29, #34) pass today and must stay green: they prove access and the trial limit are checked before a clash can be seen.
 
@@ -43,6 +43,8 @@ Failure and security scenarios fail today (the ID is ignored). Guard scenarios (
 | 34 | T7 | Guard | A member without Members Manage sending a taken invitation ID gets 403, not 409 | `CreateInvitation_MemberWithoutMembersManageSendsTakenId_ReturnsForbiddenNotConflict` | `tests/RestaurantManagement.Web.Tests/Identity/InvitationClientIdEndpointTests.cs` |
 | 35 | T7 | Happy | An invitation created with a new ID is stored under it, returned with it; an organization named in the body is ignored; the accept token is separate | `CreateInvitation_NewId_StoresInvitationUnderThatId` | `tests/RestaurantManagement.Web.Tests/Identity/InvitationClientIdEndpointTests.cs` |
 | 36 | T2–T7 | Happy | The API description shows a required UUID `id` on each of the six create requests (six cases) | `V1Document_CreateRequest_ShowsIdAsRequiredUuid` | `tests/RestaurantManagement.Web.Tests/Web/ClientIdOpenApiTests.cs` |
+| 37 | T4 | Failure | A retried location create (same ID, same code) is refused with 409 `id.already_used`, not a taken-code error; nothing new stored (added after review) | `CreateLocation_RetriedWithTheSameIdAndCode_ReturnsIdConflictAndCreatesNothingNew` | `tests/RestaurantManagement.Web.Tests/Organization/LocationClientIdRetryEndpointTests.cs` |
+| 38 | T6 | Failure | A retried role create (same ID, same name) is refused with 409 `id.already_used`, not a taken-name error; nothing new stored (added after review) | `CreateRole_RetriedWithTheSameIdAndName_ReturnsIdConflictAndCreatesNothingNew` | `tests/RestaurantManagement.Web.Tests/Identity/RoleClientIdRetryEndpointTests.cs` |
 
 ## Spec Outcome coverage
 Outcomes are the backlog item's Acceptance criteria (`backlog/offline/2026-10-26-client-generated-ids-on-create.md`), numbered in order.
@@ -51,7 +53,7 @@ Outcomes are the backlog item's Acceptance criteria (`backlog/offline/2026-10-26
 |---|---|
 | #1 Create requests accept an `id` and the server stores the record under it | 10, 15, 20, 25, 30, 35 |
 | #2 An empty UUID (and a missing, null or malformed one) returns 400 | 6, 11, 16, 21, 26, 31 |
-| #3 A UUID already used in the same organization returns 409 | 7, 12, 17, 22, 27, 32 |
+| #3 A UUID already used in the same organization returns 409 | 7, 12, 17, 22, 27, 32, 37, 38 |
 | #4 A UUID used in another organization returns the same plain 409 with nothing about that organization | 8, 13, 18, 23, 28, 33 (and 1–5 for the shared check, code and text) |
 | #5 The organization still comes only from the token | 10, 30, 35 (body names another organization); existing M10 / OR16 tests for menu, category and location (updated, see below); not applicable to organizations (T5) |
 | #6 The OpenAPI document shows `id` on each create request | 36 |
