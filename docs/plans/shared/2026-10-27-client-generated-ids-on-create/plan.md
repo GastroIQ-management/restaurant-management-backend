@@ -42,7 +42,7 @@
 - [x] T4 — Location create takes the client's ID
 - [x] T5 — Organization create takes the client's ID
 - [x] T6 — Role create takes the client's ID
-- [ ] T7 — Invitation create takes the client's ID
+- [x] T7 — Invitation create takes the client's ID
 
 ## Assumptions
 - `id` is required: missing, null, malformed or empty all answer 400, like other required IDs (Shared row SH20) — not launched yet, so one way to create; existing tests that post these creates get an `id` in step 3.

@@ -90,7 +90,9 @@ namespace RestaurantManagement.Modules.Identity.Services.Invitations
                     && i.UsedAt == null && i.CancelledAt == null && i.ReplacedAt == null);
             var before = replaced is null ? null : await DescribeAsync(replaced);
             var token = InvitationTokens.Generate();
-            var invitation = NewInvitation(organizationId, email, await ChooseLanguageAsync(email, language), token);
+            var invitation = NewInvitation(request.Id, organizationId, email, await ChooseLanguageAsync(email, language), token);
+            if (replaced is not null && replaced.Id == request.Id)
+                throw new BusinessException(ErrorCodes.IdAlreadyUsed, _localizer["IdAlreadyUsed"].Value);
             if (replaced is not null)
                 replaced.ReplacedAt = invitation.CreatedAt;
             _db.OrganizationInvitations.Add(invitation);
@@ -120,6 +122,11 @@ namespace RestaurantManagement.Modules.Identity.Services.Invitations
             catch (DbUpdateException ex) when (ex.InnerException is PostgresException { ConstraintName: IdentityDbContext.OpenInvitationIndexName })
             {
                 throw new BusinessException(InvitationErrorCodes.AlreadyOpen, _localizer["ValidationFailed"].Value);
+            }
+            catch (DbUpdateException ex) when (PrimaryKeyViolation.Matches(ex))
+            {
+                // Same answer whichever organization owns the ID.
+                throw new BusinessException(ErrorCodes.IdAlreadyUsed, _localizer["IdAlreadyUsed"].Value);
             }
         }
 
@@ -162,12 +169,12 @@ namespace RestaurantManagement.Modules.Identity.Services.Invitations
             return accountLanguage ?? requestLanguage;
         }
 
-        private OrganizationInvitation NewInvitation(Guid organizationId, string email, string language, string token)
+        private OrganizationInvitation NewInvitation(Guid id, Guid organizationId, string email, string language, string token)
         {
             var now = _timeProvider.GetUtcNow().UtcDateTime;
             return new OrganizationInvitation
             {
-                Id = Guid.NewGuid(),
+                Id = id,
                 OrganizationId = organizationId,
                 Email = email,
                 InvitedByUserId = _currentUser.UserId ?? Guid.Empty,
