@@ -29,11 +29,11 @@
 | T7 | — | — | Same as T2, delegation rules checked first; the accept token stays separate from the ID; a 409 sends no email |
 
 ## Overall Definition of Done
-- [ ] All tasks done, tests passing
-- [ ] All Outcomes met (the backlog item's Acceptance criteria)
+- [x] All tasks done, tests passing
+- [x] All Outcomes met (the backlog item's Acceptance criteria)
 - [ ] Affected tests green after the last batch; full suite green in CI (Continuous Integration)
-- [ ] No out-of-scope changes
-- [ ] Backlog item only: deleted if fully solved (deletion left uncommitted for the user), or updated with what is left
+- [x] No out-of-scope changes
+- [x] Backlog item only: deleted if fully solved (deletion left uncommitted for the user), or updated with what is left
 
 ## Checklist
 - [x] T1 — Shared "ID already used" code and primary key clash check
