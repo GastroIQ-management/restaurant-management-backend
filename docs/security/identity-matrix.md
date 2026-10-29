@@ -385,6 +385,7 @@ accented or non-Latin characters may not fit (R6, T7; bcrypt limit, ASVS V6.2.9)
 | T155 | Create an invitation with an ID used by another organization | The same status, title and code as T154 and nothing about that organization (no email, no ID) in the body; the other organization's invitation is unchanged | ✅ | `InvitationClientIdEndpointTests.CreateInvitation_IdUsedByAnotherOrganization_AnswersTheSameConflictAndRevealsNothing` |
 | T156 | A member without Members Manage at the invited location creates an invitation with a taken ID | 403, not 409: the delegation rules come first | ✅ | `InvitationClientIdEndpointTests.CreateInvitation_MemberWithoutMembersManageSendsTakenId_ReturnsForbiddenNotConflict` |
 | T157 | Create an invitation with a new `id` | 200; the invitation is stored under that ID, the response carries it and the accept token stays separate from the ID | ✅ | `InvitationClientIdEndpointTests.CreateInvitation_NewId_StoresInvitationUnderThatId` |
+| T158 | A role create is retried with the same ID and name | 409 `id.already_used`, not `role.name_already_used`; no second role is stored and the first keeps its levels | ✅ | `RoleClientIdRetryEndpointTests.CreateRole_RetriedWithTheSameIdAndName_ReturnsIdConflictAndCreatesNothingNew` |
 
 ## 11. Schema, migration and wiring tests
 These protect the database and the app setup rather than a rule users meet. They are listed so
