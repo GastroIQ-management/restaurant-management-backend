@@ -183,6 +183,8 @@ builder.Services.AddDbContext<MenuDbContext>((serviceProvider, options) =>
     options.UseNpgsql(connectionString).UseSnakeCaseNamingConvention()
         .AddInterceptors(serviceProvider.GetRequiredService<AuditSaveChangesInterceptor>()));
 
+builder.Services.AddIdempotencyKeyStore<MenuDbContext>(typeof(RestaurantManagement.Modules.Menu.Controllers.MenuController).Assembly);
+
 builder.Services.AddDbContext<OrganizationDbContext>((serviceProvider, options) =>
     options.UseNpgsql(connectionString).UseSnakeCaseNamingConvention()
         .AddInterceptors(serviceProvider.GetRequiredService<AuditSaveChangesInterceptor>()));
