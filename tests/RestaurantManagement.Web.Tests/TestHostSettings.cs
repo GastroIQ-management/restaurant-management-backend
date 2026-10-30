@@ -18,5 +18,9 @@ internal static class TestHostSettings
         // The pending email worker would otherwise send queued emails on its own timer, making endpoint
         // tests unpredictable; tests run the processor themselves.
         Environment.SetEnvironmentVariable("PendingEmails__Enabled", "false");
+
+        // Every host would otherwise watch appsettings.json for changes. Hundreds of hosts exhaust the
+        // file watchers macOS allows, and the run freezes in .NET's watcher retry loop.
+        Environment.SetEnvironmentVariable("DOTNET_hostBuilder__reloadConfigOnChange", "false");
     }
 }
