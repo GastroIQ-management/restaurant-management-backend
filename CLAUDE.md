@@ -35,7 +35,8 @@ which organization's data), never technical rules.
 - Format: `dotnet format`
 - Run: `dotnet run --project src/RestaurantManagement.Web` (Swagger at /swagger)
 - Vulnerable packages: `dotnet list package --vulnerable`
-- Build and the affected tests must pass before a task is done. The full suite runs in CI
+- Build must pass before a task is committed; in the `/implement` workflow, tests run once after
+  the last batch, and the affected tests must pass before the review. The full suite runs in CI
   (Continuous Integration) on every pull request; merge only when CI is green
 - Never commit secrets (connection strings, JWT (JSON Web Token) key)
 
@@ -142,8 +143,9 @@ stop the flow when something is wrong.
    fixes its findings once.
    ⏸ Gate 2: the user approves `scenarios.md` (test coverage).
 4. Implement: implementer commits the baseline (spec, plan, stubs, tests), then one task per
-   commit, following each task's Implementation guide. Only tests of tasks not built yet may
-   fail; the affected tests are green after the last task. After each
+   commit, following each task's Implementation guide. Each task is committed after a green
+   build, without running tests. After the last task of the last batch, the implementer runs the
+   affected tests once, fixes every failure and turns the matrix rows ✅. After each
    task it writes the task's Delivered note in its batch file and ticks the task in the
    `plan.md` Checklist. Batches run in order; a batch starts only when every task it depends
    on is ticked.

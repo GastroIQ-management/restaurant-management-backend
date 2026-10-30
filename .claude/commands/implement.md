@@ -20,6 +20,8 @@ If no plan was given, ask me for it and stop.
 4. For each batch in `plan.md`, in order, use a **new** implementer subagent with only the plan
    folder and the batch ID. Wait for it to finish before starting the next batch.
    If it reports "stopped" or any [Blocking] item, stop the whole flow and show me its message.
+   Tasks are committed after a green build only; the last batch's implementer runs the affected
+   tests once after its last task and fixes the failures.
 5. When every batch is done, use the pr-reviewer subagent on the branch. It builds only; the
    full test suite runs in CI (Continuous Integration) on the pull request.
 6. If the verdict is "Fix first":
