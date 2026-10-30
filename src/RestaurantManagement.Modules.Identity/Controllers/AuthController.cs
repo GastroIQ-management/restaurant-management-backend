@@ -12,6 +12,7 @@ using RestaurantManagement.Modules.Identity.Services.Passwords;
 using RestaurantManagement.Modules.Identity.Services.Registration;
 using RestaurantManagement.Modules.Identity.Services.Sessions;
 using RestaurantManagement.Shared.RateLimiting;
+using RestaurantManagement.Shared.Services.Idempotency;
 
 namespace RestaurantManagement.Modules.Identity.Controllers
 {
@@ -80,6 +81,7 @@ namespace RestaurantManagement.Modules.Identity.Controllers
         // POST api/v1/auth/select-organization
         [HttpPost("select-organization")]
         [Authorize]
+        [IgnoreIdempotencyKey]
         public async Task<ActionResult<AuthResponse>> SelectOrganization([FromBody] SelectOrganizationRequest request)
         {
             var subject = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -105,6 +107,7 @@ namespace RestaurantManagement.Modules.Identity.Controllers
         // POST api/v1/auth/logout-all
         [HttpPost("logout-all")]
         [Authorize]
+        [IgnoreIdempotencyKey]
         public async Task<IActionResult> LogoutAll()
         {
             var subject = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -165,6 +168,7 @@ namespace RestaurantManagement.Modules.Identity.Controllers
         // POST api/v1/auth/change-password
         [HttpPost("change-password")]
         [Authorize]
+        [IgnoreIdempotencyKey]
         [EnableRateLimiting(AuthRateLimitPolicies.ChangePassword)]
         public async Task<ActionResult<MessageResponse>> ChangePassword(
             [FromBody] ChangePasswordRequest request, [FromServices] IPasswordChangeService changeService)
