@@ -29,7 +29,8 @@ public class OrganizationGridEndpointTests : IClassFixture<PostgresDatabaseFixtu
     private static readonly Guid CentroId = Guid.Parse("44444444-dddd-4ddd-8ddd-000000000002");
 
     // Carries the location and the organization settings, so one body passes validation on every endpoint below.
-    private static object LocationBody(string name, string code) => new
+    // Version 1 stands for a request refused before the version is checked; a request that must succeed sends the version it read.
+    private static object LocationBody(string name, string code, uint version = 1) => new
     {
         id = Guid.NewGuid(),
         name,
@@ -45,7 +46,8 @@ public class OrganizationGridEndpointTests : IClassFixture<PostgresDatabaseFixtu
         description = "Cozinha italiana de família",
         serviceChargeRate = 10m,
         discountApprovalLimit = 5m,
-        businessDayCutoff = "04:00"
+        businessDayCutoff = "04:00",
+        version
     };
 
     private readonly PostgresDatabaseFixture _postgres;
@@ -78,9 +80,10 @@ public class OrganizationGridEndpointTests : IClassFixture<PostgresDatabaseFixtu
         var created = await factory.ClientFor(AnaId, CantinaId).PostAsJsonAsync("/api/v1/locations", LocationBody("Unidade Barigui", "BARIGUI"));
         var newLocationId = (await created.Content.ReadFromJsonAsync<LocationRow>())!.Id;
         var admin = factory.ClientFor(JoaoId, CantinaId);
+        var batelVersion = await admin.ReadVersionAsync("/api/v1/locations", BatelId);
 
         // Act
-        var editExisting = await admin.PutAsJsonAsync($"/api/v1/locations/{BatelId}", LocationBody("Unidade Batel Reformada", "BATEL"));
+        var editExisting = await admin.PutAsJsonAsync($"/api/v1/locations/{BatelId}", LocationBody("Unidade Batel Reformada", "BATEL", batelVersion));
         var editNew = await admin.PutAsJsonAsync($"/api/v1/locations/{newLocationId}", LocationBody("Unidade Barigui Nova", "BARIGUI"));
 
         // Assert
@@ -92,16 +95,17 @@ public class OrganizationGridEndpointTests : IClassFixture<PostgresDatabaseFixtu
     private sealed record LocationRow(Guid Id);
 
     [Theory]
-    [InlineData("POST", "/api/v1/locations")]
-    [InlineData("PUT", "/api/v1/organizations/edit")]
-    [InlineData("DELETE", "/api/v1/locations/44444444-dddd-4ddd-8ddd-000000000002")]
+    [InlineData("POST", "/api/v1/locations", "/api/v1/locations", "44444444-dddd-4ddd-8ddd-000000000001")]
+    [InlineData("PUT", "/api/v1/organizations/edit", "/api/v1/organizations", "a1a1a1a1-0000-4000-8000-000000000001")]
+    [InlineData("DELETE", "/api/v1/locations/44444444-dddd-4ddd-8ddd-000000000002", "/api/v1/locations", "44444444-dddd-4ddd-8ddd-000000000002")]
     [Trait("Rule", "OR40")]
-    public async Task OwnerOnlyEndpoints_OwnerWithNoStoredLevels_ReturnsSuccess(string method, string url)
+    public async Task OwnerOnlyEndpoints_OwnerWithNoStoredLevels_ReturnsSuccess(string method, string url, string listUrl, string recordId)
     {
         // Arrange
         await using var factory = await CreateFactoryAsync();
         var client = factory.ClientFor(AnaId, CantinaId);
-        var request = new HttpRequestMessage(new HttpMethod(method), url) { Content = JsonContent.Create(LocationBody("Unidade Barigui", "BARIGUI")) };
+        var version = await client.ReadVersionAsync(listUrl, Guid.Parse(recordId));
+        var request = new HttpRequestMessage(new HttpMethod(method), $"{url}?version={version}") { Content = JsonContent.Create(LocationBody("Unidade Barigui", "BARIGUI", version)) };
 
         // Act
         var response = await client.SendAsync(request);
@@ -117,7 +121,9 @@ public class OrganizationGridEndpointTests : IClassFixture<PostgresDatabaseFixtu
         // Arrange
         await using var factory = await CreateFactoryAsync();
         var client = factory.ClientFor(EvaId, CantinaId);
-        var ownerHere = await factory.ClientFor(AnaId, CantinaId).PutAsJsonAsync("/api/v1/organizations/edit", LocationBody("Cantina da Nonna", "X"));
+        var ownerClient = factory.ClientFor(AnaId, CantinaId);
+        var version = await ownerClient.ReadVersionAsync("/api/v1/organizations", CantinaId);
+        var ownerHere = await ownerClient.PutAsJsonAsync("/api/v1/organizations/edit", LocationBody("Cantina da Nonna", "X", version));
 
         // Act
         var response = await client.PutAsJsonAsync("/api/v1/organizations/edit", LocationBody("Cantina Invadida", "X"));

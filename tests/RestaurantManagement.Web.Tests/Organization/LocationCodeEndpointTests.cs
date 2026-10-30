@@ -34,7 +34,7 @@ public class LocationCodeEndpointTests : IClassFixture<PostgresDatabaseFixture>
         return factory;
     }
 
-    private static object LocationBody(string name, string code) => new
+    private static object LocationBody(string name, string code, uint version = 1) => new
     {
         id = Guid.NewGuid(),
         name,
@@ -46,7 +46,8 @@ public class LocationCodeEndpointTests : IClassFixture<PostgresDatabaseFixture>
         phoneNumber = "+55 11 3000-1000",
         status = "Active",
         timeZone = "America/Sao_Paulo",
-        code
+        code,
+        version
     };
 
     private static async Task<Guid> CreateLocationAsync(HttpClient client, string name, string code)
@@ -76,7 +77,7 @@ public class LocationCodeEndpointTests : IClassFixture<PostgresDatabaseFixture>
         var client = factory.ClientFor(AnaId, CantinaId);
         await CreateLocationAsync(client, "Unidade Mercado Municipal", "MM");
         var batelId = await CreateLocationAsync(client, "Unidade Batel", "BT");
-        (await client.DeleteAsync($"/api/v1/locations/{batelId}")).StatusCode.ShouldBe(HttpStatusCode.NoContent);
+        (await client.DeleteAtVersionAsync($"/api/v1/locations/{batelId}", await client.ReadVersionAsync("/api/v1/locations", batelId))).StatusCode.ShouldBe(HttpStatusCode.NoContent);
 
         // Act
         var response = await client.PostAsJsonAsync("/api/v1/locations", LocationBody("Unidade Moema", code));
@@ -116,8 +117,10 @@ public class LocationCodeEndpointTests : IClassFixture<PostgresDatabaseFixture>
         await CreateLocationAsync(client, "Unidade Mercado Municipal", "MM");
         var batelId = await CreateLocationAsync(client, "Unidade Batel", "BT");
 
+        var version = await client.ReadVersionAsync("/api/v1/locations", batelId);
+
         // Act
-        var response = await client.PutAsJsonAsync($"/api/v1/locations/{batelId}", LocationBody("Unidade Batel", "MM"));
+        var response = await client.PutAsJsonAsync($"/api/v1/locations/{batelId}", LocationBody("Unidade Batel", "MM", version));
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.BadRequest, "a location cannot take a code another location of the organization uses");
@@ -153,7 +156,7 @@ public class LocationCodeEndpointTests : IClassFixture<PostgresDatabaseFixture>
         await using var factory = await CreateFactoryAsync();
         var client = factory.ClientFor(AnaId, CantinaId);
         var batelId = await CreateLocationAsync(client, "Unidade Batel", "BT");
-        (await client.DeleteAsync($"/api/v1/locations/{batelId}")).StatusCode.ShouldBe(HttpStatusCode.NoContent);
+        (await client.DeleteAtVersionAsync($"/api/v1/locations/{batelId}", await client.ReadVersionAsync("/api/v1/locations", batelId))).StatusCode.ShouldBe(HttpStatusCode.NoContent);
         var bodyWithoutStatus = new
         {
             name = "Unidade Batel",
@@ -164,7 +167,8 @@ public class LocationCodeEndpointTests : IClassFixture<PostgresDatabaseFixture>
             country = "Brasil",
             phoneNumber = "+55 11 3000-2000",
             timeZone = "America/Sao_Paulo",
-            code = "BT"
+            code = "BT",
+            version = await client.ReadVersionAsync("/api/v1/locations", batelId)
         };
 
         // Act

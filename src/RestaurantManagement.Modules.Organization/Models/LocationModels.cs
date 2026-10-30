@@ -57,6 +57,7 @@ namespace RestaurantManagement.Modules.Organization.Models
 
     public class EditLocationRequest
     {
+        public uint Version { get; set; }
         [Required(ErrorMessage = "RequiredAttribute_ValidationError")]
         [MaxLength(100, ErrorMessage = "MaxLengthAttribute_ValidationError")]
         public string Name { get; set; } = string.Empty;
@@ -105,6 +106,7 @@ namespace RestaurantManagement.Modules.Organization.Models
 
     public class LocationResponse
     {
+        public uint Version { get; set; }
         public Guid Id { get; set; }
         public Guid OrganizationId { get; set; }
         public string Name { get; set; } = string.Empty;

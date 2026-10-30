@@ -154,7 +154,7 @@ namespace RestaurantManagement.Modules.Menu.Services
             return MapToResponse(category);
         }
 
-        public async Task<bool> DeleteAsync(Guid userId, Guid id)
+        public async Task<bool> DeleteAsync(Guid userId, Guid id, uint version)
         {
             var category = await _context.MenuCategories.FirstOrDefaultAsync(c => c.Id == id);
             if (category == null)

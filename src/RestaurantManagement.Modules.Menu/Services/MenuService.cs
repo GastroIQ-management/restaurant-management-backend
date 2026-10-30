@@ -121,7 +121,7 @@ namespace RestaurantManagement.Modules.Menu.Services
             return await GetMenuResponseAsync(menuId);
         }
 
-        public async Task DeleteMenuAsync(Guid userId, Guid menuId)
+        public async Task DeleteMenuAsync(Guid userId, Guid menuId, uint version)
         {
             var menu = await _menuDb.Menus.FirstOrDefaultAsync(m => m.Id == menuId);
             if (menu == null)

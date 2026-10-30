@@ -34,7 +34,8 @@ public class LocationMessagesEndpointTests : IClassFixture<PostgresDatabaseFixtu
           "phoneNumber": "+55 41 3333-4444",
           "timeZone": "America/Sao_Paulo",
           "type": "Store",
-          "code": "BATEL"
+          "code": "BATEL",
+          "version": 1
         }
         """;
 

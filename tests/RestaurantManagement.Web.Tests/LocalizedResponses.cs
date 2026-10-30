@@ -13,7 +13,8 @@ public static class LocalizedResponses
 {
     public static HttpRequestMessage Request(string method, string url, string culture, string? jsonBody = null)
     {
-        var request = new HttpRequestMessage(new HttpMethod(method), url);
+        // A delete of a menu, category or location needs `?version=`; a request refused before the version is checked carries version 1
+        var request = new HttpRequestMessage(new HttpMethod(method), method == "DELETE" ? url + "?version=1" : url);
         request.Headers.AcceptLanguage.Add(new StringWithQualityHeaderValue(culture));
         if (jsonBody is not null)
             request.Content = new StringContent(jsonBody, Encoding.UTF8, "application/json");

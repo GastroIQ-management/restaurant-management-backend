@@ -89,12 +89,12 @@ public class MenuGridAccessTests
         ["create a menu for every location"] = s => s.Menus.CreateMenuAsync(MariaId, NewMenu()),
         ["edit a menu linked to both locations"] = s => s.Menus.EditMenuAsync(MariaId, LunchMenuId, MenuEdit),
         ["edit a menu linked to no location"] = s => s.Menus.EditMenuAsync(MariaId, SeasonalMenuId, MenuEdit),
-        ["delete a menu linked to both locations"] = s => s.Menus.DeleteMenuAsync(MariaId, LunchMenuId),
+        ["delete a menu linked to both locations"] = s => s.Menus.DeleteMenuAsync(MariaId, LunchMenuId, 0),
         ["link a menu to Mercado"] = s => s.Menus.AttachMenuToLocationAsync(MariaId, DinnerMenuId, MercadoId),
         ["unlink a menu from Mercado"] = s => s.Menus.DetachMenuFromLocationAsync(MariaId, LunchMenuId, MercadoId),
         ["create a category at Mercado"] = s => s.Categories.CreateAsync(MariaId, NewCategory(MercadoId)),
         ["update a category at Mercado"] = s => s.Categories.UpdateAsync(MariaId, DessertCategoryId, CategoryEdit),
-        ["delete a category at Mercado"] = s => s.Categories.DeleteAsync(MariaId, DessertCategoryId),
+        ["delete a category at Mercado"] = s => s.Categories.DeleteAsync(MariaId, DessertCategoryId, 0),
         ["create a category with no location"] = s => s.Categories.CreateAsync(MariaId, NewCategory(null))
     };
 

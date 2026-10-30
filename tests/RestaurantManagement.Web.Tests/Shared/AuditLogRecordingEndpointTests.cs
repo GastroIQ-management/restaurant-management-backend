@@ -21,13 +21,14 @@ public class AuditLogRecordingEndpointTests : IClassFixture<PostgresDatabaseFixt
     private static readonly Guid TrattoriaId = Guid.Parse("b2b2b2b2-0000-4000-8000-000000000002");
     private static readonly Guid CantinaBatelId = Guid.Parse("44444444-dddd-4ddd-8ddd-000000000001");
 
-    private static readonly object OrganizationBody = new
+    private static object OrganizationBodyAt(uint version) => new
     {
         name = "Cantina da Nonna",
         description = "Cozinha italiana de família",
         serviceChargeRate = 12m,
         discountApprovalLimit = 5m,
-        businessDayCutoff = "04:00"
+        businessDayCutoff = "04:00",
+        version
     };
 
     private readonly PostgresDatabaseFixture _postgres;
@@ -67,8 +68,10 @@ public class AuditLogRecordingEndpointTests : IClassFixture<PostgresDatabaseFixt
         var cantinaClient = factory.ClientFor(AnaId, CantinaId);
         var trattoriaClient = factory.ClientFor(AnaId, TrattoriaId);
 
+        var version = await cantinaClient.ReadVersionAsync("/api/v1/organizations", CantinaId);
+
         // Act
-        var edit = await cantinaClient.PutAsJsonAsync("/api/v1/organizations/edit", OrganizationBody);
+        var edit = await cantinaClient.PutAsJsonAsync("/api/v1/organizations/edit", OrganizationBodyAt(version));
 
         // Assert
         edit.StatusCode.ShouldBe(HttpStatusCode.OK);
@@ -87,8 +90,10 @@ public class AuditLogRecordingEndpointTests : IClassFixture<PostgresDatabaseFixt
         await using var factory = await CreateFactoryAsync();
         var client = factory.ClientFor(AnaId, CantinaId);
 
+        var version = await client.ReadVersionAsync("/api/v1/locations", CantinaBatelId);
+
         // Act
-        var delete = await client.DeleteAsync($"/api/v1/locations/{CantinaBatelId}");
+        var delete = await client.DeleteAtVersionAsync($"/api/v1/locations/{CantinaBatelId}", version);
 
         // Assert
         delete.IsSuccessStatusCode.ShouldBeTrue();

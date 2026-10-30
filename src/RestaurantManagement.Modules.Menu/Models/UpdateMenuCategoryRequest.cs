@@ -4,6 +4,7 @@ namespace RestaurantManagement.Modules.Menu.Models
 {
     public class UpdateMenuCategoryRequest
     {
+        public uint Version { get; set; }
         [Required(ErrorMessage = "RequiredAttribute_ValidationError")]
         [MaxLength(255, ErrorMessage = "MaxLengthAttribute_ValidationError")]
         public string Name { get; set; } = string.Empty;

@@ -2,6 +2,7 @@ namespace RestaurantManagement.Modules.Menu.Models
 {
     public class MenuCategoryResponse
     {
+        public uint Version { get; set; }
         public Guid Id { get; set; }
         public Guid MenuId { get; set; }
         public Guid OrganizationId { get; set; }

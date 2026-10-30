@@ -83,6 +83,26 @@ endpoint and database tests in `tests/RestaurantManagement.Web.Tests/Menu/`.
 | M23 | Category name missing, description over 1000 characters, menu ID missing or not an ID | 400 with the translated message | ✅ | `MenuMessagesEndpointTests.CreateMenuCategory_NameMissing_ReturnsLocalizedRequiredError`, `MenuMessagesEndpointTests.UpdateMenuCategory_DescriptionOver1000Characters_ReturnsLocalizedMaxLengthError`, `RequiredIdFieldEndpointTests.IdMissingOrNull_ReturnsLocalizedRequiredError`, `RequiredIdFieldEndpointTests.IdNotAnId_ReturnsLocalizedRequiredError` |
 | M24 | Category name over 255 characters | 400 with the translated message; exactly 255 is accepted | ✅ | `MenuMessagesEndpointTests.CreateMenuCategory_NameOver255Characters_ReturnsLocalizedMaxLengthError`, `MenuMessagesEndpointTests.CreateMenuCategory_NameOf255Characters_IsAccepted` |
 
+## 5. Record versions (lost updates)
+A menu or category change carries the version the caller read. Order of answers: 404, then 403, then 409 `version.conflict`.
+
+| ID | Case | Expected | Status | Test |
+|---|---|---|---|---|
+| M59 | Edit or delete a menu without a version | 400 on the version field, translated; the menu is unchanged | ❌ | `MenuVersionEndpointTests.MenuChange_VersionMissing_ReturnsBadRequestOnTheVersionFieldAndChangesNothing` |
+| M60 | Edit a menu with a version an earlier read left behind | 409 `version.conflict` with the current menu under `current`; the first change is kept | ❌ | `MenuVersionEndpointTests.EditMenu_VersionOfAnEarlierRead_ReturnsConflictWithTheCurrentMenuAndKeepsTheFirstChange` |
+| M61 | Delete a menu with an old version | 409 with the current menu; the menu and its categories are still stored | ❌ | `MenuVersionEndpointTests.DeleteMenu_VersionOfAnEarlierRead_ReturnsConflictAndKeepsTheMenuAndItsCategories` |
+| M62 | Edit a menu with the current version | 200; the response carries a new `version`, the stored one | ❌ | `MenuVersionEndpointTests.EditMenu_CurrentVersion_SavesAndReturnsANewVersion` |
+| M63 | Delete a menu with the current version | 200; the menu is gone | ❌ | `MenuVersionEndpointTests.DeleteMenu_CurrentVersion_DeletesTheMenu` |
+| M64 | Edit or delete another organization's menu with its real version | 404 `menu.not_found`, never 409; nothing about the menu in the body | ❌ | `MenuVersionEndpointTests.MenuChange_MenuOfAnotherOrganizationWithItsRealVersion_ReturnsNotFoundAndRevealsNothing` |
+| M65 | A member with Menus Read only edits or deletes a menu with a stale version | 403, not 409: the access check comes first and the current menu is not shown | ❌ | `MenuVersionEndpointTests.MenuChange_MemberWithMenusReadOnlySendingAStaleVersion_ReturnsForbiddenNotConflict` |
+| M66 | Menu list, list by location and create | Every menu carries a `version` | ❌ | `MenuVersionEndpointTests.MenuResponses_ListByLocationAndCreate_CarryTheVersion` |
+| M67 | Update or delete a category without a version | 400 on the version field, translated; the category is unchanged | ❌ | `MenuCategoryVersionEndpointTests.CategoryChange_VersionMissing_ReturnsBadRequestOnTheVersionFieldAndChangesNothing` |
+| M68 | Update or delete a category with an old version | 409 `version.conflict` with the current category under `current`; the category is kept as the first change left it | ❌ | `MenuCategoryVersionEndpointTests.CategoryChange_VersionOfAnEarlierRead_ReturnsConflictWithTheCurrentCategoryAndKeepsTheFirstChange` |
+| M69 | Update a category with the current version | 200; the response carries a new `version` | ❌ | `MenuCategoryVersionEndpointTests.UpdateCategory_CurrentVersion_SavesAndReturnsANewVersion` |
+| M70 | Delete a category with the current version | 204; the category is gone | ❌ | `MenuCategoryVersionEndpointTests.DeleteCategory_CurrentVersion_DeletesTheCategory` |
+| M71 | Update or delete another organization's category with its real version | 404 `menu_category.not_found`, never 409; nothing about the category in the body | ❌ | `MenuCategoryVersionEndpointTests.CategoryChange_CategoryOfAnotherOrganizationWithItsRealVersion_ReturnsNotFoundAndRevealsNothing` |
+| M72 | A member with Menus Read only updates or deletes a category with a stale version | 403, not 409; the current category is not shown | ❌ | `MenuCategoryVersionEndpointTests.CategoryChange_MemberWithMenusReadOnlySendingAStaleVersion_ReturnsForbiddenNotConflict` |
+
 ## Open questions (no row until decided)
 - **Categories of an unknown menu or location:** the lists answer 200 with an empty list, while
   an unknown menu elsewhere answers 404. Should these be 404 too?

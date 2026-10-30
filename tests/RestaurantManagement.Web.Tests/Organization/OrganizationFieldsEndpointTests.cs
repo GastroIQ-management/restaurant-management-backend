@@ -37,7 +37,7 @@ public class OrganizationFieldsEndpointTests : IClassFixture<PostgresDatabaseFix
         return factory;
     }
 
-    private static object EditBody(object? organizationId = null, string? currency = null) => new
+    private static object EditBody(uint version, object? organizationId = null, string? currency = null) => new
     {
         organizationId,
         currency,
@@ -45,7 +45,8 @@ public class OrganizationFieldsEndpointTests : IClassFixture<PostgresDatabaseFix
         description = "Cozinha italiana de família",
         serviceChargeRate = 10m,
         discountApprovalLimit = 15.5m,
-        businessDayCutoff = "05:30"
+        businessDayCutoff = "05:30",
+        version
     };
 
     /// <summary>GET api/v1/organizations, keyed by organization name.</summary>
@@ -130,9 +131,10 @@ public class OrganizationFieldsEndpointTests : IClassFixture<PostgresDatabaseFix
         // Arrange
         await using var factory = await CreateFactoryAsync();
         var client = factory.ClientFor(AnaId, CantinaId);
+        var version = await client.ReadVersionAsync("/api/v1/organizations", CantinaId);
 
         // Act
-        var response = await client.PutAsJsonAsync("/api/v1/organizations/edit", EditBody(currency: "USD"));
+        var response = await client.PutAsJsonAsync("/api/v1/organizations/edit", EditBody(version, currency: "USD"));
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.OK, "an edit is accepted even when the body carries a currency");
@@ -167,9 +169,10 @@ public class OrganizationFieldsEndpointTests : IClassFixture<PostgresDatabaseFix
         // Arrange
         await using var factory = await CreateFactoryAsync();
         var client = factory.ClientFor(AnaId, CantinaId);
+        var version = await client.ReadVersionAsync("/api/v1/organizations", CantinaId);
 
         // Act
-        var response = await client.PutAsJsonAsync("/api/v1/organizations/edit", EditBody());
+        var response = await client.PutAsJsonAsync("/api/v1/organizations/edit", EditBody(version));
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.OK, "an Owner may edit the organization settings");
@@ -187,9 +190,10 @@ public class OrganizationFieldsEndpointTests : IClassFixture<PostgresDatabaseFix
         // Arrange
         await using var factory = await CreateFactoryAsync();
         var client = factory.ClientFor(AnaId, CantinaId);
+        var version = await client.ReadVersionAsync("/api/v1/organizations", CantinaId);
 
         // Act
-        var response = await client.PutAsJsonAsync("/api/v1/organizations/edit", EditBody(organizationId: MapleId));
+        var response = await client.PutAsJsonAsync("/api/v1/organizations/edit", EditBody(version, organizationId: MapleId));
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.OK, "the edit is accepted for the token organization");

@@ -46,11 +46,11 @@ namespace RestaurantManagement.Modules.Menu.Controllers
 
         [HttpDelete("{menuId}")]
         [Authorize]
-        public async Task<IActionResult> Delete(Guid menuId)
+        public async Task<IActionResult> Delete(Guid menuId, [FromQuery] uint version)
         {
             var userId = GetCurrentUserId();
 
-            await _menuService.DeleteMenuAsync(userId, menuId);
+            await _menuService.DeleteMenuAsync(userId, menuId, version);
             return Ok(new { message = _localizer["MenuDeletedSuccessfully"].Value });
         }
 

@@ -105,7 +105,7 @@ namespace RestaurantManagement.Modules.Organization.Services
             return MapToResponse(location);
         }
 
-        public async Task DeleteLocationAsync(Guid userId, Guid locationId)
+        public async Task DeleteLocationAsync(Guid userId, Guid locationId, uint version)
         {
             var location = await _orgDb.Locations.FirstOrDefaultAsync(l => l.Id == locationId);
             if (location == null)

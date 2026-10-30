@@ -53,10 +53,10 @@ namespace RestaurantManagement.Modules.Organization.Controllers
 
         // DELETE api/v1/locations/{locationId}
         [HttpDelete("{locationId:guid}")]
-        public async Task<IActionResult> DeleteLocation(Guid locationId)
+        public async Task<IActionResult> DeleteLocation(Guid locationId, [FromQuery] uint version)
         {
             var userId = GetCurrentUserId();
-            await _locationService.DeleteLocationAsync(userId, locationId);
+            await _locationService.DeleteLocationAsync(userId, locationId, version);
             return NoContent();
         }
 

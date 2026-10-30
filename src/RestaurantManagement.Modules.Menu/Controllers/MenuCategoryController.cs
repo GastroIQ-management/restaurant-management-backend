@@ -106,11 +106,11 @@ namespace RestaurantManagement.Modules.Menu.Controllers
         /// Delete a menu category
         /// </summary>
         [HttpDelete("menu-categories/{id}")]
-        public async Task<ActionResult> DeleteCategory(Guid id)
+        public async Task<ActionResult> DeleteCategory(Guid id, [FromQuery] uint version)
         {
             var userId = GetCurrentUserId();
 
-            var result = await _categoryService.DeleteAsync(userId, id);
+            var result = await _categoryService.DeleteAsync(userId, id, version);
             if (!result)
                 throw new BusinessException(MenuErrorCodes.MenuCategoryNotFound, _localizer["MenuCategoryNotFound"].Value);
 

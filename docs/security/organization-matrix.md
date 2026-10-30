@@ -103,6 +103,24 @@ location in a request (the location access check) is in the Shared matrix, where
 | ORD5 | `OrganizationDeleteRulesTests.Migrate_OrganizationForeignKeys_AllRestrictDeletes` | Every Organization foreign key restricts deletes |
 | ORD6 | `OrganizationDeleteRulesTests.Migrate_OrganizationTablesWithRows_NoRowAddedChangedOrRemoved` | The delete-rule migration keeps existing rows |
 
+## 7. Record versions (lost updates)
+A location or organization change carries the version the caller read. Order of answers: 404, then 403, then 409 `version.conflict`, then the other rules (a taken code).
+
+| ID | Case | Expected | Status | Test |
+|---|---|---|---|---|
+| OR60 | Edit or close a location without a version | 400 on the version field, translated; the location stays open and unchanged | ❌ | `LocationVersionEndpointTests.LocationChange_VersionMissing_ReturnsBadRequestOnTheVersionFieldAndChangesNothing` |
+| OR61 | Edit or close a location with an old version | 409 `version.conflict` with the current location under `current`; the location is not changed or closed and no audit entry is written | ❌ | `LocationVersionEndpointTests.LocationChange_VersionOfAnEarlierRead_ReturnsConflictWithTheCurrentLocationChangesNothingAndWritesNoAuditEntry` |
+| OR62 | Edit a location with an old version and a code another location uses | 409 `version.conflict`, not `location.code_already_used` | ❌ | `LocationVersionEndpointTests.EditLocation_StaleVersionWithACodeAnotherLocationUses_ReturnsVersionConflictNotTheCodeError` |
+| OR63 | Edit a location with the current version | 200; the response carries a new `version` | ❌ | `LocationVersionEndpointTests.EditLocation_CurrentVersion_SavesAndReturnsANewVersion` |
+| OR64 | Edit or close another organization's location with its real version | 404 `location.not_found`, never 409; nothing about the location in the body | ❌ | `LocationVersionEndpointTests.LocationChange_LocationOfAnotherOrganizationWithItsRealVersion_ReturnsNotFoundAndRevealsNothing` |
+| OR65 | A member with Locations Read only edits, or a non-Owner closes, a location with a stale version | 403, not 409; the current location is not shown | ❌ | `LocationVersionEndpointTests.LocationChange_MemberWhoMayNotMakeIt_SendingAStaleVersion_ReturnsForbiddenNotConflict` |
+| OR66 | Edit the organization without a version | 400 on the version field, translated; the organization is unchanged | ❌ | `OrganizationVersionEndpointTests.EditOrganization_VersionMissing_ReturnsBadRequestOnTheVersionFieldAndChangesNothing` |
+| OR67 | Edit the organization with an old version | 409 `version.conflict` with the current organization under `current`; organization and settings are unchanged and no audit entry is written | ❌ | `OrganizationVersionEndpointTests.EditOrganization_VersionOfAnEarlierRead_ReturnsConflictWithTheCurrentOrganizationChangesNothingAndWritesNoAuditEntry` |
+| OR68 | Only a setting changes in an organization edit with the current version | 200; the organization gets a new `version` | ❌ | `OrganizationVersionEndpointTests.EditOrganization_OnlyASettingChanges_ReturnsANewVersion` |
+| OR69 | A member who is not the Owner edits the organization with a stale version | 403, not 409; the current organization is not shown | ❌ | `OrganizationVersionEndpointTests.EditOrganization_MemberWhoIsNotTheOwnerSendingAStaleVersion_ReturnsForbiddenNotConflict` |
+| OR70 | An Owner of two organizations edits the one in the token | Only that organization and its version change; the other keeps its data and version | ❌ | `OrganizationVersionEndpointTests.EditOrganization_OwnerOfTwoOrganizations_ChangesOnlyTheTokenOrganizationAndItsVersion` |
+| OR71 | Organization list and create | Every organization carries a `version` | ❌ | `OrganizationVersionEndpointTests.OrganizationResponses_ListAndCreate_CarryTheVersion` |
+
 ## Open questions (no row until decided)
 - **Trial limits are stored but never enforced:** a TRIAL organization gets "1 location" and a
   30-day end date, but nothing stops it creating more locations or keeps it from working after
