@@ -1,4 +1,5 @@
 using RestaurantManagement.Shared;
+using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
@@ -53,10 +54,10 @@ namespace RestaurantManagement.Modules.Organization.Controllers
 
         // DELETE api/v1/locations/{locationId}
         [HttpDelete("{locationId:guid}")]
-        public async Task<IActionResult> DeleteLocation(Guid locationId, [FromQuery] uint version)
+        public async Task<IActionResult> DeleteLocation(Guid locationId, [FromQuery, Required(ErrorMessage = "RequiredAttribute_ValidationError")] uint? version)
         {
             var userId = GetCurrentUserId();
-            await _locationService.DeleteLocationAsync(userId, locationId, version);
+            await _locationService.DeleteLocationAsync(userId, locationId, version!.Value);
             return NoContent();
         }
 

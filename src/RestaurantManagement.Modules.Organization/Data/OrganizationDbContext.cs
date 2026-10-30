@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using RestaurantManagement.Modules.Organization.Entities;
 using RestaurantManagement.Shared.Data.Tenancy;
+using RestaurantManagement.Shared.Data.Versioning;
 
 namespace RestaurantManagement.Modules.Organization.Data
 {
@@ -61,6 +62,7 @@ namespace RestaurantManagement.Modules.Organization.Data
                 .OnDelete(DeleteBehavior.Restrict);
 
             base.OnModelCreating(modelBuilder);
+            modelBuilder.ApplyVersionTokens(Database);
             modelBuilder.ApplyTenantQueryFilters(() => _tenantContext);
         }
     }

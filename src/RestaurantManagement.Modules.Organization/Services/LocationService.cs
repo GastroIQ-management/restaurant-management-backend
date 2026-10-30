@@ -9,6 +9,7 @@ using RestaurantManagement.Modules.Organization.Models;
 using RestaurantManagement.Shared.Auth;
 using RestaurantManagement.Shared.Utils.Exceptions;
 using RestaurantManagement.Shared.Data.Tenancy;
+using RestaurantManagement.Shared.Data.Versioning;
 using RestaurantManagement.Shared.Services.AuditLog;
 
 namespace RestaurantManagement.Modules.Organization.Services
@@ -83,6 +84,7 @@ namespace RestaurantManagement.Modules.Organization.Services
                 throw new BusinessException(ErrorCodes.LocationNotFound, _localizer["LocationNotFound"].Value);
 
             await RequireManageLocationAsync(location, request.Status);
+            VersionCheck.Require(_orgDb, location, request.Version ?? 0, () => MapToResponse(location));
 
             var previousStatus = location.Status;
             location.Name = request.Name;
@@ -99,7 +101,7 @@ namespace RestaurantManagement.Modules.Organization.Services
             location.UpdatedAt = DateTime.UtcNow;
 
             await EnsureCodeIsFreeAsync(location.Code, location.Id);
-            await SaveAsync();
+            await SaveAsync(location.Id);
             await RecordStatusChangeAsync(location, previousStatus);
 
             return MapToResponse(location);
@@ -112,19 +114,15 @@ namespace RestaurantManagement.Modules.Organization.Services
                 throw new BusinessException(ErrorCodes.LocationNotFound, _localizer["LocationNotFound"].Value);
 
             await RequireOwnerAsync();
+            VersionCheck.Require(_orgDb, location, version, () => MapToResponse(location));
 
-            // Soft delete by setting status to Closed (or logic as discussed: status is status)
-            // User requested "If status closes ... do not delete". But "Delete" endpoint generally means "I want it gone or inactive".
-            // Implementation: Set to Closed as a form of soft delete or just updates status. 
-            // Better: Just set status to Closed.
-            // Wait, "Delete" usually implies "Gone". But requirement says "If user closes... don't delete data".
-            // So "Delete" endpoint creates a "Closed" state.
+            // Delete closes the location instead of removing it, so its data is kept.
 
             var previousStatus = location.Status;
             location.Status = LocationStatus.Closed;
             location.UpdatedAt = DateTime.UtcNow;
 
-            await _orgDb.SaveChangesAsync();
+            await SaveAsync(location.Id);
             await RecordStatusChangeAsync(location, previousStatus);
         }
 
@@ -190,11 +188,14 @@ namespace RestaurantManagement.Modules.Organization.Services
         }
 
         // A concurrent request can pass the check above; the unique index then rejects the second one.
-        private async Task SaveAsync()
+        private async Task SaveAsync(Guid? locationId = null)
         {
             try
             {
-                await _orgDb.SaveChangesAsync();
+                if (locationId is null)
+                    await _orgDb.SaveChangesAsync();
+                else
+                    await VersionCheck.SaveAsync(_orgDb, async () => await CurrentLocationAsync(locationId.Value));
             }
             catch (DbUpdateException ex) when (PrimaryKeyViolation.Matches(ex))
             {
@@ -206,6 +207,15 @@ namespace RestaurantManagement.Modules.Organization.Services
             }
         }
 
+        // The tracked location may be stale after a lost race, so read the stored one again; gone means 404.
+        private async Task<object> CurrentLocationAsync(Guid locationId)
+        {
+            _orgDb.ChangeTracker.Clear();
+            var location = await _orgDb.Locations.FirstOrDefaultAsync(l => l.Id == locationId)
+                ?? throw new BusinessException(ErrorCodes.LocationNotFound, _localizer["LocationNotFound"].Value);
+            return MapToResponse(location);
+        }
+
         private Guid RequireOrganizationId()
             => _tenantContext.OrganizationId
                 ?? throw new BusinessException(ErrorCodes.OrganizationRequired, _localizer["OrganizationRequired"].Value);
@@ -214,6 +224,7 @@ namespace RestaurantManagement.Modules.Organization.Services
         {
             return new LocationResponse
             {
+                Version = location.Version,
                 Id = location.Id,
                 OrganizationId = location.OrganizationId,
                 Name = location.Name,
