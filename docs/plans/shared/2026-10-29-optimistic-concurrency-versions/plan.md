@@ -43,7 +43,7 @@ returns the new version · #6 the OpenAPI (API description) document shows the `
 - [x] T2 — Menu edit and delete check the version
 - [x] T3 — Menu category update and delete check the version
 - [x] T4 — Location edit and delete check the version
-- [ ] T5 — Organization edit checks the version
+- [x] T5 — Organization edit checks the version
 - [ ] T6 — Role rename and levels update check the version
 
 ## Assumptions
