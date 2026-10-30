@@ -129,6 +129,10 @@ builder.Services.AddControllers()
     .AddApplicationPart(typeof(RestaurantManagement.Modules.Menu.Controllers.MenuController).Assembly)
     .AddApplicationPart(typeof(RestaurantManagement.Modules.Organization.Controllers.OrganizationController).Assembly);
 
+// Error answers are written outside MVC (ProblemResponse); they must name enums the same way.
+builder.Services.ConfigureHttpJsonOptions(options =>
+    options.SerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter()));
+
 // ---------------------------------------------
 // Options Configuration
 // ---------------------------------------------
