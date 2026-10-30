@@ -5,9 +5,9 @@ namespace RestaurantManagement.Shared.Services.Idempotency
     {
         public const string SectionName = "Idempotency";
 
-        public int RetentionDays { get; set; }
-        public int InProgressTimeoutSeconds { get; set; }
-        public bool CleanupEnabled { get; set; }
-        public int CleanupIntervalMinutes { get; set; }
+        public int RetentionDays { get; set; } = 8;
+        public int InProgressTimeoutSeconds { get; set; } = 120;
+        public bool CleanupEnabled { get; set; } = true;
+        public int CleanupIntervalMinutes { get; set; } = 60;
     }
 }

@@ -1,6 +1,6 @@
 # Plan: Idempotency key on writes
 
-**Source:** docs/specs/shared/2026-10-30-idempotency-key-on-writes.md   **Date:** 2026-10-30   **Status:** Draft
+**Source:** docs/specs/shared/2026-10-30-idempotency-key-on-writes.md   **Date:** 2026-10-30   **Status:** In progress
 **Risk:** High — new Shared contracts (key store, a transaction a service can join, one filter on every signed-in write), a new table and migration in three modules, and a replay answered before the modules' access checks.
 
 ## Summary
@@ -35,7 +35,7 @@
 - [ ] No out-of-scope changes
 
 ## Checklist
-- [ ] T1 — Shared key table mapping, store, settings, purge job and error codes
+- [x] T1 — Shared key table mapping, store, settings, purge job and error codes
 - [ ] T2 — Shared transaction a service can join, with an undo step when it does not commit
 - [ ] T3 — Shared write filter: check, reserve, replay, save with the write
 - [ ] T4 — Web wiring, OpenAPI header and coverage check
