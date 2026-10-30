@@ -1,6 +1,6 @@
 # Plan: Record versions to prevent lost updates (optimistic concurrency)
 
-**Source:** backlog/offline/2026-10-26-optimistic-concurrency-versions.md   **Date:** 2026-10-29   **Status:** Draft
+**Source:** backlog/offline/2026-10-26-optimistic-concurrency-versions.md   **Date:** 2026-10-29   **Status:** In progress
 **Risk:** High — new Shared contract (versioned entity, version conflict error carrying a record) and a model change plus migration on six tables in three modules; a 409 (HTTP Conflict) answered before the access check would hand the current record to a caller who may not change it.
 
 ## Summary
@@ -39,7 +39,7 @@ returns the new version · #6 the OpenAPI (API description) document shows the `
 - [ ] Backlog item only: deleted if fully solved (deletion left uncommitted for the user), or updated with what is left
 
 ## Checklist
-- [ ] T1 — Shared version mapping, version check and `version.conflict` 409
+- [x] T1 — Shared version mapping, version check and `version.conflict` 409
 - [ ] T2 — Menu edit and delete check the version
 - [ ] T3 — Menu category update and delete check the version
 - [ ] T4 — Location edit and delete check the version
