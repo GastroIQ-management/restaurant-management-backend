@@ -6,7 +6,6 @@ namespace RestaurantManagement.Modules.Organization.Models
 {
     public class EditOrganizationRequest : IValidatableObject
     {
-        [Required(ErrorMessage = "RequiredAttribute_ValidationError")]
         public uint? Version { get; set; }
 
         private string _name = string.Empty;

@@ -57,7 +57,6 @@ namespace RestaurantManagement.Modules.Organization.Models
 
     public class EditLocationRequest
     {
-        [Required(ErrorMessage = "RequiredAttribute_ValidationError")]
         public uint? Version { get; set; }
 
         [Required(ErrorMessage = "RequiredAttribute_ValidationError")]

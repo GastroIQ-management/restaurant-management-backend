@@ -40,6 +40,13 @@ namespace RestaurantManagement.Modules.Organization.Controllers
         [Authorize]
         public async Task<ActionResult<OrganizationResponse>> Edit([FromBody] EditOrganizationRequest request)
         {
+            // Checked here, not with [Required] on the request, so the request's own field rules stay valid without a version.
+            if (request.Version is null)
+            {
+                ModelState.AddModelError(nameof(request.Version), _localizer["RequiredAttribute_ValidationError", nameof(request.Version)]);
+                return ValidationProblem(ModelState);
+            }
+
             var userId = GetCurrentUserId();
 
             var response = await _organizationService.EditOrganizationAsync(userId, request);
