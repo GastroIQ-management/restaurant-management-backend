@@ -32,19 +32,19 @@ returns the new version · #6 the OpenAPI (API description) document shows the `
 | T6 | — | — | Role rules checked first; a levels change must change the role's version (child rows alone would not) |
 
 ## Overall Definition of Done
-- [ ] All tasks done, tests passing
-- [ ] All Outcomes met (the backlog item's Acceptance criteria)
-- [ ] Affected tests green after the last batch; full suite green in CI (Continuous Integration)
-- [ ] No out-of-scope changes
-- [ ] Backlog item only: deleted if fully solved (deletion left uncommitted for the user), or updated with what is left
+- [x] All tasks done, tests passing (full suite after the last batch: 1,701 passed, 0 failed)
+- [x] All Outcomes met (the backlog item's Acceptance criteria): #1 `RowVersionPostgresTests`; #2–#5 the six `*VersionEndpointTests` classes; #6 `VersionOpenApiTests`
+- [ ] Affected tests green after the last batch; full suite green in CI (Continuous Integration) — green locally; CI runs on the pull request
+- [ ] No out-of-scope changes — three changes outside the plan, made on this branch at the user's request: `033c373` (Web.Tests shared database container), `e5edbe1` (workflow: tests run once after the last batch), `9aaa9b3` (test hosts stop watching config files, which froze the suite)
+- [x] Backlog item only: deleted if fully solved (deletion left uncommitted for the user), or updated with what is left
 
 ## Checklist
-- [x] T1 — Shared version mapping, version check and `version.conflict` 409
-- [x] T2 — Menu edit and delete check the version
-- [x] T3 — Menu category update and delete check the version
-- [x] T4 — Location edit and delete check the version
-- [x] T5 — Organization edit checks the version
-- [x] T6 — Role rename and levels update check the version
+- [x] T1 — Shared version mapping, version check and `version.conflict` 409 — `ba540c7`
+- [x] T2 — Menu edit and delete check the version — `0fbce68`
+- [x] T3 — Menu category update and delete check the version — `bcaaa75`
+- [x] T4 — Location edit and delete check the version — `9da8548`, fix `4a03446`
+- [x] T5 — Organization edit checks the version — `ca960a2`, fix `4a03446`
+- [x] T6 — Role rename and levels update check the version — `ceba4ed`
 
 ## Assumptions
 - Updates send `version` in the JSON body; deletes send it as a required `?version=` query parameter (no body on DELETE, no `If-Match` header) — both appear in the OpenAPI document; a missing version answers 400, translated (not launched, so no fallback); existing tests that edit or delete get a version in step 3.
