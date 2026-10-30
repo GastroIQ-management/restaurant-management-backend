@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
 using RestaurantManagement.Shared.Utils.Exceptions;
 using Microsoft.AspNetCore.Authorization;
@@ -106,11 +107,11 @@ namespace RestaurantManagement.Modules.Menu.Controllers
         /// Delete a menu category
         /// </summary>
         [HttpDelete("menu-categories/{id}")]
-        public async Task<ActionResult> DeleteCategory(Guid id)
+        public async Task<ActionResult> DeleteCategory(Guid id, [FromQuery, Required(ErrorMessage = "RequiredAttribute_ValidationError")] uint? version)
         {
             var userId = GetCurrentUserId();
 
-            var result = await _categoryService.DeleteAsync(userId, id);
+            var result = await _categoryService.DeleteAsync(userId, id, version!.Value);
             if (!result)
                 throw new BusinessException(MenuErrorCodes.MenuCategoryNotFound, _localizer["MenuCategoryNotFound"].Value);
 

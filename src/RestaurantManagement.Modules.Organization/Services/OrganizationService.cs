@@ -11,6 +11,7 @@ using RestaurantManagement.Modules.Organization.Data;
 using RestaurantManagement.Modules.Organization.Entities;
 using RestaurantManagement.Modules.Organization.Models;
 using RestaurantManagement.Shared.Data.Tenancy;
+using RestaurantManagement.Shared.Data.Versioning;
 using RestaurantManagement.Shared.Services.AuditLog;
 using RestaurantManagement.Shared.Auth;
 using RestaurantManagement.Shared.Services.Identity;
@@ -211,6 +212,7 @@ namespace RestaurantManagement.Modules.Organization.Services
 
             // 3. Only the Owner may edit the organization and its settings
             await _accessGuard.RequireOwnerAsync();
+            VersionCheck.Require(_orgDb, organization, request.Version ?? 0, () => ToResponse(organization, organizationSettings));
 
             var before = (organizationSettings.ServiceChargeRate, organizationSettings.DiscountApprovalLimit, organizationSettings.BusinessDayCutoff);
 
@@ -226,7 +228,7 @@ namespace RestaurantManagement.Modules.Organization.Services
             organizationSettings.DiscountApprovalLimit = request.DiscountApprovalLimit!.Value;
             organizationSettings.BusinessDayCutoff = TimeOnly.ParseExact(request.BusinessDayCutoff!, "HH:mm", CultureInfo.InvariantCulture);
 
-            await _orgDb.SaveChangesAsync();
+            await VersionCheck.SaveAsync(_orgDb, async () => await CurrentOrganizationAsync(organizationId));
 
             await RecordSettingsChangeAsync(organizationSettings, before);
 
@@ -283,8 +285,17 @@ namespace RestaurantManagement.Modules.Organization.Services
             return organizations.Select(o => ToResponse(o, o.Settings)).ToList();
         }
 
+        // The tracked rows may be stale after a lost race, so read the stored ones again.
+        private async Task<object> CurrentOrganizationAsync(Guid organizationId)
+        {
+            _orgDb.ChangeTracker.Clear();
+            var org = await _orgDb.Organizations.Include(o => o.Settings).FirstAsync(o => o.Id == organizationId);
+            return ToResponse(org, org.Settings);
+        }
+
         private static OrganizationResponse ToResponse(Entities.Organization org, OrganizationSettings? settings) => new()
         {
+            Version = org.Version,
             Id = org.Id,
             Name = org.Name,
             Description = org.Description,

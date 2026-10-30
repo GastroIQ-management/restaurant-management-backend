@@ -22,6 +22,7 @@ public class OrganizationUserIdentifierEndpointTests : IClassFixture<PostgresDat
     private const string EditJson = """
         {
           "name": "Cantina da Nonna",
+          "version": 1,
           "serviceChargeRate": 10,
           "discountApprovalLimit": 15,
           "businessDayCutoff": "04:00"

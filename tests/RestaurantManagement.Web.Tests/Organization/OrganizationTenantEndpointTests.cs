@@ -38,19 +38,21 @@ public class OrganizationTenantEndpointTests : IClassFixture<PostgresDatabaseFix
         status = "Closed",
         timeZone = "America/Sao_Paulo",
         code = "MERCADO",
+        version = 1u,
         serviceChargeRate = 10m,
         discountApprovalLimit = 5m,
         businessDayCutoff = "04:00"
     };
 
-    private static readonly object OrganizationBody = new
+    private static object OrganizationBodyAt(uint version) => new
     {
         organizationId = TrattoriaId,
         name = "Cantina da Nonna Batel",
         description = "Cozinha italiana de família",
         serviceChargeRate = 10m,
         discountApprovalLimit = 5m,
-        businessDayCutoff = "04:00"
+        businessDayCutoff = "04:00",
+        version
     };
 
     private readonly PostgresDatabaseFixture _postgres;
@@ -74,9 +76,9 @@ public class OrganizationTenantEndpointTests : IClassFixture<PostgresDatabaseFix
         return factory;
     }
 
-    /// <summary>Every request carries a JSON body; endpoints that take no body ignore it.</summary>
+    /// <summary>Every request carries a JSON body; endpoints that take no body ignore it. A delete carries `?version=1`: the version is only checked after the location is found.</summary>
     private static HttpRequestMessage Request(string method, string url, object body)
-        => new(new HttpMethod(method), url) { Content = JsonContent.Create(body) };
+        => new(new HttpMethod(method), method == "DELETE" ? url + "?version=1" : url) { Content = JsonContent.Create(body) };
 
     // Scenario 18
     [Theory]
@@ -144,9 +146,10 @@ public class OrganizationTenantEndpointTests : IClassFixture<PostgresDatabaseFix
         // Arrange
         await using var factory = await CreateFactoryWithTwoOrganizationsAsync();
         var client = factory.ClientFor(AnaId, CantinaId);
+        var version = await client.ReadVersionAsync("/api/v1/organizations", CantinaId);
 
         // Act
-        var response = await client.PutAsJsonAsync("/api/v1/organizations/edit", OrganizationBody);
+        var response = await client.PutAsJsonAsync("/api/v1/organizations/edit", OrganizationBodyAt(version));
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.OK, "an Owner may edit the organization they are signed in to");

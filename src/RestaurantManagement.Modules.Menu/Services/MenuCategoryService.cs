@@ -5,6 +5,7 @@ using RestaurantManagement.Modules.Menu.Entities;
 using RestaurantManagement.Modules.Menu.Models;
 using RestaurantManagement.Shared;
 using RestaurantManagement.Shared.Data.Tenancy;
+using RestaurantManagement.Shared.Data.Versioning;
 using RestaurantManagement.Shared.Auth;
 using RestaurantManagement.Shared.Services.Organization;
 using RestaurantManagement.Shared.Utils.Exceptions;
@@ -144,17 +145,18 @@ namespace RestaurantManagement.Modules.Menu.Services
                 return null;
 
             await _access.RequireManageCategoryAsync(category.LocationId);
+            VersionCheck.Require(_context, category, request.Version ?? 0, () => MapToResponse(category));
 
             category.Name = request.Name;
             category.Description = request.Description;
             category.SortOrder = request.SortOrder;
 
-            await _context.SaveChangesAsync();
+            await VersionCheck.SaveAsync(_context, async () => await CurrentCategoryAsync(id));
 
             return MapToResponse(category);
         }
 
-        public async Task<bool> DeleteAsync(Guid userId, Guid id)
+        public async Task<bool> DeleteAsync(Guid userId, Guid id, uint version)
         {
             var category = await _context.MenuCategories.FirstOrDefaultAsync(c => c.Id == id);
             if (category == null)
@@ -162,8 +164,10 @@ namespace RestaurantManagement.Modules.Menu.Services
 
             await _access.RequireManageCategoryAsync(category.LocationId);
 
+            VersionCheck.Require(_context, category, version, () => MapToResponse(category));
+
             _context.MenuCategories.Remove(category);
-            await _context.SaveChangesAsync();
+            await VersionCheck.SaveAsync(_context, async () => await CurrentCategoryAsync(id));
 
             return true;
         }
@@ -174,10 +178,20 @@ namespace RestaurantManagement.Modules.Menu.Services
                 ?? throw new BusinessException(ErrorCodes.OrganizationRequired, _localizer["OrganizationRequired"].Value);
         }
 
+        // The tracked category may be stale after a lost race, so read the stored one again; gone means 404.
+        private async Task<object> CurrentCategoryAsync(Guid id)
+        {
+            _context.ChangeTracker.Clear();
+            var stored = await _context.MenuCategories.FirstOrDefaultAsync(c => c.Id == id)
+                ?? throw new BusinessException(MenuErrorCodes.MenuCategoryNotFound, _localizer["MenuCategoryNotFound"].Value);
+            return MapToResponse(stored);
+        }
+
         private static MenuCategoryResponse MapToResponse(MenuCategory category)
         {
             return new MenuCategoryResponse
             {
+                Version = category.Version,
                 Id = category.Id,
                 MenuId = category.MenuId,
                 OrganizationId = category.OrganizationId,

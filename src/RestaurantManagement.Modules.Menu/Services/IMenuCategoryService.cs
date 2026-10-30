@@ -10,6 +10,6 @@ namespace RestaurantManagement.Modules.Menu.Services
         Task<IEnumerable<MenuCategoryResponse>> GetAllAsync(Guid userId);
         Task<IEnumerable<MenuCategoryResponse>> GetByLocationIdAsync(Guid userId, Guid locationId);
         Task<MenuCategoryResponse?> UpdateAsync(Guid userId, Guid id, UpdateMenuCategoryRequest request);
-        Task<bool> DeleteAsync(Guid userId, Guid id);
+        Task<bool> DeleteAsync(Guid userId, Guid id, uint version);
     }
 }

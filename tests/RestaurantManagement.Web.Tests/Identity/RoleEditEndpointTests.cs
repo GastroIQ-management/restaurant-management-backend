@@ -1,5 +1,6 @@
 using System.Net;
 using System.Net.Http.Json;
+using System.Text.Json.Nodes;
 using RestaurantManagement.Modules.Identity.Data;
 using RestaurantManagement.Modules.Identity.Entities.Invitations;
 using RestaurantManagement.Shared.Auth;
@@ -20,8 +21,16 @@ public class RoleEditEndpointTests : IClassFixture<PostgresDatabaseFixture>
 
     public RoleEditEndpointTests(PostgresDatabaseFixture postgres) => _postgres = postgres;
 
-    private const string LevelsBody = """{"levels":{"Orders":"Read"}}""";
-    private const string NameBody = """{"name":"Till"}""";
+    // Version 1 stands for a request refused before the version is checked; a request that must succeed sends the version it read
+    private const string LevelsBody = """{"levels":{"Orders":"Read"},"version":1}""";
+    private const string NameBody = """{"name":"Till","version":1}""";
+
+    private static async Task<StringContent> BodyAtCurrentVersionAsync(HttpClient client, Guid roleId, string json)
+    {
+        var body = JsonNode.Parse(json)!;
+        body["version"] = await client.ReadVersionAsync($"/api/v1/roles/{roleId}");
+        return Json(body.ToJsonString());
+    }
 
     [Fact]
     [Trait("Rule", "T121")]
@@ -31,9 +40,11 @@ public class RoleEditEndpointTests : IClassFixture<PostgresDatabaseFixture>
         await using var factory = await CreateFactoryAsync(_postgres);
         var waiterId = await RoleIdAsync(factory, CantinaId, "Waiter");
         var gridBefore = await CellsAsync(factory, CantinaId, BiaId, BatelId);
+        var owner = factory.ClientFor(AnaId, CantinaId);
+        var body = await BodyAtCurrentVersionAsync(owner, waiterId, LevelsBody);
 
         // Act
-        var response = await factory.ClientFor(AnaId, CantinaId).PutAsync($"/api/v1/roles/{waiterId}/levels", Json(LevelsBody));
+        var response = await owner.PutAsync($"/api/v1/roles/{waiterId}/levels", body);
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
@@ -49,7 +60,7 @@ public class RoleEditEndpointTests : IClassFixture<PostgresDatabaseFixture>
         await using var factory = await CreateFactoryAsync(_postgres);
         var waiterId = await RoleIdAsync(factory, CantinaId, "Waiter");
         var owner = factory.ClientFor(AnaId, CantinaId);
-        (await owner.PutAsync($"/api/v1/roles/{waiterId}/levels", Json(LevelsBody))).EnsureSuccessStatusCode();
+        (await owner.PutAsync($"/api/v1/roles/{waiterId}/levels", await BodyAtCurrentVersionAsync(owner, waiterId, LevelsBody))).EnsureSuccessStatusCode();
 
         // Act
         var invitation = await owner.PostAsJsonAsync("/api/v1/invitations", InviteBody(BrunoEmail, MercadoId, new[] { "Waiter" }));
@@ -72,7 +83,7 @@ public class RoleEditEndpointTests : IClassFixture<PostgresDatabaseFixture>
         var client = factory.ClientFor(AnaId, CantinaId);
 
         // Act
-        var response = await client.PutAsync($"/api/v1/roles/{waiterId}/name", Json("""{"name":"Server"}"""));
+        var response = await client.PutAsync($"/api/v1/roles/{waiterId}/name", await BodyAtCurrentVersionAsync(client, waiterId, """{"name":"Server"}"""));
         var names = (await ListRolesAsync(client)).Select(r => r.Name).ToList();
 
         // Assert
@@ -160,7 +171,7 @@ public class RoleEditEndpointTests : IClassFixture<PostgresDatabaseFixture>
 
         // Act
         var response = await factory.ClientFor(MariaId, CantinaId)
-            .PutAsync($"/api/v1/roles/{waiterId}/levels", Json("""{"levels":{"Orders":"Manage","Cashier":"Manage"}}"""));
+            .PutAsync($"/api/v1/roles/{waiterId}/levels", Json("""{"levels":{"Orders":"Manage","Cashier":"Manage"},"version":1}"""));
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.Forbidden, "an Admin cannot raise a role's default above her own level in a module");

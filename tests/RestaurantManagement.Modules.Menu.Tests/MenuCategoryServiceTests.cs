@@ -385,7 +385,7 @@ namespace RestaurantManagement.Modules.Menu.Tests
             var sut = CreateSut(context, accessGuard, tenant);
 
             // Act
-            var act = () => sut.DeleteAsync(userId, categoryId);
+            var act = () => sut.DeleteAsync(userId, categoryId, 0);
 
             // Assert
             await act.Should().ThrowAsync<BusinessException>().Where(e => e.StatusCode == 403, "a member who has been given no access yet may not delete menu categories");
@@ -407,7 +407,7 @@ namespace RestaurantManagement.Modules.Menu.Tests
             var sut = CreateSut(context, accessGuard, tenant);
 
             // Act
-            var result = await sut.DeleteAsync(userId, categoryId);
+            var result = await sut.DeleteAsync(userId, categoryId, 0);
 
             // Assert
             result.Should().BeTrue("a member who is allowed may delete a category of the organization");

@@ -60,7 +60,7 @@ public class MenuMessagesEndpointTests : IClassFixture<PostgresDatabaseFixture>
         // Arrange
         await using var factory = await CreateFactoryAsync();
         var client = AnaSignedInToCantina(factory);
-        var request = Request("PUT", $"/api/v1/menus/{DeletedMenuId}", culture, new { name = "Almoço Executivo", isActive = true });
+        var request = Request("PUT", $"/api/v1/menus/{DeletedMenuId}", culture, new { name = "Almoço Executivo", isActive = true, version = 1u });
 
         // Act
         var response = await client.SendAsync(request);
@@ -81,7 +81,7 @@ public class MenuMessagesEndpointTests : IClassFixture<PostgresDatabaseFixture>
         // Arrange
         await using var factory = await CreateFactoryAsync();
         var client = AnaSignedInToCantina(factory);
-        var request = Request(method, $"/api/v1/menu-categories/{TrattoriaPizzaCategoryId}", culture, new { name = "Pizzas Artesanais", sortOrder = 1 });
+        var request = Request(method, $"/api/v1/menu-categories/{TrattoriaPizzaCategoryId}", culture, new { name = "Pizzas Artesanais", sortOrder = 1, version = 1u });
 
         // Act
         var response = await client.SendAsync(request);
@@ -122,7 +122,7 @@ public class MenuMessagesEndpointTests : IClassFixture<PostgresDatabaseFixture>
         using var factory = new AuthApiFactory();
         var client = AnaSignedInToCantina(factory);
         var name = string.Concat(Enumerable.Repeat("Jantar de Domingo ", 6));
-        var request = Request("PUT", $"/api/v1/menus/{CantinaDinnerMenuId}", culture, new { name, isActive = true });
+        var request = Request("PUT", $"/api/v1/menus/{CantinaDinnerMenuId}", culture, new { name, isActive = true, version = 1u });
 
         // Act
         var response = await client.SendAsync(request);
@@ -163,7 +163,7 @@ public class MenuMessagesEndpointTests : IClassFixture<PostgresDatabaseFixture>
         using var factory = new AuthApiFactory();
         var client = AnaSignedInToCantina(factory);
         var description = string.Concat(Enumerable.Repeat("Massas frescas feitas na casa. ", 33));
-        var request = Request("PUT", $"/api/v1/menu-categories/{CantinaPastaCategoryId}", culture, new { name = "Massas", description, sortOrder = 2 });
+        var request = Request("PUT", $"/api/v1/menu-categories/{CantinaPastaCategoryId}", culture, new { name = "Massas", description, sortOrder = 2, version = 1u });
 
         // Act
         var response = await client.SendAsync(request);
@@ -183,7 +183,7 @@ public class MenuMessagesEndpointTests : IClassFixture<PostgresDatabaseFixture>
         using var factory = new AuthApiFactory();
         var client = AnaSignedInToCantina(factory);
         var description = new string('a', 501);
-        var request = Request("PUT", $"/api/v1/menus/{CantinaDinnerMenuId}", culture, new { name = "Jantar", description, isActive = true });
+        var request = Request("PUT", $"/api/v1/menus/{CantinaDinnerMenuId}", culture, new { name = "Jantar", description, isActive = true, version = 1u });
 
         // Act
         var response = await client.SendAsync(request);
@@ -201,7 +201,8 @@ public class MenuMessagesEndpointTests : IClassFixture<PostgresDatabaseFixture>
         await using var factory = await CreateFactoryAsync();
         var client = AnaSignedInToCantina(factory);
         var description = new string('a', 500);
-        var request = Request("PUT", $"/api/v1/menus/{CantinaDinnerMenuId}", "pt", new { name = "Jantar", description, isActive = true });
+        var version = await client.ReadVersionAsync("/api/v1/menus", CantinaDinnerMenuId);
+        var request = Request("PUT", $"/api/v1/menus/{CantinaDinnerMenuId}", "pt", new { name = "Jantar", description, isActive = true, version });
 
         // Act
         var response = await client.SendAsync(request);

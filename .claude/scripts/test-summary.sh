@@ -50,12 +50,15 @@ build() {
 # Runs one test target: failures first (capped), then the totals. Sets NO_MATCH=1 when the filter matched no test.
 run_tests() {
   local target="$1" filter="${2:-}" out code
-  local args=(test "$target" --no-build --nologo --logger "console;verbosity=normal")
+  # A test stuck for 5 minutes is stopped and named instead of blocking the run forever.
+  local args=(test "$target" --no-build --nologo --logger "console;verbosity=normal"
+    --blame-hang-timeout 5m --blame-hang-dump-type none)
   [[ -n "$filter" ]] && args+=(--filter "$filter")
   echo "== $target ${filter:+($filter)}"
   out=$(mktemp)
   dotnet "${args[@]}" 2>&1 | awk '
     /No test matches the given testcase filter/ { print "NO_MATCH"; next }
+    /inactivity time|active [Tt]est|aborted/ { sub(/^[[:space:]]+/, ""); print "  HANG: " substr($0, 1, 300); next }
     /^[[:space:]]+Passed [A-Za-z]/ { next }
     /^[[:space:]]+Failed [A-Za-z].* \[[0-9<]/ { sub(/^[[:space:]]+/, ""); sub(/ \[[^]]*\]$/, ""); print "  " $0; want_msg = 1; next }
     want_msg && /^[[:space:]]*Error Message:/ { next }

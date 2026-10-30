@@ -17,9 +17,9 @@ public class MenuUserIdentifierEndpointTests : IClassFixture<PostgresDatabaseFix
     private const string LocationId = "33333333-cccc-4ccc-8ccc-000000000001";
     private const string CategoryId = "66666666-0000-4000-8000-000000000001";
 
-    private const string MenuJson = """{ "id": "01933b2e-7c10-7a55-9d3e-5b1f0c2a4eb2", "name": "Jantar", "description": "Menu do jantar", "isActive": true }""";
+    private const string MenuJson = """{ "id": "01933b2e-7c10-7a55-9d3e-5b1f0c2a4eb2", "name": "Jantar", "description": "Menu do jantar", "isActive": true, "version": 1 }""";
     private const string CategoryJson = """{ "id": "01933b2e-7c10-7a55-9d3e-5b1f0c2a4eb3", "menuId": "55555555-0000-4000-8000-000000000001", "name": "Massas" }""";
-    private const string CategoryUpdateJson = """{ "name": "Massas" }""";
+    private const string CategoryUpdateJson = """{ "name": "Massas", "version": 1 }""";
 
     private static readonly Guid AnaId = Guid.Parse("11111111-aaaa-4aaa-8aaa-00000000000a");
     private static readonly Guid CantinaId = Guid.Parse("a1a1a1a1-0000-4000-8000-000000000001");

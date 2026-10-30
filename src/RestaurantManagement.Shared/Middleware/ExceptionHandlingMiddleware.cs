@@ -27,6 +27,13 @@ namespace RestaurantManagement.Shared.Middleware
             {
                 await _next(context);
             }
+            catch (VersionConflictException conflict)
+            {
+                _logger.LogWarning("Version conflict");
+
+                var localizer = context.RequestServices.GetRequiredService<IStringLocalizer<SharedResource>>();
+                await ProblemResponse.WriteAsync(context, ErrorCodes.VersionConflict, localizer["VersionConflict"].Value, current: conflict.Current);
+            }
             catch (BusinessException bex)
             {
                 // ✅ Business error: skip Sentry

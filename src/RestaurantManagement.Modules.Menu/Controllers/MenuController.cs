@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using Microsoft.AspNetCore.Authorization;
+using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
 using RestaurantManagement.Shared.Utils.Exceptions;
 using RestaurantManagement.Modules.Menu.Models;
@@ -46,11 +47,11 @@ namespace RestaurantManagement.Modules.Menu.Controllers
 
         [HttpDelete("{menuId}")]
         [Authorize]
-        public async Task<IActionResult> Delete(Guid menuId)
+        public async Task<IActionResult> Delete(Guid menuId, [FromQuery, Required(ErrorMessage = "RequiredAttribute_ValidationError")] uint? version)
         {
             var userId = GetCurrentUserId();
 
-            await _menuService.DeleteMenuAsync(userId, menuId);
+            await _menuService.DeleteMenuAsync(userId, menuId, version!.Value);
             return Ok(new { message = _localizer["MenuDeletedSuccessfully"].Value });
         }
 

@@ -49,9 +49,9 @@ public class MenuTenantEndpointTests : IClassFixture<PostgresDatabaseFixture>
         return factory;
     }
 
-    /// <summary>Every request carries the same JSON body; endpoints that take no body ignore it.</summary>
+    /// <summary>Every request carries the same JSON body; endpoints that take no body ignore it. A delete carries `?version=1`: the version is only checked after the menu is found.</summary>
     private static HttpRequestMessage Request(string method, string url, object body)
-        => new(new HttpMethod(method), url) { Content = JsonContent.Create(body) };
+        => new(new HttpMethod(method), method == "DELETE" ? url + "?version=1" : url) { Content = JsonContent.Create(body) };
 
     // Scenario 9
     [Theory]
@@ -66,7 +66,7 @@ public class MenuTenantEndpointTests : IClassFixture<PostgresDatabaseFixture>
         await using var factory = await CreateFactoryWithTwoOrganizationsAsync();
         var client = factory.ClientFor(AnaId, CantinaId);
         var request = Request(method, $"/api/v1/menus/{TrattoriaLunchMenuId}{pathAfterMenuId}",
-            new { name = "Cardápio Invadido", description = "Alterado por outra organização", isActive = false });
+            new { name = "Cardápio Invadido", description = "Alterado por outra organização", isActive = false, version = 1u });
 
         // Act
         var response = await client.SendAsync(request);
@@ -91,7 +91,7 @@ public class MenuTenantEndpointTests : IClassFixture<PostgresDatabaseFixture>
         // Arrange
         await using var factory = await CreateFactoryWithTwoOrganizationsAsync();
         var client = factory.ClientFor(AnaId, CantinaId);
-        var body = new { name = "Categoria Invadida", description = "Alterada", sortOrder = 9 };
+        var body = new { name = "Categoria Invadida", description = "Alterada", sortOrder = 9, version = 1u };
 
         // Act
         var response = await client.SendAsync(Request(method, $"/api/v1/menu-categories/{TrattoriaPizzaCategoryId}", body));
@@ -228,7 +228,7 @@ public class MenuTenantEndpointTests : IClassFixture<PostgresDatabaseFixture>
         // Arrange
         await using var factory = await CreateFactoryWithTwoOrganizationsAsync();
         var client = factory.ClientFor(AnaId, CantinaId);
-        var body = new { name = "Cardápio Invadido", description = "Alterado por outra organização", isActive = false, sortOrder = 1 };
+        var body = new { name = "Cardápio Invadido", description = "Alterado por outra organização", isActive = false, sortOrder = 1, version = 1u };
 
         // Act
         var otherOrganization = await client.SendAsync(Request(method, otherOrganizationUrl, body));

@@ -12,6 +12,7 @@ using RestaurantManagement.Shared.Services.Organization;
 using RestaurantManagement.Shared.Auth;
 using RestaurantManagement.Shared.Utils.Exceptions;
 using RestaurantManagement.Shared.Data.Tenancy;
+using RestaurantManagement.Shared.Data.Versioning;
 
 namespace RestaurantManagement.Modules.Menu.Services
 {
@@ -101,36 +102,39 @@ namespace RestaurantManagement.Modules.Menu.Services
 
             await transaction.CommitAsync();
 
-            return await GetMenuResponseAsync(menu.Id);
+            return (await GetMenuResponseAsync(menu.Id))!;
         }
         public async Task<MenuResponse> EditMenuAsync(Guid userId, Guid menuId, EditMenuRequest request)
         {
-            var menu = await _menuDb.Menus.FirstOrDefaultAsync(m => m.Id == menuId);
+            var menu = await _menuDb.Menus.Include(m => m.LocationMenus).FirstOrDefaultAsync(m => m.Id == menuId);
             if (menu == null)
                 throw new BusinessException(MenuErrorCodes.MenuNotFound, _localizer["MenuNotFound"].Value);
 
             await RequireManageMenuAsync(menuId);
+            VersionCheck.Require(_menuDb, menu, request.Version ?? 0, () => MapToResponse(menu));
 
             menu.Name = request.Name;
             menu.Description = request.Description;
             menu.IsActive = request.IsActive;
             menu.UpdatedAt = DateTime.UtcNow;
 
-            await _menuDb.SaveChangesAsync();
+            await VersionCheck.SaveAsync(_menuDb, async () => await CurrentMenuAsync(menuId));
 
-            return await GetMenuResponseAsync(menuId);
+            return MapToResponse(menu);
         }
 
-        public async Task DeleteMenuAsync(Guid userId, Guid menuId)
+        public async Task DeleteMenuAsync(Guid userId, Guid menuId, uint version)
         {
-            var menu = await _menuDb.Menus.FirstOrDefaultAsync(m => m.Id == menuId);
+            var menu = await _menuDb.Menus.Include(m => m.LocationMenus).FirstOrDefaultAsync(m => m.Id == menuId);
             if (menu == null)
                 throw new BusinessException(MenuErrorCodes.MenuNotFound, _localizer["MenuNotFound"].Value);
 
             await RequireManageMenuAsync(menuId);
 
+            VersionCheck.Require(_menuDb, menu, version, () => MapToResponse(menu));
+
             _menuDb.Menus.Remove(menu);
-            await _menuDb.SaveChangesAsync();
+            await VersionCheck.SaveAsync(_menuDb, async () => await CurrentMenuAsync(menuId));
         }
 
         public async Task AttachMenuToLocationAsync(Guid userId, Guid menuId, Guid locationId)
@@ -191,15 +195,7 @@ namespace RestaurantManagement.Modules.Menu.Services
                 .Include(m => m.LocationMenus)
                 .ToListAsync();
 
-            return menus.Select(m => new MenuResponse
-            {
-                Id = m.Id,
-                OrganizationId = m.OrganizationId,
-                Name = m.Name,
-                Description = m.Description,
-                IsActive = m.IsActive,
-                LocationIds = m.LocationMenus.Select(lm => lm.LocationId).ToList()
-            }).ToList();
+            return menus.Select(MapToResponse).ToList();
         }
 
         public async Task<List<MenuResponse>> GetMenusByLocationAsync(Guid userId, Guid locationId)
@@ -217,15 +213,7 @@ namespace RestaurantManagement.Modules.Menu.Services
                 .Select(lm => lm.Menu)
                 .ToListAsync();
 
-            return menus.Select(m => new MenuResponse
-            {
-                Id = m.Id,
-                OrganizationId = m.OrganizationId,
-                Name = m.Name,
-                Description = m.Description,
-                IsActive = m.IsActive,
-                LocationIds = m.LocationMenus.Select(lm => lm.LocationId).ToList()
-            }).ToList();
+            return menus.Select(MapToResponse).ToList();
         }
 
         private async Task RequireManageMenuAsync(Guid menuId)
@@ -243,16 +231,30 @@ namespace RestaurantManagement.Modules.Menu.Services
                 ?? throw new BusinessException(ErrorCodes.OrganizationRequired, _localizer["OrganizationRequired"].Value);
         }
 
-        private async Task<MenuResponse> GetMenuResponseAsync(Guid menuId)
+        private async Task<MenuResponse?> GetMenuResponseAsync(Guid menuId)
         {
             var menu = await _menuDb.Menus
                 .Include(m => m.LocationMenus)
                 .FirstOrDefaultAsync(m => m.Id == menuId);
 
-            if (menu == null) return null!;
+            if (menu == null) return null;
 
+            return MapToResponse(menu);
+        }
+
+        // The tracked menu may be stale after a lost race, so read the stored one again; gone means 404.
+        private async Task<object> CurrentMenuAsync(Guid menuId)
+        {
+            _menuDb.ChangeTracker.Clear();
+            return await GetMenuResponseAsync(menuId)
+                ?? throw new BusinessException(MenuErrorCodes.MenuNotFound, _localizer["MenuNotFound"].Value);
+        }
+
+        private static MenuResponse MapToResponse(Entities.Menu menu)
+        {
             return new MenuResponse
             {
+                Version = menu.Version,
                 Id = menu.Id,
                 OrganizationId = menu.OrganizationId,
                 Name = menu.Name,

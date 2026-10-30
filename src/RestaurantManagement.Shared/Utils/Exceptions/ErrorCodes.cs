@@ -60,6 +60,9 @@ namespace RestaurantManagement.Shared.Utils.Exceptions
         // "id.already_used", 409
         public static ErrorCode IdAlreadyUsed { get; } = new("id.already_used", 409);
 
+        // "version.conflict", 409
+        public static ErrorCode VersionConflict { get; } = new("version.conflict", 409);
+
         // "http.bad_request", 400
         public static ErrorCode HttpBadRequest { get; } = new("http.bad_request", 400);
 

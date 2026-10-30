@@ -38,7 +38,7 @@ namespace RestaurantManagement.Modules.Organization.Tests
             ["edit to TemporarilyClosed"] = (sut, locationId) => sut.EditLocationAsync(AnaId, locationId, EditRequest(LocationStatus.TemporarilyClosed)),
             ["edit keeping Active"] = (sut, locationId) => sut.EditLocationAsync(AnaId, locationId, EditRequest(LocationStatus.Active)),
             ["edit keeping Closed"] = (sut, locationId) => sut.EditLocationAsync(AnaId, locationId, EditRequest(LocationStatus.Closed)),
-            ["delete"] = (sut, locationId) => sut.DeleteLocationAsync(AnaId, locationId)
+            ["delete"] = (sut, locationId) => sut.DeleteLocationAsync(AnaId, locationId, 0)
         };
 
         private static EditLocationRequest EditRequest(LocationStatus status) => new()
@@ -136,7 +136,7 @@ namespace RestaurantManagement.Modules.Organization.Tests
             var sut = CreateSut(database, "Owner", auditLog, logger);
 
             // Act
-            var delete = () => sut.DeleteLocationAsync(AnaId, CantinaBatelId);
+            var delete = () => sut.DeleteLocationAsync(AnaId, CantinaBatelId, 0);
 
             // Assert
             await Should.NotThrowAsync(delete);

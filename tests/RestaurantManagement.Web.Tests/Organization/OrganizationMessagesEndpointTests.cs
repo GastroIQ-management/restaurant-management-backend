@@ -40,10 +40,10 @@ public class OrganizationMessagesEndpointTests : IDisposable
         """{ "name": "Pizzaria Vila Madalena", "currency": "BRL", "primaryColor": "vermelho" }""",
         "PrimaryColor must be in hex format (#RRGGBB).")]
     [InlineData("PUT", EditUrl, "pt",
-        """{ "name": "Cantina da Nonna", "accentColor": "#12345G", "serviceChargeRate": 10, "discountApprovalLimit": 15.5, "businessDayCutoff": "05:30" }""",
+        """{ "name": "Cantina da Nonna", "version": 1, "accentColor": "#12345G", "serviceChargeRate": 10, "discountApprovalLimit": 15.5, "businessDayCutoff": "05:30" }""",
         "O campo AccentColor deve estar no formato hexadecimal (#RRGGBB).")]
     [InlineData("PUT", EditUrl, "en",
-        """{ "name": "Cantina da Nonna", "accentColor": "#12345G", "serviceChargeRate": 10, "discountApprovalLimit": 15.5, "businessDayCutoff": "05:30" }""",
+        """{ "name": "Cantina da Nonna", "version": 1, "accentColor": "#12345G", "serviceChargeRate": 10, "discountApprovalLimit": 15.5, "businessDayCutoff": "05:30" }""",
         "AccentColor must be in hex format (#RRGGBB).")]
     [Trait("Rule", "OR24")]
     public async Task OrganizationRequest_InvalidColor_ReturnsLocalizedHexColorError(string method, string url, string culture, string body, string expected)
@@ -88,13 +88,13 @@ public class OrganizationMessagesEndpointTests : IDisposable
         """{ "name": "Pizzaria Vila Madalena", "currency": "BRL", "logoUrl": "logo-pizzaria" }""",
         "O campo LogoUrl não é uma URL válida.")]
     [InlineData("PUT", EditUrl,
-        """{ "name": "Cantina da Nonna", "serviceChargeRate": 150, "discountApprovalLimit": 15.5, "businessDayCutoff": "05:30" }""",
+        """{ "name": "Cantina da Nonna", "version": 1, "serviceChargeRate": 150, "discountApprovalLimit": 15.5, "businessDayCutoff": "05:30" }""",
         "O campo ServiceChargeRate deve estar entre 0 e 100.")]
     [InlineData("PUT", EditUrl,
-        """{ "name": "Cantina da Nonna", "serviceChargeRate": 10, "discountApprovalLimit": 12.345, "businessDayCutoff": "05:30" }""",
+        """{ "name": "Cantina da Nonna", "version": 1, "serviceChargeRate": 10, "discountApprovalLimit": 12.345, "businessDayCutoff": "05:30" }""",
         "O campo DiscountApprovalLimit permite no máximo 2 casas decimais.")]
     [InlineData("PUT", EditUrl,
-        """{ "name": "Cantina da Nonna", "serviceChargeRate": 10, "discountApprovalLimit": 15.5, "businessDayCutoff": "25:00" }""",
+        """{ "name": "Cantina da Nonna", "version": 1, "serviceChargeRate": 10, "discountApprovalLimit": 15.5, "businessDayCutoff": "25:00" }""",
         "O campo BusinessDayCutoff deve estar no formato HH:mm.")]
     [Trait("Rule", "OR23")]
     public async Task OrganizationRequest_InvalidSettingInPortuguese_ReturnsPortugueseFieldError(string method, string url, string body, string expected)
@@ -120,7 +120,7 @@ public class OrganizationMessagesEndpointTests : IDisposable
     {
         // Arrange
         var client = AnaSignedInToCantina();
-        var body = JsonNode.Parse("""{ "name": "Cantina da Nonna", "serviceChargeRate": 10, "discountApprovalLimit": 15.5, "businessDayCutoff": "05:30" }""")!.AsObject();
+        var body = JsonNode.Parse("""{ "name": "Cantina da Nonna", "version": 1, "serviceChargeRate": 10, "discountApprovalLimit": 15.5, "businessDayCutoff": "05:30" }""")!.AsObject();
         body[field] = string.Concat(Enumerable.Repeat("Cozinha italiana de família. ", 40))[..length];
         var request = Request("PUT", EditUrl, culture, body.ToJsonString());
 

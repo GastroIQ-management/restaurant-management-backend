@@ -386,6 +386,12 @@ accented or non-Latin characters may not fit (R6, T7; bcrypt limit, ASVS V6.2.9)
 | T156 | A member without Members Manage at the invited location creates an invitation with a taken ID | 403, not 409: the delegation rules come first | ✅ | `InvitationClientIdEndpointTests.CreateInvitation_MemberWithoutMembersManageSendsTakenId_ReturnsForbiddenNotConflict` |
 | T157 | Create an invitation with a new `id` | 200; the invitation is stored under that ID, the response carries it and the accept token stays separate from the ID | ✅ | `InvitationClientIdEndpointTests.CreateInvitation_NewId_StoresInvitationUnderThatId` |
 | T158 | A role create is retried with the same ID and name | 409 `id.already_used`, not `role.name_already_used`; no second role is stored and the first keeps its levels | ✅ | `RoleClientIdRetryEndpointTests.CreateRole_RetriedWithTheSameIdAndName_ReturnsIdConflictAndCreatesNothingNew` |
+| T159 | Rename a role or update its levels without a version | 400 on the version field, translated; name and levels are unchanged | ✅ | `RoleVersionEndpointTests.EditRole_VersionMissing_ReturnsBadRequestOnTheVersionFieldAndChangesNothing` |
+| T160 | Rename a role (also to its own name) or update its levels with an old version | 409 `version.conflict` with the current role, levels included, under `current`; name and levels are unchanged and no audit entry is written | ✅ | `RoleVersionEndpointTests.EditRole_VersionOfAnEarlierRead_ReturnsConflictWithTheCurrentRoleAndAppliesNothing` |
+| T161 | Rename a role or update its levels with the current version | 200; the response carries a new `version` (a levels change changes it too) | ✅ | `RoleVersionEndpointTests.EditRole_CurrentVersion_SavesAndReturnsANewVersion` |
+| T162 | Rename or update the levels of another organization's role with its real version | 404 `role.not_found`, never 409; nothing about the role in the body | ✅ | `RoleVersionEndpointTests.EditRole_RoleOfAnotherOrganizationWithItsRealVersion_ReturnsNotFoundAndRevealsNothing` |
+| T163 | An Admin the role rules refuse edits or renames a role with a stale version | 403, not 409; the current role is not shown | ✅ | `RoleVersionEndpointTests.EditRole_AdminTheRoleRulesRefuseSendingAStaleVersion_ReturnsForbiddenNotConflict` |
+| T164 | Role list and single role | Both carry the same stored `version` | ✅ | `RoleVersionEndpointTests.RoleResponses_ListAndGet_CarryTheSameVersion` |
 
 ## 11. Schema, migration and wiring tests
 These protect the database and the app setup rather than a rule users meet. They are listed so

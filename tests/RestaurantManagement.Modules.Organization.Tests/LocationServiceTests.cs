@@ -140,7 +140,7 @@ namespace RestaurantManagement.Modules.Organization.Tests
             var sut = CreateSut(database, organizationId, TestAccess.Guard(userId, organizationId, grid, batelId));
 
             // Act
-            var act = () => operation == "create" ? sut.CreateLocationAsync(userId, ValidCreateRequest) : sut.DeleteLocationAsync(userId, batelId);
+            var act = () => operation == "create" ? sut.CreateLocationAsync(userId, ValidCreateRequest) : sut.DeleteLocationAsync(userId, batelId, 0);
 
             // Assert
             var exception = await act.ShouldThrowAsync<BusinessException>();
@@ -256,7 +256,7 @@ namespace RestaurantManagement.Modules.Organization.Tests
             var sut = CreateSut(database, organizationId, TestAccess.OwnerGuard(userId, organizationId));
 
             // Act
-            await sut.DeleteLocationAsync(userId, locationId);
+            await sut.DeleteLocationAsync(userId, locationId, 0);
 
             // Assert
             using var verifyContext = database.CreateContext(TestTenant.Of(organizationId));

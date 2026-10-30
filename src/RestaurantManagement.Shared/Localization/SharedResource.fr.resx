@@ -267,4 +267,7 @@
   <data name="HttpTooManyRequestsTitle" xml:space="preserve">
     <value>Trop de requêtes. Réessayez plus tard.</value>
   </data>
+  <data name="VersionConflict" xml:space="preserve">
+    <value>Cet enregistrement a été modifié par quelqu'un d'autre. Vérifiez la version actuelle et réessayez.</value>
+  </data>
 </root>

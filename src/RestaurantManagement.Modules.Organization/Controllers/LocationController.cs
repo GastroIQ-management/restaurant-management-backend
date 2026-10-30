@@ -1,4 +1,5 @@
 using RestaurantManagement.Shared;
+using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
@@ -46,6 +47,13 @@ namespace RestaurantManagement.Modules.Organization.Controllers
         [HttpPut("{locationId:guid}")]
         public async Task<ActionResult<LocationResponse>> EditLocation(Guid locationId, [FromBody] EditLocationRequest request)
         {
+            // Checked here, not with [Required] on the request, so the request's own field rules stay valid without a version.
+            if (request.Version is null)
+            {
+                ModelState.AddModelError(nameof(request.Version), _localizer["RequiredAttribute_ValidationError", nameof(request.Version)]);
+                return ValidationProblem(ModelState);
+            }
+
             var userId = GetCurrentUserId();
             var response = await _locationService.EditLocationAsync(userId, locationId, request);
             return Ok(response);
@@ -53,10 +61,10 @@ namespace RestaurantManagement.Modules.Organization.Controllers
 
         // DELETE api/v1/locations/{locationId}
         [HttpDelete("{locationId:guid}")]
-        public async Task<IActionResult> DeleteLocation(Guid locationId)
+        public async Task<IActionResult> DeleteLocation(Guid locationId, [FromQuery, Required(ErrorMessage = "RequiredAttribute_ValidationError")] uint? version)
         {
             var userId = GetCurrentUserId();
-            await _locationService.DeleteLocationAsync(userId, locationId);
+            await _locationService.DeleteLocationAsync(userId, locationId, version!.Value);
             return NoContent();
         }
 
