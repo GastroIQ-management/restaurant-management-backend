@@ -1,12 +1,15 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using RestaurantManagement.Shared.Data.Entities;
+using RestaurantManagement.Shared.Data.Versioning;
 
 namespace RestaurantManagement.Modules.Menu.Entities
 {
     [Table("menu_categories")]
-    public class MenuCategory : TenantEntity
+    public class MenuCategory : TenantEntity, IVersionedEntity
     {
+        public uint Version { get; set; }
+
         [Required]
         [Column("menu_id")]
         public Guid MenuId { get; set; }
