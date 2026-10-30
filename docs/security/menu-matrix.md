@@ -102,6 +102,9 @@ A menu or category change carries the version the caller read. Order of answers:
 | M70 | Delete a category with the current version | 204; the category is gone | ✅ | `MenuCategoryVersionEndpointTests.DeleteCategory_CurrentVersion_DeletesTheCategory` |
 | M71 | Update or delete another organization's category with its real version | 404 `menu_category.not_found`, never 409; nothing about the category in the body | ✅ | `MenuCategoryVersionEndpointTests.CategoryChange_CategoryOfAnotherOrganizationWithItsRealVersion_ReturnsNotFoundAndRevealsNothing` |
 | M72 | A member with Menus Read only updates or deletes a category with a stale version | 403, not 409; the current category is not shown | ✅ | `MenuCategoryVersionEndpointTests.CategoryChange_MemberWithMenusReadOnlySendingAStaleVersion_ReturnsForbiddenNotConflict` |
+| M73 | A member without Menus Manage sends an `Idempotency-Key` on a menu create | 403; no key is stored | ❌ | `MenuIdempotencyEndpointTests.CreateMenu_MemberWithoutMenusManageSendsAKey_ReturnsForbiddenAndStoresNoKey` |
+| M74 | A menu create with a reused menu ID and a key | 409 `id.already_used`; the key is released and can run a corrected request | ✅ | `MenuIdempotencyEndpointTests.CreateMenu_ReusedMenuIdWithAKey_ReturnsConflictAndReleasesTheKey` |
+| M75 | A category create sent twice with one key | One category; the replay keeps 201 and `Location` | ❌ | `MenuIdempotencyEndpointTests.CreateMenuCategory_SameKeyTwice_CreatesOneCategoryAndReplaysCreatedWithLocation` |
 
 ## Open questions (no row until decided)
 - **Categories of an unknown menu or location:** the lists answer 200 with an empty list, while

@@ -392,6 +392,8 @@ accented or non-Latin characters may not fit (R6, T7; bcrypt limit, ASVS V6.2.9)
 | T162 | Rename or update the levels of another organization's role with its real version | 404 `role.not_found`, never 409; nothing about the role in the body | ✅ | `RoleVersionEndpointTests.EditRole_RoleOfAnotherOrganizationWithItsRealVersion_ReturnsNotFoundAndRevealsNothing` |
 | T163 | An Admin the role rules refuse edits or renames a role with a stale version | 403, not 409; the current role is not shown | ✅ | `RoleVersionEndpointTests.EditRole_AdminTheRoleRulesRefuseSendingAStaleVersion_ReturnsForbiddenNotConflict` |
 | T164 | Role list and single role | Both carry the same stored `version` | ✅ | `RoleVersionEndpointTests.RoleResponses_ListAndGet_CarryTheSameVersion` |
+| T165 | `logout-all` (and the other session actions) sent twice with one key | Runs both times and stores no key, so no cookie answer is ever stored or replayed | ❌ | `IdentityIdempotencyEndpointTests.LogoutAll_SameKeyTwice_RunsBothTimesAndStoresNoKey` |
+| T166 | Invitation create sent twice with one key | One invitation and one email; identical answers | ❌ | `IdentityIdempotencyEndpointTests.CreateInvitation_SameKeyTwice_StoresOneInvitationSendsOneEmailAndAnswersTheSame` |
 
 ## 11. Schema, migration and wiring tests
 These protect the database and the app setup rather than a rule users meet. They are listed so
