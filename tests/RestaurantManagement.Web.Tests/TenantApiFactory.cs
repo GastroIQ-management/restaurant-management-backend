@@ -41,14 +41,17 @@ public sealed class TenantApiFactory : AuthApiFactory
     private TenantApiFactory(string connectionString) => _connectionString = connectionString;
 
     public static async Task<TenantApiFactory> CreateAsync(PostgresDatabaseFixture postgres)
+        => new(await postgres.CreateDatabaseFromTemplateAsync("test_migrated_template", MigrateAsync));
+
+    // Runs once per test run; every test database is then a copy of the migrated template.
+    private static async Task MigrateAsync(string connectionString)
     {
-        var factory = new TenantApiFactory(await postgres.CreateDatabaseAsync());
+        await using var factory = new TenantApiFactory(connectionString);
         using var scope = factory.Services.CreateScope();
         await scope.ServiceProvider.GetRequiredService<IdentityDbContext>().Database.MigrateAsync();
         await scope.ServiceProvider.GetRequiredService<OrganizationDbContext>().Database.MigrateAsync();
         await scope.ServiceProvider.GetRequiredService<MenuDbContext>().Database.MigrateAsync();
         await scope.ServiceProvider.GetRequiredService<AuditLogDbContext>().Database.MigrateAsync();
-        return factory;
     }
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
