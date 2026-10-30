@@ -44,7 +44,7 @@ returns the new version · #6 the OpenAPI (API description) document shows the `
 - [x] T3 — Menu category update and delete check the version
 - [x] T4 — Location edit and delete check the version
 - [x] T5 — Organization edit checks the version
-- [ ] T6 — Role rename and levels update check the version
+- [x] T6 — Role rename and levels update check the version
 
 ## Assumptions
 - Updates send `version` in the JSON body; deletes send it as a required `?version=` query parameter (no body on DELETE, no `If-Match` header) — both appear in the OpenAPI document; a missing version answers 400, translated (not launched, so no fallback); existing tests that edit or delete get a version in step 3.

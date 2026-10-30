@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 using RestaurantManagement.Shared.Models;
 
@@ -17,13 +18,15 @@ namespace RestaurantManagement.Modules.Identity.Models.Roles
 
     public class UpdateRoleLevelsRequest
     {
-        public uint Version { get; set; }
+        [Required(ErrorMessage = "RequiredAttribute_ValidationError")]
+        public uint? Version { get; set; }
         public Dictionary<string, string> Levels { get; set; } = new();
     }
 
     public class RenameRoleRequest
     {
-        public uint Version { get; set; }
+        [Required(ErrorMessage = "RequiredAttribute_ValidationError")]
+        public uint? Version { get; set; }
         public string Name { get; set; } = string.Empty;
     }
 

@@ -7,6 +7,7 @@ using RestaurantManagement.Modules.Identity.Data;
 using RestaurantManagement.Modules.Identity.Entities.Roles;
 using RestaurantManagement.Modules.Identity.Models.Roles;
 using RestaurantManagement.Shared.Data.Tenancy;
+using RestaurantManagement.Shared.Data.Versioning;
 using RestaurantManagement.Shared;
 using RestaurantManagement.Shared.Auth;
 using RestaurantManagement.Shared.Services.AuditLog;
@@ -90,10 +91,13 @@ namespace RestaurantManagement.Modules.Identity.Services.Roles
             var proposed = InvitationGrids.ParseLevels(request.Levels, _localizer);
             var current = stored.ToDictionary(l => l.Module, l => l.Level);
             await _rules.RequireAsync(current, proposed);
+            VersionCheck.Require(_db, role, request.Version ?? 0, () => MapToResponse(role, stored));
 
             var before = DescribeLevels(current);
             StoreLevels(role.Id, organizationId, stored, proposed);
-            await SaveRoleAsync();
+            // Level rows alone would leave the role's version unchanged.
+            role.UpdatedAt = DateTime.UtcNow;
+            await SaveRoleAsync(organizationId, role.Id);
 
             var after = DescribeLevels(proposed);
             if (!before.SequenceEqual(after))
@@ -108,8 +112,9 @@ namespace RestaurantManagement.Modules.Identity.Services.Roles
             var organizationId = RequireOrganizationId();
             var (role, levels) = await LoadRoleAsync(roleId, organizationId);
             var name = RequireValidName(request.Name);
-            await RequireNameFreeAsync(name, organizationId, role.Id);
             await _rules.RequireAsync(levels.ToDictionary(l => l.Module, l => l.Level), new Dictionary<AccessModule, AccessLevel>());
+            VersionCheck.Require(_db, role, request.Version ?? 0, () => MapToResponse(role, levels));
+            await RequireNameFreeAsync(name, organizationId, role.Id);
 
             var oldName = role.Name;
             if (oldName == name)
@@ -117,7 +122,7 @@ namespace RestaurantManagement.Modules.Identity.Services.Roles
 
             role.Name = name;
             role.UpdatedAt = DateTime.UtcNow;
-            await SaveRoleAsync();
+            await SaveRoleAsync(organizationId, role.Id);
             await RecordChangeAsync(AuditActions.RoleRenamed, role.Id,
                 JsonSerializer.Serialize(new { Name = oldName }), JsonSerializer.Serialize(new { Name = name }));
             return MapToResponse(role, levels);
@@ -156,6 +161,14 @@ namespace RestaurantManagement.Modules.Identity.Services.Roles
             return (role, levels);
         }
 
+        // The tracked rows may be stale after a lost race, so read the stored ones again.
+        private async Task<object> CurrentRoleAsync(Guid organizationId, Guid roleId)
+        {
+            _db.ChangeTracker.Clear();
+            var (role, levels) = await LoadRoleAsync(roleId, organizationId);
+            return MapToResponse(role, levels);
+        }
+
         private string RequireValidName(string? rawName)
         {
             var name = (rawName ?? string.Empty).Trim();
@@ -184,11 +197,14 @@ namespace RestaurantManagement.Modules.Identity.Services.Roles
         }
 
         // The index is the real guard against two simultaneous creates; the check above is a fast path.
-        private async Task SaveRoleAsync()
+        private async Task SaveRoleAsync(Guid? organizationId = null, Guid? roleId = null)
         {
             try
             {
-                await _db.SaveChangesAsync();
+                if (organizationId is null || roleId is null)
+                    await _db.SaveChangesAsync();
+                else
+                    await VersionCheck.SaveAsync(_db, async () => await CurrentRoleAsync(organizationId.Value, roleId.Value));
             }
             catch (DbUpdateException ex) when (IsDuplicateNameViolation(ex))
             {
@@ -228,6 +244,7 @@ namespace RestaurantManagement.Modules.Identity.Services.Roles
             var stored = levels.ToDictionary(l => l.Module, l => l.Level);
             return new RoleResponse
             {
+                Version = role.Version,
                 Id = role.Id,
                 Name = role.Name,
                 Levels = Enum.GetValues<AccessModule>().ToDictionary(m => m.ToString(), m => stored.GetValueOrDefault(m, AccessLevel.None).ToString())

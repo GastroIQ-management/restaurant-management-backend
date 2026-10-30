@@ -4,6 +4,7 @@ using RestaurantManagement.Modules.Identity.Entities.Members;
 using RestaurantManagement.Modules.Identity.Entities.Passwords;
 using RestaurantManagement.Modules.Identity.Entities.Registration;
 using RestaurantManagement.Modules.Identity.Entities.Roles;
+using RestaurantManagement.Shared.Data.Versioning;
 using RestaurantManagement.Modules.Identity.Entities.Sessions;
 using RestaurantManagement.Modules.Identity.Entities.Lockout;
 using RestaurantManagement.Modules.Identity.Entities.Users;
@@ -193,6 +194,8 @@ namespace RestaurantManagement.Modules.Identity.Data
                 entity.HasIndex(f => f.FailedAt);
                 entity.Property(f => f.IpAddress).IsRequired().HasMaxLength(LoginFailure.IpAddressMaxLength);
             });
+
+            modelBuilder.ApplyVersionTokens(Database);
 
             base.OnModelCreating(modelBuilder);
         }
