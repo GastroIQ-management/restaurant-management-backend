@@ -41,7 +41,7 @@
 - [x] T4 — Web wiring, OpenAPI header and coverage check
 - [x] T5 — Menu writes accept the key
 - [x] T6 — Organization writes accept the key
-- [ ] T7 — Identity writes accept the key
+- [x] T7 — Identity writes accept the key
 
 ## Assumptions
 - Each module keeps its own key table and saves the key in its own transaction, so it stays correct when modules get separate databases. A key reused on another module's endpoint counts as new there: no 422 across modules — keys are random, so only a client bug reuses one.
