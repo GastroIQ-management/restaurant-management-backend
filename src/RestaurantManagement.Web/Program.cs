@@ -189,6 +189,8 @@ builder.Services.AddDbContext<OrganizationDbContext>((serviceProvider, options) 
     options.UseNpgsql(connectionString).UseSnakeCaseNamingConvention()
         .AddInterceptors(serviceProvider.GetRequiredService<AuditSaveChangesInterceptor>()));
 
+builder.Services.AddIdempotencyKeyStore<OrganizationDbContext>(typeof(RestaurantManagement.Modules.Organization.Controllers.OrganizationController).Assembly);
+
 builder.Services.AddAuditLog((sp, options) => options.UseNpgsql(connectionString).UseSnakeCaseNamingConvention()
     .AddInterceptors(sp.GetRequiredService<AuditSaveChangesInterceptor>()));
 

@@ -40,7 +40,7 @@
 - [x] T3 — Shared write filter: check, reserve, replay, save with the write
 - [x] T4 — Web wiring, OpenAPI header and coverage check
 - [x] T5 — Menu writes accept the key
-- [ ] T6 — Organization writes accept the key
+- [x] T6 — Organization writes accept the key
 - [ ] T7 — Identity writes accept the key
 
 ## Assumptions
