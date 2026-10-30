@@ -1,4 +1,6 @@
+using System.Runtime.CompilerServices;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 
 namespace RestaurantManagement.Shared.Data.Idempotency
 {
@@ -8,19 +10,104 @@ namespace RestaurantManagement.Shared.Data.Idempotency
     /// </summary>
     public sealed class JoinableTransaction : IAsyncDisposable
     {
-        /// <summary>True when the transaction was already open, so commit and rollback belong to whoever opened it.</summary>
-        public bool IsJoined => throw new NotImplementedException();
+        // The undo steps belong to the transaction, not to a handle, so owner and joined handles share them.
+        private static readonly ConditionalWeakTable<IDbContextTransaction, UndoSteps> StepsByTransaction = new();
 
-        public static Task<JoinableTransaction> BeginOrJoinAsync(DbContext context, CancellationToken cancellationToken = default)
-            => throw new NotImplementedException();
+        private readonly IDbContextTransaction _transaction;
+        private readonly UndoSteps _steps;
+        private bool _ended;
+
+        private JoinableTransaction(IDbContextTransaction transaction, bool isJoined)
+        {
+            _transaction = transaction;
+            IsJoined = isJoined;
+            _steps = StepsByTransaction.GetOrCreateValue(transaction);
+        }
+
+        /// <summary>True when the transaction was already open, so commit and rollback belong to whoever opened it.</summary>
+        public bool IsJoined { get; }
+
+        public static async Task<JoinableTransaction> BeginOrJoinAsync(DbContext context, CancellationToken cancellationToken = default)
+        {
+            var open = context.Database.CurrentTransaction;
+            return open is not null
+                ? new JoinableTransaction(open, isJoined: true)
+                : new JoinableTransaction(await context.Database.BeginTransactionAsync(cancellationToken), isJoined: false);
+        }
 
         /// <summary>Registers a step that undoes a change made outside this context, run once if the transaction does not commit.</summary>
-        public void OnNotCommitted(Func<CancellationToken, Task> undo) => throw new NotImplementedException();
+        public void OnNotCommitted(Func<CancellationToken, Task> undo) => _steps.Add(undo);
 
-        public Task CommitAsync(CancellationToken cancellationToken = default) => throw new NotImplementedException();
+        public async Task CommitAsync(CancellationToken cancellationToken = default)
+        {
+            if (IsJoined || _ended)
+                return;
 
-        public Task RollbackAsync(CancellationToken cancellationToken = default) => throw new NotImplementedException();
+            try
+            {
+                await _transaction.CommitAsync(cancellationToken);
+                _ended = true;
+                _steps.Discard();
+            }
+            catch
+            {
+                await EndWithoutCommitAsync(cancellationToken);
+                throw;
+            }
+        }
 
-        public ValueTask DisposeAsync() => throw new NotImplementedException();
+        public async Task RollbackAsync(CancellationToken cancellationToken = default)
+        {
+            if (IsJoined || _ended)
+                return;
+
+            await EndWithoutCommitAsync(cancellationToken);
+        }
+
+        public async ValueTask DisposeAsync()
+        {
+            if (IsJoined)
+                return;
+
+            if (!_ended)
+                await EndWithoutCommitAsync(CancellationToken.None);
+            await _transaction.DisposeAsync();
+        }
+
+        private async Task EndWithoutCommitAsync(CancellationToken cancellationToken)
+        {
+            _ended = true;
+            try
+            {
+                await _transaction.RollbackAsync(cancellationToken);
+            }
+            catch (Exception) when (!cancellationToken.IsCancellationRequested)
+            {
+                // The transaction is already unusable (for example a failed commit); disposing it discards the work.
+            }
+
+            // The undo must run even when the request was cancelled.
+            await _steps.RunOnceAsync();
+        }
+
+        private sealed class UndoSteps
+        {
+            private readonly List<Func<CancellationToken, Task>> _undo = new();
+            private bool _done;
+
+            public void Add(Func<CancellationToken, Task> step) => _undo.Add(step);
+
+            public void Discard() => _done = true;
+
+            public async Task RunOnceAsync()
+            {
+                if (_done)
+                    return;
+
+                _done = true;
+                foreach (var step in _undo)
+                    await step(CancellationToken.None);
+            }
+        }
     }
 }

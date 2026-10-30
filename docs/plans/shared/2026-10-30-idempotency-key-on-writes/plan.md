@@ -36,7 +36,7 @@
 
 ## Checklist
 - [x] T1 — Shared key table mapping, store, settings, purge job and error codes
-- [ ] T2 — Shared transaction a service can join, with an undo step when it does not commit
+- [x] T2 — Shared transaction a service can join, with an undo step when it does not commit
 - [ ] T3 — Shared write filter: check, reserve, replay, save with the write
 - [ ] T4 — Web wiring, OpenAPI header and coverage check
 - [ ] T5 — Menu writes accept the key
