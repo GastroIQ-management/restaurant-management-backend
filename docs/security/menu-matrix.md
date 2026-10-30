@@ -88,14 +88,14 @@ A menu or category change carries the version the caller read. Order of answers:
 
 | ID | Case | Expected | Status | Test |
 |---|---|---|---|---|
-| M59 | Edit or delete a menu without a version | 400 on the version field, translated; the menu is unchanged | ❌ | `MenuVersionEndpointTests.MenuChange_VersionMissing_ReturnsBadRequestOnTheVersionFieldAndChangesNothing` |
-| M60 | Edit a menu with a version an earlier read left behind | 409 `version.conflict` with the current menu under `current`; the first change is kept | ❌ | `MenuVersionEndpointTests.EditMenu_VersionOfAnEarlierRead_ReturnsConflictWithTheCurrentMenuAndKeepsTheFirstChange` |
-| M61 | Delete a menu with an old version | 409 with the current menu; the menu and its categories are still stored | ❌ | `MenuVersionEndpointTests.DeleteMenu_VersionOfAnEarlierRead_ReturnsConflictAndKeepsTheMenuAndItsCategories` |
-| M62 | Edit a menu with the current version | 200; the response carries a new `version`, the stored one | ❌ | `MenuVersionEndpointTests.EditMenu_CurrentVersion_SavesAndReturnsANewVersion` |
-| M63 | Delete a menu with the current version | 200; the menu is gone | ❌ | `MenuVersionEndpointTests.DeleteMenu_CurrentVersion_DeletesTheMenu` |
-| M64 | Edit or delete another organization's menu with its real version | 404 `menu.not_found`, never 409; nothing about the menu in the body | ❌ | `MenuVersionEndpointTests.MenuChange_MenuOfAnotherOrganizationWithItsRealVersion_ReturnsNotFoundAndRevealsNothing` |
-| M65 | A member with Menus Read only edits or deletes a menu with a stale version | 403, not 409: the access check comes first and the current menu is not shown | ❌ | `MenuVersionEndpointTests.MenuChange_MemberWithMenusReadOnlySendingAStaleVersion_ReturnsForbiddenNotConflict` |
-| M66 | Menu list, list by location and create | Every menu carries a `version` | ❌ | `MenuVersionEndpointTests.MenuResponses_ListByLocationAndCreate_CarryTheVersion` |
+| M59 | Edit or delete a menu without a version | 400 on the version field, translated; the menu is unchanged | ✅ | `MenuVersionEndpointTests.MenuChange_VersionMissing_ReturnsBadRequestOnTheVersionFieldAndChangesNothing` |
+| M60 | Edit a menu with a version an earlier read left behind | 409 `version.conflict` with the current menu under `current`; the first change is kept | ✅ | `MenuVersionEndpointTests.EditMenu_VersionOfAnEarlierRead_ReturnsConflictWithTheCurrentMenuAndKeepsTheFirstChange` |
+| M61 | Delete a menu with an old version | 409 with the current menu; the menu and its categories are still stored | ✅ | `MenuVersionEndpointTests.DeleteMenu_VersionOfAnEarlierRead_ReturnsConflictAndKeepsTheMenuAndItsCategories` |
+| M62 | Edit a menu with the current version | 200; the response carries a new `version`, the stored one | ✅ | `MenuVersionEndpointTests.EditMenu_CurrentVersion_SavesAndReturnsANewVersion` |
+| M63 | Delete a menu with the current version | 200; the menu is gone | ✅ | `MenuVersionEndpointTests.DeleteMenu_CurrentVersion_DeletesTheMenu` |
+| M64 | Edit or delete another organization's menu with its real version | 404 `menu.not_found`, never 409; nothing about the menu in the body | ✅ | `MenuVersionEndpointTests.MenuChange_MenuOfAnotherOrganizationWithItsRealVersion_ReturnsNotFoundAndRevealsNothing` |
+| M65 | A member with Menus Read only edits or deletes a menu with a stale version | 403, not 409: the access check comes first and the current menu is not shown | ✅ | `MenuVersionEndpointTests.MenuChange_MemberWithMenusReadOnlySendingAStaleVersion_ReturnsForbiddenNotConflict` |
+| M66 | Menu list, list by location and create | Every menu carries a `version` | ✅ | `MenuVersionEndpointTests.MenuResponses_ListByLocationAndCreate_CarryTheVersion` |
 | M67 | Update or delete a category without a version | 400 on the version field, translated; the category is unchanged | ❌ | `MenuCategoryVersionEndpointTests.CategoryChange_VersionMissing_ReturnsBadRequestOnTheVersionFieldAndChangesNothing` |
 | M68 | Update or delete a category with an old version | 409 `version.conflict` with the current category under `current`; the category is kept as the first change left it | ❌ | `MenuCategoryVersionEndpointTests.CategoryChange_VersionOfAnEarlierRead_ReturnsConflictWithTheCurrentCategoryAndKeepsTheFirstChange` |
 | M69 | Update a category with the current version | 200; the response carries a new `version` | ❌ | `MenuCategoryVersionEndpointTests.UpdateCategory_CurrentVersion_SavesAndReturnsANewVersion` |

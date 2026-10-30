@@ -40,7 +40,7 @@ returns the new version · #6 the OpenAPI (API description) document shows the `
 
 ## Checklist
 - [x] T1 — Shared version mapping, version check and `version.conflict` 409
-- [ ] T2 — Menu edit and delete check the version
+- [x] T2 — Menu edit and delete check the version
 - [ ] T3 — Menu category update and delete check the version
 - [ ] T4 — Location edit and delete check the version
 - [ ] T5 — Organization edit checks the version
