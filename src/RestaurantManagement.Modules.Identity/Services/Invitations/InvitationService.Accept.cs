@@ -6,6 +6,7 @@ using RestaurantManagement.Modules.Identity.Entities.Invitations;
 using RestaurantManagement.Modules.Identity.Entities.Members;
 using RestaurantManagement.Modules.Identity.Entities.Users;
 using RestaurantManagement.Modules.Identity.Models.Invitations;
+using RestaurantManagement.Shared.Data.Idempotency;
 using RestaurantManagement.Shared.Utils.Exceptions;
 
 namespace RestaurantManagement.Modules.Identity.Services.Invitations
@@ -68,7 +69,7 @@ namespace RestaurantManagement.Modules.Identity.Services.Invitations
         private async Task JoinAsync(OrganizationInvitation invitation, Guid userId, User? newUser)
         {
             using var scope = _tenantScope.Begin(invitation.OrganizationId);
-            await using var transaction = await _db.Database.BeginTransactionAsync();
+            await using var transaction = await JoinableTransaction.BeginOrJoinAsync(_db);
             if (await _db.OrganizationMembers.AnyAsync(m => m.UserId == userId && m.OrganizationId == invitation.OrganizationId))
                 throw new BusinessException(MemberErrorCodes.AlreadyMember, _localizer["AlreadyMemberOfOrganization"].Value);
 

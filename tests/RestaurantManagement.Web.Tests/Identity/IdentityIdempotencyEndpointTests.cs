@@ -73,4 +73,24 @@ public class IdentityIdempotencyEndpointTests : IClassFixture<PostgresDatabaseFi
         factory.EmailService.ReceivedCalls().Count(c => c.GetMethodInfo().Name == nameof(IEmailService.SendEmailAsync))
             .ShouldBe(1, "the email was sent once");
     }
+
+    [Fact]
+    [Trait("Rule", "T167")]
+    public async Task AcceptInvitation_SameKeyTwice_JoinsOnceAndTheReplayAnswersTheSame()
+    {
+        // Arrange
+        await using var factory = await CreateFactoryAsync(_postgres);
+        await InviteAsync(factory, AnaId, RitaEmail, BatelId, new[] { "Waiter" });
+        var body = System.Text.Json.JsonSerializer.Serialize(new { token = LatestTokenSentTo(factory, RitaEmail) });
+        var client = factory.ClientFor(RitaId, null);
+        var first = await client.SendAsync(Post("/api/v1/invitations/accept", body));
+
+        // Act
+        var second = await client.SendAsync(Post("/api/v1/invitations/accept", body));
+
+        // Assert
+        first.StatusCode.ShouldBe(HttpStatusCode.NoContent, "the accept runs inside the key's transaction without failing");
+        second.StatusCode.ShouldBe(first.StatusCode, "the replay answers the saved status");
+        (await IsMemberAsync(factory, CantinaId, RitaId)).ShouldBeTrue("the invitee joined");
+    }
 }

@@ -45,6 +45,7 @@
 | 38 | T6 | Happy | Create location twice with one key makes one location and identical answers | `OrganizationIdempotencyEndpointTests.CreateLocation_SameKeyTwice_CreatesOneLocationAndAnswersTheSameBothTimes` | `tests/RestaurantManagement.Web.Tests/Organization/OrganizationIdempotencyEndpointTests.cs` |
 | 39 | T7 | Edge | logout-all sent twice with one key runs both times and stores no key | `IdentityIdempotencyEndpointTests.LogoutAll_SameKeyTwice_RunsBothTimesAndStoresNoKey` | `tests/RestaurantManagement.Web.Tests/Identity/IdentityIdempotencyEndpointTests.cs` |
 | 40 | T7 | Happy | Invitation create sent twice with one key makes one invitation, sends one email, answers the same | `IdentityIdempotencyEndpointTests.CreateInvitation_SameKeyTwice_StoresOneInvitationSendsOneEmailAndAnswersTheSame` | `tests/RestaurantManagement.Web.Tests/Identity/IdentityIdempotencyEndpointTests.cs` |
+| 41 | T7 | Happy | Invitation accept sent twice with one key joins once and the replay answers the same | `IdentityIdempotencyEndpointTests.AcceptInvitation_SameKeyTwice_JoinsOnceAndTheReplayAnswersTheSame` | `tests/RestaurantManagement.Web.Tests/Identity/IdentityIdempotencyEndpointTests.cs` |
 
 ## Existing tests updated
 - `ErrorCodeCatalogTests.Read_SharedCatalog_ListsEveryNamedCodeWithItsStatus` (SH52): two rows added for `idempotency_key.invalid` (400) and `idempotency_key.reused` (422). They fail until T1 adds the codes.
