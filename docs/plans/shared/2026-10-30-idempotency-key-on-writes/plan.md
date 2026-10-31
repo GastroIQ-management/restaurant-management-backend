@@ -35,13 +35,13 @@
 - [x] No out-of-scope changes
 
 ## Checklist
-- [x] T1 — Shared key table mapping, store, settings, purge job and error codes
-- [x] T2 — Shared transaction a service can join, with an undo step when it does not commit
-- [x] T3 — Shared write filter: check, reserve, replay, save with the write
-- [x] T4 — Web wiring, OpenAPI header and coverage check
-- [x] T5 — Menu writes accept the key
-- [x] T6 — Organization writes accept the key
-- [x] T7 — Identity writes accept the key
+- [x] T1 — Shared key table mapping, store, settings, purge job and error codes (`feaa2a7`)
+- [x] T2 — Shared transaction a service can join, with an undo step when it does not commit (`da44e42`)
+- [x] T3 — Shared write filter: check, reserve, replay, save with the write (`8124839`)
+- [x] T4 — Web wiring, OpenAPI header and coverage check (`7068af9`)
+- [x] T5 — Menu writes accept the key (`db25ffe`)
+- [x] T6 — Organization writes accept the key (`3a70898`)
+- [x] T7 — Identity writes accept the key (`42d42fd`, test-run fixes `a0b022f`, `e6e934a`)
 
 ## Assumptions
 - Each module keeps its own key table and saves the key in its own transaction, so it stays correct when modules get separate databases. A key reused on another module's endpoint counts as new there: no 422 across modules — keys are random, so only a client bug reuses one.
