@@ -8,6 +8,8 @@ namespace RestaurantManagement.Shared.Options
         public string SmtpPass { get; set; } = string.Empty;
         public string FromEmail { get; set; } = string.Empty;
         public string FromName { get; set; } = "RestaurantManagement";
+        // Public address of the logo shown in emails; when empty the email shows the text "GastroIQ".
+        public string LogoUrl { get; set; } = string.Empty;
         public bool EnableSsl { get; set; } = true;
     }
 }

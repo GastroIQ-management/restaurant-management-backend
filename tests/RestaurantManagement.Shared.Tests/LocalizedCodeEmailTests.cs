@@ -29,15 +29,15 @@ namespace RestaurantManagement.Shared.Tests
         }
 
         [Theory]
-        [InlineData("en", "Verify your email")]
-        [InlineData("pt", "Confirme seu e-mail")]
-        [InlineData("fr", "Confirmez votre adresse e-mail")]
-        [InlineData("de", "Verify your email")]
+        [InlineData("en", "Your GastroIQ code: 482913")]
+        [InlineData("pt", "Seu código do GastroIQ: 482913")]
+        [InlineData("fr", "Votre code GastroIQ : 482913")]
+        [InlineData("de", "Your GastroIQ code: 482913")]
         [Trait("Rule", "SH48")]
         public void Subject_Verification_FollowsTheLanguage(string language, string expected)
         {
             // Act
-            var subject = VerificationEmailTemplate.Subject(language);
+            var subject = VerificationEmailTemplate.Subject(language, "482913");
 
             // Assert
             subject.ShouldBe(expected, "the verification subject is in the user's language, English when the language has no text");
@@ -59,10 +59,10 @@ namespace RestaurantManagement.Shared.Tests
         }
 
         [Theory]
-        [InlineData("en", "Enter the code below to finish setting up your account")]
-        [InlineData("pt", "Digite o código abaixo para concluir a criação da sua conta")]
-        [InlineData("fr", "Saisissez le code ci-dessous pour terminer la création de votre compte")]
-        [InlineData("de", "Enter the code below to finish setting up your account")]
+        [InlineData("en", "Enter the code below in GastroIQ to finish setting up your account")]
+        [InlineData("pt", "Digite o código abaixo no GastroIQ para terminar de configurar sua conta")]
+        [InlineData("fr", "Entrez le code ci-dessous dans GastroIQ pour terminer la configuration de votre compte")]
+        [InlineData("de", "Enter the code below in GastroIQ to finish setting up your account")]
         [Trait("Rule", "SH48")]
         public void Build_Verification_IsWrittenInTheLanguage(string language, string sentence)
         {
@@ -106,7 +106,7 @@ namespace RestaurantManagement.Shared.Tests
                 body.ShouldContain("20", customMessage: "the email says how many minutes the code lasts");
                 body.ShouldContain(Recipient, customMessage: "the email names the address it was sent to");
                 body.ShouldNotContain("{{", customMessage: "every placeholder is filled in");
-                body.ShouldContain($"<html lang=\"{language}\">", customMessage: "the page declares its language");
+                body.ShouldContain($"<html lang=\"{language}\"", customMessage: "the page declares its language");
             }
         }
 
@@ -140,7 +140,7 @@ namespace RestaurantManagement.Shared.Tests
             await sut.SendVerificationEmailAsync(Recipient, "Maria", "482913", 15, "pt");
 
             // Assert
-            logger.Messages.ShouldContain(m => m.Contains("Confirme seu e-mail"), "the email is sent in the language it was asked for");
+            logger.Messages.ShouldContain(m => m.Contains("Seu código do GastroIQ: 482913"), "the email is sent in the language it was asked for");
         }
 
         [Fact]

@@ -80,7 +80,7 @@ namespace RestaurantManagement.Shared.Services.Email
 
         public async Task SendVerificationEmailAsync(string to, string firstName, string code, int expiryMinutes, string language)
         {
-            await SendEmailAsync(to, VerificationEmailTemplate.Subject(language), VerificationEmailTemplate.Build(to, firstName, code, expiryMinutes, language));
+            await SendEmailAsync(to, VerificationEmailTemplate.Subject(language, code), VerificationEmailTemplate.Build(to, firstName, code, expiryMinutes, language, _emailOptions.LogoUrl));
         }
 
         public async Task SendPasswordResetEmailAsync(string to, string firstName, string code, int expiryMinutes, string language)
