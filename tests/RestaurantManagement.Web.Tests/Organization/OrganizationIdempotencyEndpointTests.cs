@@ -73,7 +73,7 @@ public class OrganizationIdempotencyEndpointTests : IClassFixture<PostgresDataba
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.InternalServerError, "the failed key save fails the request");
-        (await factory.InOrganizationAsync<OrganizationDbContext, int>(NewOrganizationId, db => db.Organizations.CountAsync()))
+        (await factory.InOrganizationAsync<OrganizationDbContext, int>(NewOrganizationId, db => db.Organizations.CountAsync(o => o.Id == NewOrganizationId)))
             .ShouldBe(0, "the organization is not kept without its key");
         (await CountMembershipsAsync(factory)).ShouldBe(0, "the Owner access set up in Identity is revoked when the write does not commit");
     }
