@@ -11,6 +11,7 @@ using RestaurantManagement.Modules.Menu.Models;
 using RestaurantManagement.Shared.Services.Organization;
 using RestaurantManagement.Shared.Auth;
 using RestaurantManagement.Shared.Utils.Exceptions;
+using RestaurantManagement.Shared.Data.Idempotency;
 using RestaurantManagement.Shared.Data.Tenancy;
 using RestaurantManagement.Shared.Data.Versioning;
 
@@ -68,7 +69,7 @@ namespace RestaurantManagement.Modules.Menu.Services
                 UpdatedAt = DateTime.UtcNow
             };
 
-            using var transaction = await _menuDb.Database.BeginTransactionAsync();
+            await using var transaction = await JoinableTransaction.BeginOrJoinAsync(_menuDb);
 
             _menuDb.Menus.Add(menu);
             try

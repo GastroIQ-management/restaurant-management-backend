@@ -120,6 +120,9 @@ A location or organization change carries the version the caller read. Order of 
 | OR69 | A member who is not the Owner edits the organization with a stale version | 403, not 409; the current organization is not shown | ✅ | `OrganizationVersionEndpointTests.EditOrganization_MemberWhoIsNotTheOwnerSendingAStaleVersion_ReturnsForbiddenNotConflict` |
 | OR70 | An Owner of two organizations edits the one in the token | Only that organization and its version change; the other keeps its data and version | ✅ | `OrganizationVersionEndpointTests.EditOrganization_OwnerOfTwoOrganizations_ChangesOnlyTheTokenOrganizationAndItsVersion` |
 | OR71 | Organization list and create | Every organization carries a `version` | ✅ | `OrganizationVersionEndpointTests.OrganizationResponses_ListAndCreate_CarryTheVersion` |
+| OR72 | Create organization with a key, and saving the key fails | No organization and no Owner access are left | ✅ | `OrganizationIdempotencyEndpointTests.CreateOrganization_FailureWhileSavingTheKey_LeavesNoOrganizationAndNoOwnerAccess` |
+| OR73 | Create organization twice with one key and no organization in the token | One organization; the replay is not refused by the trial rule and returns the same answer | ✅ | `OrganizationIdempotencyEndpointTests.CreateOrganization_SameKeyTwiceWithNoOrganizationInTheToken_CreatesOneAndReplaysTheAnswer` |
+| OR74 | Create location twice with one key | One location; identical answers | ✅ | `OrganizationIdempotencyEndpointTests.CreateLocation_SameKeyTwice_CreatesOneLocationAndAnswersTheSameBothTimes` |
 
 ## Open questions (no row until decided)
 - **Trial limits are stored but never enforced:** a TRIAL organization gets "1 location" and a

@@ -23,6 +23,8 @@ public class ErrorCodeCatalogTests
     [InlineData("audit_log.unknown_action", 400)]
     [InlineData("tenant.mismatch", 403)]
     [InlineData("id.already_used", 409)]
+    [InlineData("idempotency_key.invalid", 400)]
+    [InlineData("idempotency_key.reused", 422)]
     [Trait("Rule", "SH52")]
     public void Read_SharedCatalog_ListsEveryNamedCodeWithItsStatus(string value, int status)
     {

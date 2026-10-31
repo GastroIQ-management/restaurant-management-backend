@@ -17,6 +17,7 @@ using RestaurantManagement.Shared.Middleware;
 using RestaurantManagement.Shared.Options;
 using RestaurantManagement.Shared.Services.AuditLog;
 using RestaurantManagement.Shared.Services.Email;
+using RestaurantManagement.Shared.Services.Idempotency;
 using RestaurantManagement.Shared.Services.Identity;
 using RestaurantManagement.Shared.Services.Organization;
 using RestaurantManagement.Shared.Utils.Exceptions;
@@ -114,7 +115,7 @@ builder.Services.AddLocalizedValidationTitle();
 // ---------------------------------------------
 // Controllers
 // ---------------------------------------------
-builder.Services.AddControllers()
+builder.Services.AddControllers(options => options.Filters.Add<IdempotencyKeyFilter>())
     .AddJsonOptions(options =>
     {
         options.JsonSerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
@@ -149,6 +150,14 @@ builder.Services.AddOptions<RestaurantManagement.Modules.Identity.Services.Invit
     .Bind(builder.Configuration.GetSection(RestaurantManagement.Modules.Identity.Services.Invitations.InvitationOptions.SectionName))
     .ValidateOnStart();
 builder.Services.AddSingleton<IValidateOptions<RestaurantManagement.Modules.Identity.Services.Invitations.InvitationOptions>, RestaurantManagement.Modules.Identity.Services.Invitations.InvitationOptionsValidator>();
+builder.Services.AddOptions<IdempotencyOptions>()
+    .Bind(builder.Configuration.GetSection(IdempotencyOptions.SectionName))
+    .ValidateOnStart();
+builder.Services.AddSingleton<IValidateOptions<IdempotencyOptions>, IdempotencyOptionsValidator>();
+if (builder.Configuration.GetValue("Idempotency:CleanupEnabled", true))
+{
+    builder.Services.AddHostedService<IdempotencyKeyCleanupWorker>();
+}
 builder.Services.Configure<EmailOptions>(builder.Configuration.GetSection("Email"));
 builder.Services.Configure<CorsOptions>(builder.Configuration.GetSection("Cors"));
 builder.Services.AddAuthRateLimiting(builder.Configuration);
@@ -170,13 +179,19 @@ builder.Services.AddDbContext<IdentityDbContext>((serviceProvider, options) =>
     options.UseNpgsql(connectionString).UseSnakeCaseNamingConvention()
         .AddInterceptors(serviceProvider.GetRequiredService<AuditSaveChangesInterceptor>()));
 
+builder.Services.AddIdempotencyKeyStore<IdentityDbContext>(typeof(RestaurantManagement.Modules.Identity.Controllers.AuthController).Assembly);
+
 builder.Services.AddDbContext<MenuDbContext>((serviceProvider, options) =>
     options.UseNpgsql(connectionString).UseSnakeCaseNamingConvention()
         .AddInterceptors(serviceProvider.GetRequiredService<AuditSaveChangesInterceptor>()));
 
+builder.Services.AddIdempotencyKeyStore<MenuDbContext>(typeof(RestaurantManagement.Modules.Menu.Controllers.MenuController).Assembly);
+
 builder.Services.AddDbContext<OrganizationDbContext>((serviceProvider, options) =>
     options.UseNpgsql(connectionString).UseSnakeCaseNamingConvention()
         .AddInterceptors(serviceProvider.GetRequiredService<AuditSaveChangesInterceptor>()));
+
+builder.Services.AddIdempotencyKeyStore<OrganizationDbContext>(typeof(RestaurantManagement.Modules.Organization.Controllers.OrganizationController).Assembly);
 
 builder.Services.AddAuditLog((sp, options) => options.UseNpgsql(connectionString).UseSnakeCaseNamingConvention()
     .AddInterceptors(sp.GetRequiredService<AuditSaveChangesInterceptor>()));
@@ -207,6 +222,7 @@ builder.Services.AddSwaggerGen(c =>
     c.DocInclusionPredicate((version, api) =>
         RestaurantManagement.Web.OpenApi.ApiVersions.IncludesRoute(version, api.RelativePath ?? string.Empty));
     c.OperationFilter<RestaurantManagement.Web.OpenApi.AppVersionHeaderOperationFilter>();
+    c.OperationFilter<RestaurantManagement.Web.OpenApi.IdempotencyKeyHeaderOperationFilter>();
     c.SchemaFilter<RestaurantManagement.Web.OpenApi.VersionRequiredSchemaFilter>();
 
     // Add JWT Authentication to Swagger

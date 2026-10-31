@@ -15,6 +15,9 @@ internal static class TestHostSettings
         // including a developer's local database.
         Environment.SetEnvironmentVariable("RefreshTokenCleanup__Enabled", "false");
 
+        // The purge job would otherwise delete expired keys from whatever database the host points at.
+        Environment.SetEnvironmentVariable("Idempotency__CleanupEnabled", "false");
+
         // The pending email worker would otherwise send queued emails on its own timer, making endpoint
         // tests unpredictable; tests run the processor themselves.
         Environment.SetEnvironmentVariable("PendingEmails__Enabled", "false");

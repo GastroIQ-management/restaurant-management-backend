@@ -234,6 +234,15 @@
   <data name="IdAlreadyUsed" xml:space="preserve">
     <value>This ID is already used.</value>
   </data>
+  <data name="IdempotencyKeyInvalid" xml:space="preserve">
+    <value>The Idempotency-Key header must be a valid UUID.</value>
+  </data>
+  <data name="IdempotencyKeyReused" xml:space="preserve">
+    <value>This Idempotency-Key was already used for a different request.</value>
+  </data>
+  <data name="RequestInProgress" xml:space="preserve">
+    <value>This request is still being processed. Try again shortly.</value>
+  </data>
   <data name="RoleNameAlreadyUsed" xml:space="preserve">
     <value>A role with this name already exists.</value>
   </data>

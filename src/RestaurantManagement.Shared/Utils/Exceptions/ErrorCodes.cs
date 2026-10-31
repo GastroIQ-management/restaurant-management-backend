@@ -60,6 +60,12 @@ namespace RestaurantManagement.Shared.Utils.Exceptions
         // "id.already_used", 409
         public static ErrorCode IdAlreadyUsed { get; } = new("id.already_used", 409);
 
+        // "idempotency_key.invalid", 400
+        public static ErrorCode IdempotencyKeyInvalid { get; } = new("idempotency_key.invalid", 400);
+
+        // "idempotency_key.reused", 422
+        public static ErrorCode IdempotencyKeyReused { get; } = new("idempotency_key.reused", 422);
+
         // "version.conflict", 409
         public static ErrorCode VersionConflict { get; } = new("version.conflict", 409);
 

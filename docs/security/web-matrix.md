@@ -69,6 +69,7 @@ for one module (rate limits on sign-in endpoints, the refresh cookie) are in tha
 | W29 | Any endpoint route of the app | Starts with `api/v<n>/` of a supported API version (today `v1`); an endpoint outside every supported version fails the build | ✅ | `ApiVersionRoutesTests.EveryEndpoint_RouteTemplate_StartsWithASupportedApiVersion` |
 | W30 | The OpenAPI document of a version | Holds only that version's paths and every one of its operations | ✅ | `ApiVersionDocumentsTests.V1Document_InDevelopment_ListsOnlyV1PathsAndEveryV1Operation` |
 | W31 | The OpenAPI document of a version that is not supported | Not served (404) | ✅ | `ApiVersionDocumentsTests.Document_VersionThatIsNotSupported_IsNotServed` |
+| W32 | Startup with an idempotency retention that is not positive | The app refuses to start, naming `Idempotency:RetentionDays` | ✅ | `IdempotencyKeyWiringTests.Startup_NonPositiveIdempotencyRetentionDays_FailsNamingIdempotencyRetentionDays` |
 
 ## 6. Wiring tests
 These protect the app setup rather than a rule users meet.
@@ -87,3 +88,6 @@ These protect the app setup rather than a rule users meet.
 | WD10 | `AppVersionHeaderOpenApiTests.V1Document_AppVersionHeader_DeclaresItsFormatLengthAndPurpose` | The header shows its format, 32-character limit and purpose |
 | WD11 | `ClientIdOpenApiTests.V1Document_CreateRequest_ShowsIdAsRequiredUuid` | The OpenAPI document shows `id` (uuid, required) on the six create requests that take the client's ID |
 | WD12 | `VersionOpenApiTests.SwaggerDocument_InDevelopment_ShowsVersionOnEditableRecordsAndOnEveryDelete` | The OpenAPI document shows `version` on every editable record's response and update request (required on the requests), and the required `version` query parameter on the menu, category and location deletes |
+| WD13 | `IdempotencyKeyWiringTests.V1Document_SignedInWrites_DeclareTheOptionalIdempotencyKeyHeaderAsUuid` | Generated clients may send `Idempotency-Key` on every signed-in write |
+| WD14 | `IdempotencyKeyWiringTests.V1Document_PublicWritesSessionActionsAndReads_DoNotDeclareTheIdempotencyKeyHeader` | The header is not shown where the key is ignored |
+| WD15 | `IdempotencyKeyWiringTests.EveryEndpoint_SignedInWrite_BelongsToAModuleWithAKeyStoreOrIgnoresKeys` | No module's signed-in write silently skips the key |

@@ -1,15 +1,14 @@
 using RestaurantManagement.Shared;
-using System;
 using System.Globalization;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Storage;
 using RestaurantManagement.Modules.Organization.Data;
 using RestaurantManagement.Modules.Organization.Entities;
 using RestaurantManagement.Modules.Organization.Models;
+using RestaurantManagement.Shared.Data.Idempotency;
 using RestaurantManagement.Shared.Data.Tenancy;
 using RestaurantManagement.Shared.Data.Versioning;
 using RestaurantManagement.Shared.Services.AuditLog;
@@ -59,17 +58,14 @@ namespace RestaurantManagement.Modules.Organization.Services
             if (!userExists)
                 throw new BusinessException(ErrorCodes.Unauthorized, _localizer["UserNotFound"].Value);
 
-            // Get user's organization IDs from Identity module
             var userOrgIds = await _memberAccess.GetOrganizationIdsForUserAsync(ownerUserId);
 
-            // Get organizations with settings from Organization module
             var userOrgs = await _orgDb.Organizations
                 .Where(o => userOrgIds.Contains(o.Id))
                 .IgnoreQueryFilters() // Filter-bypass rule: the user's own memberships may have no token organization yet
                 .Include(o => o.Settings)
                 .ToListAsync();
 
-            // 🧩 Check if any of the user's organizations are under trial
             bool hasTrialOrg = userOrgs.Any(o =>
                 o.Settings != null &&
                 o.Settings.PlanType == "TRIAL");
@@ -83,9 +79,8 @@ namespace RestaurantManagement.Modules.Organization.Services
             if (userOrgs.Any(o => o.Id == request.Id))
                 throw new BusinessException(ErrorCodes.IdAlreadyUsed, _localizer["IdAlreadyUsed"].Value);
 
-            using var tx = await _orgDb.Database.BeginTransactionAsync();
+            await using var tx = await JoinableTransaction.BeginOrJoinAsync(_orgDb);
 
-            // 1. Create Organization
             var org = new Entities.Organization
             {
                 Id = request.Id,
@@ -105,7 +100,6 @@ namespace RestaurantManagement.Modules.Organization.Services
             // interceptor and the role assignment must see it through the scope.
             using var tenantScope = _tenantScope.Begin(org.Id);
 
-            // 2. Create Trial Settings
             var settings = new OrganizationSettings
             {
                 Id = Guid.NewGuid(),
@@ -124,9 +118,7 @@ namespace RestaurantManagement.Modules.Organization.Services
 
             try
             {
-                // Save Organization and Settings, but do not commit yet: the organization
-                // must not become visible to any query until the creating user is
-                // confirmed as Owner.
+                // Not committed yet: the organization stays invisible until the Owner is confirmed.
                 await _orgDb.SaveChangesAsync();
             }
             catch (Exception ex)
@@ -138,11 +130,14 @@ namespace RestaurantManagement.Modules.Organization.Services
                 throw new Exception($"Failed to create organization: {innerMessage}", ex);
             }
 
-            // 3. Assign the owner role while still inside the transaction, so a failure
+            // Assign the owner role while still inside the transaction, so a failure
             // here rolls back the organization instead of leaving it orphaned.
             try
             {
                 await _accessSetup.AddOwnerWithDefaultRolesAsync(ownerUserId, org.Id);
+                // Runs when the transaction ends without a commit, which may be after this method returned
+                // (a failed key save), so it opens its own tenant scope.
+                tx.OnNotCommitted(_ => RemoveAccessBestEffortAsync(ownerUserId, org.Id));
             }
             catch (Exception ex)
             {
@@ -151,39 +146,37 @@ namespace RestaurantManagement.Modules.Organization.Services
                 throw;
             }
 
-            // 4. Commit only after the Owner role is confirmed.
+            // Commit only after the Owner role is confirmed. When the request's transaction is joined,
+            // the filter commits it after saving the key, and the undo step still revokes the Owner on failure.
             try
             {
                 await tx.CommitAsync();
             }
             catch (Exception ex)
             {
-                // The owner role was already written to Identity's database, but the
-                // organization itself never committed: this UserRole now points at a
-                // non-existent organization. Compensate by revoking it as a best-effort
-                // cleanup, without masking the original commit failure.
-                _logger.LogError(ex, "Failed to commit organization {OrganizationId} after the Owner access was set up for user {UserId}; a dangling membership for a non-existent organization may exist.", org.Id, ownerUserId);
-                await RemoveAccessBestEffortAsync(ownerUserId, org.Id, ex);
+                _logger.LogError(ex, "Failed to commit organization {OrganizationId} after the Owner access was set up for user {UserId}; the Owner access is being revoked.", org.Id, ownerUserId);
                 throw;
             }
 
-            // 5. Return sanitized response
             return ToResponse(org, settings);
         }
 
-        private async Task RemoveAccessBestEffortAsync(Guid ownerUserId, Guid organizationId, Exception causeException)
+        // The Owner role was written to Identity's database, so a transaction that never commits leaves a
+        // membership for a non-existent organization. Revoke it as best effort, without masking the failure.
+        private async Task RemoveAccessBestEffortAsync(Guid ownerUserId, Guid organizationId)
         {
             try
             {
+                using var scope = _tenantScope.Begin(organizationId);
                 await _accessSetup.RemoveOwnerAndRolesAsync(ownerUserId, organizationId);
             }
             catch (Exception revokeEx)
             {
-                _logger.LogError(revokeEx, "Failed to revoke the Owner access of user {UserId} for organization {OrganizationId} after commit failure: {CauseMessage}", ownerUserId, organizationId, causeException.Message);
+                _logger.LogError(revokeEx, "Failed to revoke the Owner access of user {UserId} for organization {OrganizationId} after the organization did not commit.", ownerUserId, organizationId);
             }
         }
 
-        private async Task RollbackAsync(IDbContextTransaction tx, Exception causeException)
+        private async Task RollbackAsync(JoinableTransaction tx, Exception causeException)
         {
             try
             {
@@ -272,10 +265,8 @@ namespace RestaurantManagement.Modules.Organization.Services
             if (!userExists)
                 throw new BusinessException(ErrorCodes.Unauthorized, _localizer["UserNotFound"].Value);
 
-            // Get organization IDs from Identity module
             var orgIds = await _memberAccess.GetOrganizationIdsForUserAsync(userId);
 
-            // Get organizations with settings from Organization module
             var organizations = await _orgDb.Organizations
                 .Where(o => orgIds.Contains(o.Id))
                 .IgnoreQueryFilters() // Filter-bypass rule: lists plan details for every one of the user's memberships
