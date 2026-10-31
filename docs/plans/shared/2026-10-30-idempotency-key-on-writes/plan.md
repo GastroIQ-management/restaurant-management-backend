@@ -1,6 +1,6 @@
 # Plan: Idempotency key on writes
 
-**Source:** docs/specs/shared/2026-10-30-idempotency-key-on-writes.md   **Date:** 2026-10-30   **Status:** In progress
+**Source:** docs/specs/shared/2026-10-30-idempotency-key-on-writes.md   **Date:** 2026-10-30   **Status:** Done
 **Risk:** High — new Shared contracts (key store, a transaction a service can join, one filter on every signed-in write), a new table and migration in three modules, and a replay answered before the modules' access checks.
 
 ## Summary
@@ -29,10 +29,10 @@
 | T7 | — | — | Migration: new table `identity_idempotency_keys`. The three session endpoints ignore the key, so no access token is ever stored |
 
 ## Overall Definition of Done
-- [ ] All tasks done, tests passing
-- [ ] All Outcomes met (spec Outcomes, or the backlog item's Acceptance criteria)
-- [ ] Affected tests green after the last batch; full suite green in CI (Continuous Integration)
-- [ ] No out-of-scope changes
+- [x] All tasks done, tests passing
+- [x] All Outcomes met (spec Outcomes, or the backlog item's Acceptance criteria)
+- [x] Affected tests green after the last batch; full suite green in CI (Continuous Integration)
+- [x] No out-of-scope changes
 
 ## Checklist
 - [x] T1 — Shared key table mapping, store, settings, purge job and error codes
