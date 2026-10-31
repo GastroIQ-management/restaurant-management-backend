@@ -1,4 +1,3 @@
-using FluentAssertions;
 using RestaurantManagement.Shared.Services.Email;
 using Shouldly;
 
@@ -22,8 +21,8 @@ namespace RestaurantManagement.Shared.Tests
             var body = VerificationEmailTemplate.Build(ValidEmail, firstName!, ValidCode, ValidExpiryMinutes, "en");
 
             // Assert
-            body.Should().Contain("Hi there,", "a blank first name gets the generic greeting");
-            body.Should().NotContain("Hi ,", "the greeting never shows an empty name");
+            body.ShouldContain("Hi there,", customMessage: "a blank first name gets the generic greeting");
+            body.ShouldNotContain("Hi ,", customMessage: "the greeting never shows an empty name");
         }
 
         [Fact]
@@ -34,8 +33,8 @@ namespace RestaurantManagement.Shared.Tests
             var body = VerificationEmailTemplate.Build(ValidEmail, ValidFirstName, ValidCode, 30, "en");
 
             // Assert
-            body.Should().Contain("30 minutes", "the email states the configured code lifetime");
-            body.Should().NotContain("15 minutes", "the default lifetime is not shown when another one is configured");
+            body.ShouldContain("expires in 30 minutes", customMessage: "the email states the configured code lifetime");
+            body.ShouldNotContain("15 minutes", customMessage: "the default lifetime is not shown when another one is configured");
         }
 
         [Fact]
@@ -46,7 +45,7 @@ namespace RestaurantManagement.Shared.Tests
             var body = VerificationEmailTemplate.Build(ValidEmail, ValidFirstName, "482913", ValidExpiryMinutes, "en");
 
             // Assert
-            body.Should().Contain("482913", "the email carries the code the user must type");
+            body.ShouldContain("482913", customMessage: "the email carries the code the user must type");
         }
 
         [Fact]
@@ -54,10 +53,10 @@ namespace RestaurantManagement.Shared.Tests
         public void Build_WithValidInput_LeavesNoUnsubstitutedTokens()
         {
             // Act
-            var body = VerificationEmailTemplate.Build(ValidEmail, ValidFirstName, ValidCode, ValidExpiryMinutes, "en");
+            var body = VerificationEmailTemplate.Build(ValidEmail, ValidFirstName, ValidCode, ValidExpiryMinutes, "en", "https://cdn.gastroiq.com/logo.png");
 
             // Assert
-            body.Should().NotContain("{{", "the email never shows unfilled template placeholders");
+            body.ShouldNotContain("{{", customMessage: "the email never shows unfilled template placeholders");
         }
 
         [Fact]
@@ -68,7 +67,7 @@ namespace RestaurantManagement.Shared.Tests
             var body = VerificationEmailTemplate.Build("diner@example.com", ValidFirstName, ValidCode, ValidExpiryMinutes, "en");
 
             // Assert
-            body.Should().Contain("This message was sent to diner@example.com", "the footer says which address the email was sent to");
+            body.ShouldContain("Sent to diner@example.com because an account was created with this address.", customMessage: "the footer says which address the email was sent to");
         }
 
         [Fact]
@@ -79,7 +78,7 @@ namespace RestaurantManagement.Shared.Tests
             var body = VerificationEmailTemplate.Build(ValidEmail, "Giulia", ValidCode, ValidExpiryMinutes, "en");
 
             // Assert
-            body.Should().Contain("Hi Giulia,", "the greeting uses the user first name");
+            body.ShouldContain("Hi Giulia,", customMessage: "the greeting uses the user first name");
         }
 
         [Fact]
@@ -90,40 +89,70 @@ namespace RestaurantManagement.Shared.Tests
             var body = VerificationEmailTemplate.Build(ValidEmail, ValidFirstName, ValidCode, ValidExpiryMinutes, "en");
 
             // Assert
-            body.Should().Contain("RISTORANTE");
-            body.Should().Contain("Confirm your email");
-            body.Should().Contain("15 minutes");
-            body.Should().Contain(ValidCode);
-            body.Should().Contain("didn't create an account");
-            body.Should().Contain("The Ristorante team");
-            body.Should().Contain("Reply to this email");
-            body.Should().Contain("This message was sent to");
+            body.ShouldContain("Confirm your email");
+            body.ShouldContain("Use this code to confirm your email. It expires in 15 minutes.");
+            body.ShouldContain("Enter the code below in GastroIQ to finish setting up your account.");
+            body.ShouldContain("The code expires in 15 minutes.");
+            body.ShouldContain(ValidCode);
+            body.ShouldContain("Didn't create an account?");
+            body.ShouldContain("The GastroIQ team");
+            body.ShouldContain("Questions? Just reply to this email.");
+            body.ShouldContain($"© {DateTime.UtcNow.Year} GastroIQ");
+        }
+
+        [Fact]
+        [Trait("Rule", "SH24")]
+        public void Build_WithLogoUrl_LogoImageUsesIt()
+        {
+            // Act
+            var body = VerificationEmailTemplate.Build(ValidEmail, ValidFirstName, ValidCode, ValidExpiryMinutes, "en", "https://cdn.gastroiq.com/logo.png");
+
+            // Assert
+            body.ShouldContain("src=\"https://cdn.gastroiq.com/logo.png\"", customMessage: "the logo comes from the configured address");
+        }
+
+        [Theory]
+        [InlineData("en", "Your GastroIQ code: 482913")]
+        [InlineData("pt", "Seu código do GastroIQ: 482913")]
+        [InlineData("fr", "Votre code GastroIQ : 482913")]
+        [Trait("Rule", "SH24")]
+        public void Subject_WithCode_ShowsTheCode(string language, string expected)
+        {
+            // Act
+            var subject = VerificationEmailTemplate.Subject(language, "482913");
+
+            // Assert
+            subject.ShouldBe(expected, "the subject carries the code so it can be read without opening the email");
         }
 
         [Fact]
         [Trait("Rule", "SH26")]
-        public void Build_NameAndAddressWithHtmlCharacters_AreShownAsTextNeverAsMarkup()
+        public void Build_NameAddressAndLogoWithHtmlCharacters_AreShownAsTextNeverAsMarkup()
         {
             // Arrange
             const string firstName = "<script>alert(1)</script>Ana";
             const string recipient = "ana+\"x\"@cantina.com.br";
 
             // Act
-            var body = VerificationEmailTemplate.Build(recipient, firstName, ValidCode, ValidExpiryMinutes, "en");
+            var body = VerificationEmailTemplate.Build(recipient, firstName, ValidCode, ValidExpiryMinutes, "en", "x\" onerror=\"alert(1)");
 
             // Assert
             body.ShouldContain("&lt;script&gt;", customMessage: "a name with HTML must be shown as text");
             body.ShouldNotContain("<script>", customMessage: "a name must never become markup in the email");
             body.ShouldContain("&quot;", customMessage: "an address with quotes must be shown as text");
             body.ShouldNotContain(recipient, customMessage: "the raw address with quotes must not appear in the email");
+            body.ShouldNotContain("onerror=\"alert", customMessage: "a logo address cannot break out of its attribute");
         }
 
         [Fact]
-        [Trait("Rule", "SH24")]
-        public void Subject_IsUnchanged()
+        [Trait("Rule", "SH26")]
+        public void Build_NameLooksLikeAPlaceholder_IsNotReplacedAgain()
         {
+            // Act
+            var body = VerificationEmailTemplate.Build(ValidEmail, "{{heading}}", ValidCode, ValidExpiryMinutes, "en");
+
             // Assert
-            VerificationEmailTemplate.Subject("en").Should().Be("Verify your email", "the email subject keeps its agreed wording");
+            body.ShouldContain("Hi {{heading}},", customMessage: "a name is shown as typed and never filled in as a placeholder");
         }
     }
 }

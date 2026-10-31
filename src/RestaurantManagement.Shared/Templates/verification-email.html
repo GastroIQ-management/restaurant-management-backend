@@ -1,112 +1,97 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{locale}}" xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Verify your email</title>
+<meta name="x-apple-disable-message-reformatting">
+<meta name="color-scheme" content="light">
+<meta name="supported-color-schemes" content="light">
+<title>{{subject}}</title>
+<!--
+  GastroIQ email verification code. The texts live in VerificationEmailTemplate.
+  Email-safe: tables + inline styles only. No SVG, no CSS variables, no web fonts required.
+-->
+<style>
+  @media (max-width: 600px) {
+    .gq-card { padding: 34px 21px !important; }
+    .gq-h1 { font-size: 26px !important; line-height: 32px !important; }
+    .gq-code { font-size: 30px !important; letter-spacing: 8px !important; }
+  }
+</style>
 </head>
-<body style="margin:0; padding:0; background-color:#f2f2f2;">
+<body style="margin:0; padding:0; background-color:#F2F3F6; -webkit-text-size-adjust:100%;">
+  <!-- Preheader: shows in the inbox preview, hidden in the email -->
+  <div style="display:none; max-height:0; overflow:hidden; mso-hide:all; font-size:1px; line-height:1px; color:#F2F3F6;">{{preheader}}&#8202;&#847;&#8202;&#847;&#8202;&#847;&#8202;&#847;&#8202;&#847;&#8202;&#847;</div>
 
-<!-- preheader: shows in the inbox preview, hidden in the body -->
-<div style="display:none; max-height:0; overflow:hidden; opacity:0;">
-  Your verification code is {{CODE}}
-</div>
-
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#f2f2f2;">
-<tr>
-<td align="center" style="padding:24px 12px;">
-
-  <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="width:600px; max-width:100%; background-color:#ffffff;">
-
-    <!-- logo -->
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#F2F3F6;">
     <tr>
-      <td align="center" style="padding:36px 32px 0 32px;">
-        <span style="font-family:Helvetica,Arial,sans-serif; font-size:26px; font-weight:bold; letter-spacing:3px; color:#CE2B37;">RISTORANTE</span>
-      </td>
-    </tr>
+      <td align="center" style="padding:34px 13px;">
 
-    <!-- italian flag rule -->
-    <tr>
-      <td align="center" style="padding:14px 32px 0 32px;">
-        <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="width:120px;">
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:560px;">
+          <!-- Logo -->
           <tr>
-            <td height="4" style="background-color:#009246; font-size:0; line-height:0;">&nbsp;</td>
-            <td height="4" style="background-color:#ffffff; font-size:0; line-height:0; border-top:1px solid #e0e0e0; border-bottom:1px solid #e0e0e0;">&nbsp;</td>
-            <td height="4" style="background-color:#CE2B37; font-size:0; line-height:0;">&nbsp;</td>
+            <td align="left" style="padding:0 8px 21px 8px;">
+              <img src="{{logo_url}}" width="132" height="31" alt="GastroIQ" style="display:block; border:0; outline:none; text-decoration:none; width:132px; height:31px; font-family:'Plus Jakarta Sans',Helvetica,Arial,sans-serif; font-size:21px; font-weight:800; color:#14161A;">
+            </td>
           </tr>
-        </table>
-      </td>
-    </tr>
 
-    <!-- heading -->
-    <tr>
-      <td style="padding:32px 32px 0 32px; font-family:Helvetica,Arial,sans-serif; font-size:30px; line-height:38px; font-weight:bold; color:#221f1f;">
-        Confirm your email
-      </td>
-    </tr>
-
-    <!-- body copy -->
-    <tr>
-      <td style="padding:20px 32px 0 32px; font-family:Helvetica,Arial,sans-serif; font-size:16px; line-height:26px; color:#333333;">
-        Hi {{FIRST_NAME}},
-      </td>
-    </tr>
-    <tr>
-      <td style="padding:16px 32px 0 32px; font-family:Helvetica,Arial,sans-serif; font-size:16px; line-height:26px; color:#333333;">
-        Enter the code below to finish setting up your account. The code expires in
-        {{EXPIRY_MINUTES}} minutes.
-      </td>
-    </tr>
-
-    <!-- code -->
-    <tr>
-      <td align="center" style="padding:28px 32px 0 32px;">
-        <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="background-color:#faf7f7; border:1px solid #eadcdc;">
+          <!-- Card -->
           <tr>
-            <td align="center" style="padding:20px 40px; font-family:Helvetica,Arial,sans-serif; font-size:38px; line-height:44px; font-weight:bold; letter-spacing:10px; color:#CE2B37;">
-              {{CODE}}
+            <td class="gq-card" style="background-color:#FFFFFF; border-radius:21px; padding:34px 34px 34px 34px; border:1px solid #E2E5EA;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                  <td style="font-family:'Plus Jakarta Sans',Helvetica,Arial,sans-serif; color:#14161A;">
+                    <h1 class="gq-h1" style="margin:0 0 21px 0; font-size:34px; line-height:40px; font-weight:700; letter-spacing:-0.5px; color:#14161A;">{{heading}}</h1>
+                    <p style="margin:0 0 13px 0; font-size:16px; line-height:26px; color:#14161A;">{{greeting}}</p>
+                    <p style="margin:0 0 21px 0; font-size:16px; line-height:26px; color:#14161A;">{{intro}}</p>
+                  </td>
+                </tr>
+
+                <!-- Code -->
+                <tr>
+                  <td align="center" style="padding:0 0 13px 0;">
+                    <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="background-color:#E1F0EB; border-radius:13px;">
+                      <tr>
+                        <td align="center" style="padding:21px 13px;">
+                          <div class="gq-code" style="font-family:'SF Mono','Menlo','Consolas','Courier New',monospace; font-size:38px; line-height:44px; font-weight:700; letter-spacing:12px; color:#175446; mso-line-height-rule:exactly;">{{code}}</div>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                <tr>
+                  <td align="center" style="padding:0 0 34px 0; font-family:'Plus Jakarta Sans',Helvetica,Arial,sans-serif; font-size:13px; line-height:21px; color:#5F646D;">
+                    {{expiry}}
+                  </td>
+                </tr>
+
+                <!-- Note -->
+                <tr>
+                  <td style="font-family:'Plus Jakarta Sans',Helvetica,Arial,sans-serif;">
+                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#F2F3F6; border-radius:13px;">
+                      <tr>
+                        <td style="padding:13px 21px; font-size:13px; line-height:21px; color:#5F646D;">{{ignore_note}}</td>
+                      </tr>
+                    </table>
+                    <p style="margin:21px 0 0 0; font-size:16px; line-height:26px; color:#14161A;">{{signoff}}</p>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td style="padding:21px 8px 0 8px; font-family:'Plus Jakarta Sans',Helvetica,Arial,sans-serif; font-size:13px; line-height:21px; color:#5F646D;">
+              <p style="margin:0 0 8px 0;">{{help_line}}</p>
+              <p style="margin:0 0 8px 0;">{{sent_to_line}}</p>
+              <p style="margin:0;">{{company_line}}</p>
             </td>
           </tr>
         </table>
+
       </td>
     </tr>
-
-    <!-- note -->
-    <tr>
-      <td style="padding:28px 32px 0 32px; font-family:Helvetica,Arial,sans-serif; font-size:15px; line-height:24px; color:#555555;">
-        If you didn't create an account, you can ignore this email and nothing will happen.
-      </td>
-    </tr>
-
-    <!-- sign off -->
-    <tr>
-      <td style="padding:24px 32px 0 32px; font-family:Helvetica,Arial,sans-serif; font-size:15px; line-height:24px; color:#555555;">
-        &ndash; The Ristorante team
-      </td>
-    </tr>
-
-    <!-- green divider -->
-    <tr>
-      <td style="padding:32px 32px 0 32px;">
-        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
-          <tr><td height="3" style="background-color:#009246; font-size:0; line-height:0;">&nbsp;</td></tr>
-        </table>
-      </td>
-    </tr>
-
-    <!-- footer -->
-    <tr>
-      <td style="padding:20px 32px 36px 32px; font-family:Helvetica,Arial,sans-serif; font-size:12px; line-height:20px; color:#8c8c8c;">
-        Questions? Reply to this email and we'll help.<br>
-        This message was sent to {{EMAIL}} because an account was created with this address.
-      </td>
-    </tr>
-
   </table>
-
-</td>
-</tr>
-</table>
-
 </body>
 </html>
