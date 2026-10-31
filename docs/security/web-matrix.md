@@ -69,7 +69,7 @@ for one module (rate limits on sign-in endpoints, the refresh cookie) are in tha
 | W29 | Any endpoint route of the app | Starts with `api/v<n>/` of a supported API version (today `v1`); an endpoint outside every supported version fails the build | ✅ | `ApiVersionRoutesTests.EveryEndpoint_RouteTemplate_StartsWithASupportedApiVersion` |
 | W30 | The OpenAPI document of a version | Holds only that version's paths and every one of its operations | ✅ | `ApiVersionDocumentsTests.V1Document_InDevelopment_ListsOnlyV1PathsAndEveryV1Operation` |
 | W31 | The OpenAPI document of a version that is not supported | Not served (404) | ✅ | `ApiVersionDocumentsTests.Document_VersionThatIsNotSupported_IsNotServed` |
-| W32 | Startup with an idempotency retention that is not positive | The app refuses to start, naming `Idempotency:RetentionDays` | ❌ | `IdempotencyKeyWiringTests.Startup_NonPositiveIdempotencyRetentionDays_FailsNamingIdempotencyRetentionDays` |
+| W32 | Startup with an idempotency retention that is not positive | The app refuses to start, naming `Idempotency:RetentionDays` | ✅ | `IdempotencyKeyWiringTests.Startup_NonPositiveIdempotencyRetentionDays_FailsNamingIdempotencyRetentionDays` |
 
 ## 6. Wiring tests
 These protect the app setup rather than a rule users meet.
