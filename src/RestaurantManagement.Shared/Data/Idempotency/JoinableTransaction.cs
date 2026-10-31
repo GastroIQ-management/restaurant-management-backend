@@ -61,7 +61,7 @@ namespace RestaurantManagement.Shared.Data.Idempotency
             if (IsJoined || _ended)
                 return;
 
-            await EndWithoutCommitAsync(cancellationToken);
+            await EndWithoutCommitAsync(cancellationToken, reportRollbackFailure: true);
         }
 
         public async ValueTask DisposeAsync()
@@ -74,20 +74,22 @@ namespace RestaurantManagement.Shared.Data.Idempotency
             await _transaction.DisposeAsync();
         }
 
-        private async Task EndWithoutCommitAsync(CancellationToken cancellationToken)
+        private async Task EndWithoutCommitAsync(CancellationToken cancellationToken, bool reportRollbackFailure = false)
         {
             _ended = true;
             try
             {
                 await _transaction.RollbackAsync(cancellationToken);
             }
-            catch (Exception) when (!cancellationToken.IsCancellationRequested)
+            catch (Exception) when (!reportRollbackFailure && !cancellationToken.IsCancellationRequested)
             {
                 // The transaction is already unusable (for example a failed commit); disposing it discards the work.
             }
-
-            // The undo must run even when the request was cancelled.
-            await _steps.RunOnceAsync();
+            finally
+            {
+                // The undo must run even when the request was cancelled or the rollback failed.
+                await _steps.RunOnceAsync();
+            }
         }
 
         private sealed class UndoSteps

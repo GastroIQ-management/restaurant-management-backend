@@ -148,7 +148,15 @@ namespace RestaurantManagement.Modules.Organization.Services
 
             // Commit only after the Owner role is confirmed. When the request's transaction is joined,
             // the filter commits it after saving the key, and the undo step still revokes the Owner on failure.
-            await tx.CommitAsync();
+            try
+            {
+                await tx.CommitAsync();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to commit organization {OrganizationId} after the Owner access was set up for user {UserId}; the Owner access is being revoked.", org.Id, ownerUserId);
+                throw;
+            }
 
             return ToResponse(org, settings);
         }
