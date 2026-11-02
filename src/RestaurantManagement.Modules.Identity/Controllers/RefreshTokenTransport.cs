@@ -39,6 +39,7 @@ namespace RestaurantManagement.Modules.Identity.Controllers
                 return result.Auth;
             }
 
+            _context.Response.Headers.CacheControl = "no-store";
             result.Auth.RefreshToken = result.RefreshToken;
             result.Auth.RefreshTokenExpiresAt = result.RefreshTokenExpiresAt;
             return result.Auth;
