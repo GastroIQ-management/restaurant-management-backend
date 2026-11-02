@@ -32,7 +32,7 @@ the headers.
 ## Overall Definition of Done
 - [x] All tasks done, tests passing
 - [x] All Outcomes met (spec Outcomes)
-- [x] Affected tests green after the last batch; full suite green in CI (Continuous Integration)
+- [ ] Affected tests green after the last batch; full suite green in CI (Continuous Integration) — green locally; CI runs on the pull request
 - [x] No out-of-scope changes
 - [x] `python3 .claude/scripts/check-security-matrices.py` passes
 
