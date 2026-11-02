@@ -29,22 +29,34 @@ namespace RestaurantManagement.Web.Hosting
                 options.Debug = builder.Environment.IsDevelopment();
                 options.TracesSampleRate = ReadTracesSampleRate(builder.Configuration, builder.Environment.IsDevelopment());
                 options.SetBeforeSend(RemoveRefreshTokenHeader);
+                options.SetBeforeSendTransaction(RemoveRefreshTokenHeader);
             });
 
             return builder;
         }
 
         // The header carries a long-lived session secret and Sentry does not treat custom headers as sensitive.
+        // Errors and traces both carry the request, so both go through here.
         private static SentryEvent? RemoveRefreshTokenHeader(SentryEvent sentryEvent, SentryHint hint)
         {
-            var names = sentryEvent.Request.Headers.Keys
+            RemoveRefreshTokenHeader(sentryEvent.Request);
+            return sentryEvent;
+        }
+
+        private static SentryTransaction? RemoveRefreshTokenHeader(SentryTransaction transaction, SentryHint hint)
+        {
+            RemoveRefreshTokenHeader(transaction.Request);
+            return transaction;
+        }
+
+        private static void RemoveRefreshTokenHeader(SentryRequest request)
+        {
+            var names = request.Headers.Keys
                 .Where(name => string.Equals(name, RefreshTokenHeader, StringComparison.OrdinalIgnoreCase))
                 .ToList();
 
             foreach (var name in names)
-                sentryEvent.Request.Headers.Remove(name);
-
-            return sentryEvent;
+                request.Headers.Remove(name);
         }
 
         private static double ReadTracesSampleRate(IConfiguration configuration, bool isDevelopment)

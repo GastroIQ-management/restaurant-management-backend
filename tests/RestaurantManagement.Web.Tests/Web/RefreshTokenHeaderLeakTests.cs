@@ -87,6 +87,35 @@ public class RefreshTokenHeaderLeakTests
         transport.Sent.ToString().ShouldContain("pt-BR,pt;q=0.9", customMessage: "other headers are kept so errors stay easy to investigate");
     }
 
+    [Theory]
+    [InlineData("X-Refresh-Token")]
+    [InlineData("x-refresh-token")]
+    [Trait("Rule", "T173")]
+    [Trait("Rule", "W33")]
+    public async Task SentryTransaction_RequestCarriesRefreshTokenHeader_LeavesWithoutTheTokenAndKeepsOtherHeaders(string headerName)
+    {
+        // Arrange
+        using var factory = new AuthApiFactory();
+        var options = factory.Services.GetRequiredService<IOptions<SentryAspNetCoreOptions>>().Value;
+        var transport = new RecordingTransport();
+        options.Dsn = "https://0123456789abcdef@o0.ingest.sentry.io/1";
+        options.Transport = transport;
+        options.TracesSampleRate = 1.0;
+        using var sdk = SentrySdk.Init(options);
+        var transaction = SentrySdk.StartTransaction("POST /api/v1/auth/refresh", "http.server");
+        transaction.Request.Headers[headerName] = Secret;
+        transaction.Request.Headers["Accept-Language"] = "pt-BR,pt;q=0.9";
+
+        // Act
+        transaction.Finish();
+        await SentrySdk.FlushAsync(TimeSpan.FromSeconds(10));
+
+        // Assert
+        transport.Sent.Length.ShouldBeGreaterThan(0, "the transaction is sent");
+        transport.Sent.ToString().ShouldNotContain(Secret, customMessage: "the refresh token header value must never reach Sentry traces, whatever the letter case");
+        transport.Sent.ToString().ShouldContain("pt-BR,pt;q=0.9", customMessage: "other headers are kept so traces stay easy to investigate");
+    }
+
     // Weak guard: with the session service substituted this only proves the controller and middleware never log or echo the header token
     [Fact]
     [Trait("Rule", "T174")]

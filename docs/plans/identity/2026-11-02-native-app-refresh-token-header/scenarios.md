@@ -35,6 +35,7 @@ Guard = already correct today and must stay so (the test passes before the chang
 | 25 | T3 | Happy | Native change password revokes every session, sets no cookie; earlier header tokens are refused | `ChangePassword_NativeCorrectCurrentPassword_RefusesEarlierHeaderTokensAndSetsNoCookie` | `W/Identity/NativeAppSessionEndpointTests.cs` |
 | 26 | T4 | Happy | A Sentry event whose request carries `X-Refresh-Token` (any letter case) leaves without the token value and keeps other headers | `SentryEvent_RequestCarriesRefreshTokenHeader_LeavesWithoutTheTokenAndKeepsOtherHeaders` | `W/Web/RefreshTokenHeaderLeakTests.cs` |
 | 27 | T4 | Guard | A refused native refresh puts the token in no log entry and not in the 401 answer | `Refresh_NativeTokenRefused_NeitherLogsNorAnswerContainTheToken` | `W/Web/RefreshTokenHeaderLeakTests.cs` |
+| 29 | T4 | Happy | A Sentry transaction (trace) whose request carries `X-Refresh-Token` (any letter case) leaves without the token value and keeps other headers | `SentryTransaction_RequestCarriesRefreshTokenHeader_LeavesWithoutTheTokenAndKeepsOtherHeaders` | `W/Web/RefreshTokenHeaderLeakTests.cs` |
 
 ## Spec Outcome coverage
 | Outcome | Scenarios |
@@ -59,7 +60,7 @@ None. No existing test is edited. Test files touched: one new test added to `Sta
 - #27 is a weak guard (session service substituted); it proves little beyond the controller and middleware not logging or echoing the header.
 
 ## Assumptions
-- No size label in the plan: treated as size L (4 tasks, High risk, 3 batches), so the 40-scenario budget applies; 28 used.
+- No size label in the plan: treated as size L (4 tasks, High risk, 3 batches), so the 40-scenario budget applies; 29 used.
 - Six scenarios (6, 7, 12, 17, 20, 27) already pass today because the service rules already refuse these cases, or because the web path does not change; they are guards, not failing tests.
 - Stubs: only `NativeAppOptions` and `NativeAppOptionsValidator` (validator body throws `NotImplementedException`) in `Services/NativeApps/`. Not wired in `Program.cs` or `appsettings.json`: the implementer does that (scenarios 4 and 5 fail until then).
 - The carrier helper, `AuthResponse` fields and `X-Refresh-Token` constant are not stubbed: tests go through HTTP and use the header literal, so they compile without them.
