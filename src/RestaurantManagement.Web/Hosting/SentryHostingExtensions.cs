@@ -1,3 +1,4 @@
+using Sentry;
 using Sentry.AspNetCore;
 
 namespace RestaurantManagement.Web.Hosting
@@ -6,6 +7,8 @@ namespace RestaurantManagement.Web.Hosting
     {
         private const string DsnKey = "Sentry:Dsn";
         private const string TracesSampleRateKey = "Sentry:TracesSampleRate";
+        // Same name as the Identity refresh token header; that constant is internal to Identity.
+        private const string RefreshTokenHeader = "X-Refresh-Token";
         private const double DevelopmentTracesSampleRate = 1.0;
         private const double DefaultTracesSampleRate = 0.1;
         private const double MinimumTracesSampleRate = 0.0;
@@ -25,9 +28,23 @@ namespace RestaurantManagement.Web.Hosting
                 options.Dsn = builder.Configuration[DsnKey];
                 options.Debug = builder.Environment.IsDevelopment();
                 options.TracesSampleRate = ReadTracesSampleRate(builder.Configuration, builder.Environment.IsDevelopment());
+                options.SetBeforeSend(RemoveRefreshTokenHeader);
             });
 
             return builder;
+        }
+
+        // The header carries a long-lived session secret and Sentry does not treat custom headers as sensitive.
+        private static SentryEvent? RemoveRefreshTokenHeader(SentryEvent sentryEvent, SentryHint hint)
+        {
+            var names = sentryEvent.Request.Headers.Keys
+                .Where(name => string.Equals(name, RefreshTokenHeader, StringComparison.OrdinalIgnoreCase))
+                .ToList();
+
+            foreach (var name in names)
+                sentryEvent.Request.Headers.Remove(name);
+
+            return sentryEvent;
         }
 
         private static double ReadTracesSampleRate(IConfiguration configuration, bool isDevelopment)

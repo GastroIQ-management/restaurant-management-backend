@@ -33,7 +33,7 @@
 - [x] T1 — Native origins setting, checked at startup
 - [x] T2 — Native login, refresh and choose organization
 - [x] T3 — Native logout, logout-all and change password
-- [ ] T4 — Header token kept out of error reports
+- [x] T4 — Header token kept out of error reports
 
 ## Assumptions
 - Header `X-Refresh-Token`; body fields `refreshToken` and `refreshTokenExpiresAt`, left out of web responses entirely (not sent as null) — names not set by the spec

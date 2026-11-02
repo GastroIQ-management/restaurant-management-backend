@@ -419,7 +419,7 @@ accented or non-Latin characters may not fit (R6, T7; bcrypt limit, ASVS V6.2.9)
 | T170 | Native origins setting holds one or both native origins, or is empty | Accepted; an empty list turns native mode off | ❌ | `NativeAppOptionsValidatorTests.Validate_EachNativeOrigin_Succeeds`, `NativeAppOptionsValidatorTests.Validate_EmptyList_SucceedsAndTurnsNativeModeOff` |
 | T171 | Startup with a web origin in `NativeApp:Origins` | The app refuses to start, naming `NativeApp:Origins` | ❌ | `StartupConfigurationTests.Startup_NativeAppOriginIsAWebOrigin_FailsNamingNativeAppOrigins` |
 | T172 | Shipped `NativeApp:Origins` | Exactly `https://localhost` and `capacitor://localhost` | ❌ | `ShippedNativeOriginsTests.Configuration_ShippedNativeAppOrigins_AreExactlyTheTwoNativeOrigins` |
-| T173 | Error report (Sentry event) of a request carrying `X-Refresh-Token` | The token value never leaves; other headers are kept; any route, any letter case | ❌ | `RefreshTokenHeaderLeakTests.SentryEvent_RequestCarriesRefreshTokenHeader_LeavesWithoutTheTokenAndKeepsOtherHeaders` |
+| T173 | Error report (Sentry event) of a request carrying `X-Refresh-Token` | The token value never leaves; other headers are kept; any route, any letter case | ✅ | `RefreshTokenHeaderLeakTests.SentryEvent_RequestCarriesRefreshTokenHeader_LeavesWithoutTheTokenAndKeepsOtherHeaders` |
 | T174 | Native refresh refused (header token) | No log entry and not the 401 answer holds the token (weak guard: the session service is substituted, so it shows only that the controller and middleware never log or echo it) | ✅ | `RefreshTokenHeaderLeakTests.Refresh_NativeTokenRefused_NeitherLogsNorAnswerContainTheToken` |
 
 ## 11. Schema, migration and wiring tests
