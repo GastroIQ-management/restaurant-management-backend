@@ -43,7 +43,7 @@ the headers.
 - [x] T4 — Organization tables store the times
 - [x] T5 — Identity tables store the times
 - [x] T6 — Menu tables store the times
-- [ ] T7 — OpenAPI declares the two required headers
+- [x] T7 — OpenAPI declares the two required headers
 
 ## Assumptions
 - Times travel as headers `X-Client-Action-Time` and `X-Client-Sent-At` (RFC 3339 date and time with a required offset), with no request body change; rows saved with no signed-in write (registration, background jobs) keep the columns empty — one rule for every module.

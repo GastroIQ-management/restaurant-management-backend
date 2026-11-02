@@ -231,6 +231,7 @@ builder.Services.AddSwaggerGen(c =>
         RestaurantManagement.Web.OpenApi.ApiVersions.IncludesRoute(version, api.RelativePath ?? string.Empty));
     c.OperationFilter<RestaurantManagement.Web.OpenApi.AppVersionHeaderOperationFilter>();
     c.OperationFilter<RestaurantManagement.Web.OpenApi.IdempotencyKeyHeaderOperationFilter>();
+    c.OperationFilter<RestaurantManagement.Web.OpenApi.ClientTimeHeadersOperationFilter>();
     c.SchemaFilter<RestaurantManagement.Web.OpenApi.VersionRequiredSchemaFilter>();
 
     // Add JWT Authentication to Swagger
