@@ -1,6 +1,6 @@
 # Plan: Record Client Action Time
 
-**Source:** docs/specs/shared/2026-10-30-record-client-action-time.md   **Date:** 2026-10-31   **Status:** In progress
+**Source:** docs/specs/shared/2026-10-30-record-client-action-time.md   **Date:** 2026-10-31   **Status:** Done
 **Risk:** High — new Shared contract, new columns on every table of every module, and two new required headers on every signed-in write
 
 ## Summary

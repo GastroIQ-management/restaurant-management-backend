@@ -130,10 +130,10 @@ Other modules ask Organization for the business day of a location; an Organizati
 
 | ID | Case | Expected | Status | Test |
 |---|---|---|---|---|
-| OR75 | The business day of a location of the token organization for a moment | Taken in the location's time zone with the organization's cutoff: 23:30 local that is already the next day in universal time stays on the local date (Sao Paulo and Toronto); before the cutoff (04:00 by default, or the organization's own, e.g. 05:30) it is the day before | ❌ | `LocationBusinessDayTests.GetBusinessDayAsync_LocationOfTheTokenOrganization_ReturnsTheLocalBusinessDay` |
-| OR76 | The business day of a location that does not exist | Null | ❌ | `LocationBusinessDayTests.GetBusinessDayAsync_UnknownLocation_ReturnsNull` |
-| OR77 | The business day of another organization's location | Null, as if it did not exist | ❌ | `LocationBusinessDayTests.GetBusinessDayAsync_LocationOfAnotherOrganization_ReturnsNullAsIfItDidNotExist` |
-| OR78 | An organization edit with a device time 2 hours old | The organization row stores the corrected action time, the clock error and the received time | ❌ | `OrganizationClientTimeEndpointTests.EditOrganization_SignedInWriteTwoHoursOld_StoresTheTimesOnTheChangedRow` |
+| OR75 | The business day of a location of the token organization for a moment | Taken in the location's time zone with the organization's cutoff: 23:30 local that is already the next day in universal time stays on the local date (Sao Paulo and Toronto); before the cutoff (04:00 by default, or the organization's own, e.g. 05:30) it is the day before | ✅ | `LocationBusinessDayTests.GetBusinessDayAsync_LocationOfTheTokenOrganization_ReturnsTheLocalBusinessDay` |
+| OR76 | The business day of a location that does not exist | Null | ✅ | `LocationBusinessDayTests.GetBusinessDayAsync_UnknownLocation_ReturnsNull` |
+| OR77 | The business day of another organization's location | Null, as if it did not exist | ✅ | `LocationBusinessDayTests.GetBusinessDayAsync_LocationOfAnotherOrganization_ReturnsNullAsIfItDidNotExist` |
+| OR78 | An organization edit with a device time 2 hours old | The organization row stores the corrected action time, the clock error and the received time | ✅ | `OrganizationClientTimeEndpointTests.EditOrganization_SignedInWriteTwoHoursOld_StoresTheTimesOnTheChangedRow` |
 
 ## Open questions (no row until decided)
 - **Trial limits are stored but never enforced:** a TRIAL organization gets "1 location" and a
