@@ -39,11 +39,27 @@ namespace RestaurantManagement.Modules.Organization.Migrations
                         .HasColumnType("text")
                         .HasColumnName("city");
 
+                    b.Property<int?>("ClientActionOffsetMinutes")
+                        .HasColumnType("integer")
+                        .HasColumnName("client_action_offset_minutes");
+
+                    b.Property<DateTime?>("ClientActionTime")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("client_action_time");
+
+                    b.Property<TimeSpan?>("ClockError")
+                        .HasColumnType("interval")
+                        .HasColumnName("clock_error");
+
                     b.Property<string>("Code")
                         .IsRequired()
                         .HasMaxLength(10)
                         .HasColumnType("character varying(10)")
                         .HasColumnName("code");
+
+                    b.Property<DateTime?>("CorrectedActionTime")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("corrected_action_time");
 
                     b.Property<string>("Country")
                         .IsRequired()
@@ -76,6 +92,10 @@ namespace RestaurantManagement.Modules.Organization.Migrations
                         .IsRequired()
                         .HasColumnType("text")
                         .HasColumnName("postal_code");
+
+                    b.Property<DateTime?>("ReceivedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("received_at");
 
                     b.Property<string>("State")
                         .IsRequired()
@@ -135,6 +155,22 @@ namespace RestaurantManagement.Modules.Organization.Migrations
                         .HasColumnType("text")
                         .HasColumnName("accent_color");
 
+                    b.Property<int?>("ClientActionOffsetMinutes")
+                        .HasColumnType("integer")
+                        .HasColumnName("client_action_offset_minutes");
+
+                    b.Property<DateTime?>("ClientActionTime")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("client_action_time");
+
+                    b.Property<TimeSpan?>("ClockError")
+                        .HasColumnType("interval")
+                        .HasColumnName("clock_error");
+
+                    b.Property<DateTime?>("CorrectedActionTime")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("corrected_action_time");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at");
@@ -172,6 +208,10 @@ namespace RestaurantManagement.Modules.Organization.Migrations
                         .HasColumnType("text")
                         .HasColumnName("primary_color");
 
+                    b.Property<DateTime?>("ReceivedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("received_at");
+
                     b.Property<string>("SecondaryColor")
                         .HasColumnType("text")
                         .HasColumnName("secondary_color");
@@ -207,6 +247,22 @@ namespace RestaurantManagement.Modules.Organization.Migrations
                         .HasColumnType("time without time zone")
                         .HasColumnName("business_day_cutoff");
 
+                    b.Property<int?>("ClientActionOffsetMinutes")
+                        .HasColumnType("integer")
+                        .HasColumnName("client_action_offset_minutes");
+
+                    b.Property<DateTime?>("ClientActionTime")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("client_action_time");
+
+                    b.Property<TimeSpan?>("ClockError")
+                        .HasColumnType("interval")
+                        .HasColumnName("clock_error");
+
+                    b.Property<DateTime?>("CorrectedActionTime")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("corrected_action_time");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at");
@@ -236,6 +292,10 @@ namespace RestaurantManagement.Modules.Organization.Migrations
                         .IsRequired()
                         .HasColumnType("text")
                         .HasColumnName("plan_type");
+
+                    b.Property<DateTime?>("ReceivedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("received_at");
 
                     b.Property<decimal>("ServiceChargeRate")
                         .HasPrecision(5, 2)
