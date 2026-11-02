@@ -41,7 +41,7 @@ the headers.
 - [x] T2 — Stamp the times on every saved record
 - [x] T3 — Business day of a location through a Shared contract
 - [x] T4 — Organization tables store the times
-- [ ] T5 — Identity tables store the times
+- [x] T5 — Identity tables store the times
 - [ ] T6 — Menu tables store the times
 - [ ] T7 — OpenAPI declares the two required headers
 
