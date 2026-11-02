@@ -93,6 +93,8 @@ public class AuditFieldsMigrationTests : IClassFixture<PostgresDatabaseFixture>
         await MigrateToAsync(context, MenuBeforeAuditMigration);
         await SeedMenusAsync(context);
         await MigrateToAsync(context, auditMigration);
+        // Later migrations add columns the current model reads; the audit backfill is already done.
+        await context.Database.MigrateAsync();
         return (options, auditMigration);
     }
 

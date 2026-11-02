@@ -279,6 +279,18 @@
   <data name="VersionConflict" xml:space="preserve">
     <value>This record was changed by someone else. Review the current version and try again.</value>
   </data>
+  <data name="ClientTimeRequired" xml:space="preserve">
+    <value>Both X-Client-Action-Time and X-Client-Sent-At headers are required.</value>
+  </data>
+  <data name="ClientTimeInvalid" xml:space="preserve">
+    <value>Each device-time header must be one date and time in RFC 3339 format with an offset.</value>
+  </data>
+  <data name="ClientTimeInFuture" xml:space="preserve">
+    <value>The action time cannot be more than 5 minutes in the future.</value>
+  </data>
+  <data name="ClientTimeTooOld" xml:space="preserve">
+    <value>The action time cannot be older than 7 days.</value>
+  </data>
 </root>
 
 

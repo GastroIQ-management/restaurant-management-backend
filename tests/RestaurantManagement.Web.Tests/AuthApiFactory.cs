@@ -7,6 +7,7 @@ using NSubstitute;
 using RestaurantManagement.Modules.Identity.Services.Registration;
 using RestaurantManagement.Modules.Identity.Services.Sessions;
 using RestaurantManagement.Shared.Middleware;
+using RestaurantManagement.Shared.Services.ClientTime;
 
 namespace RestaurantManagement.Web.Tests;
 
@@ -38,6 +39,11 @@ public class AuthApiFactory : WebApplicationFactory<Program>
     {
         base.ConfigureClient(client);
         client.DefaultRequestHeaders.Add(AppVersionMiddleware.HeaderName, AppVersion);
+
+        // Signed-in writes need the device time of the action and the device clock; a test that checks them sets its own per request.
+        var now = DateTimeOffset.UtcNow.ToString("O", System.Globalization.CultureInfo.InvariantCulture);
+        client.DefaultRequestHeaders.Add(ClientTimeHeaders.ActionTime, now);
+        client.DefaultRequestHeaders.Add(ClientTimeHeaders.SentAt, now);
     }
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)

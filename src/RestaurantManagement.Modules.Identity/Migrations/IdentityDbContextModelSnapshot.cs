@@ -33,6 +33,22 @@ namespace RestaurantManagement.Modules.Identity.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("cancelled_at");
 
+                    b.Property<int?>("ClientActionOffsetMinutes")
+                        .HasColumnType("integer")
+                        .HasColumnName("client_action_offset_minutes");
+
+                    b.Property<DateTime?>("ClientActionTime")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("client_action_time");
+
+                    b.Property<TimeSpan?>("ClockError")
+                        .HasColumnType("interval")
+                        .HasColumnName("clock_error");
+
+                    b.Property<DateTime?>("CorrectedActionTime")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("corrected_action_time");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at");
@@ -64,6 +80,10 @@ namespace RestaurantManagement.Modules.Identity.Migrations
                     b.Property<Guid>("OrganizationId")
                         .HasColumnType("uuid")
                         .HasColumnName("organization_id");
+
+                    b.Property<DateTime?>("ReceivedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("received_at");
 
                     b.Property<DateTime?>("ReplacedAt")
                         .HasColumnType("timestamp with time zone")
@@ -108,6 +128,22 @@ namespace RestaurantManagement.Modules.Identity.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("id");
 
+                    b.Property<int?>("ClientActionOffsetMinutes")
+                        .HasColumnType("integer")
+                        .HasColumnName("client_action_offset_minutes");
+
+                    b.Property<DateTime?>("ClientActionTime")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("client_action_time");
+
+                    b.Property<TimeSpan?>("ClockError")
+                        .HasColumnType("interval")
+                        .HasColumnName("clock_error");
+
+                    b.Property<DateTime?>("CorrectedActionTime")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("corrected_action_time");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at");
@@ -140,6 +176,10 @@ namespace RestaurantManagement.Modules.Identity.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("organization_id");
 
+                    b.Property<DateTime?>("ReceivedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("received_at");
+
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_at");
@@ -165,6 +205,22 @@ namespace RestaurantManagement.Modules.Identity.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("id");
 
+                    b.Property<int?>("ClientActionOffsetMinutes")
+                        .HasColumnType("integer")
+                        .HasColumnName("client_action_offset_minutes");
+
+                    b.Property<DateTime?>("ClientActionTime")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("client_action_time");
+
+                    b.Property<TimeSpan?>("ClockError")
+                        .HasColumnType("interval")
+                        .HasColumnName("clock_error");
+
+                    b.Property<DateTime?>("CorrectedActionTime")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("corrected_action_time");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at");
@@ -184,6 +240,10 @@ namespace RestaurantManagement.Modules.Identity.Migrations
                     b.Property<Guid>("OrganizationId")
                         .HasColumnType("uuid")
                         .HasColumnName("organization_id");
+
+                    b.Property<DateTime?>("ReceivedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("received_at");
 
                     b.Property<Guid>("RoleId")
                         .HasColumnType("uuid")
@@ -262,6 +322,22 @@ namespace RestaurantManagement.Modules.Identity.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("id");
 
+                    b.Property<int?>("ClientActionOffsetMinutes")
+                        .HasColumnType("integer")
+                        .HasColumnName("client_action_offset_minutes");
+
+                    b.Property<DateTime?>("ClientActionTime")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("client_action_time");
+
+                    b.Property<TimeSpan?>("ClockError")
+                        .HasColumnType("interval")
+                        .HasColumnName("clock_error");
+
+                    b.Property<DateTime?>("CorrectedActionTime")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("corrected_action_time");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at");
@@ -289,6 +365,10 @@ namespace RestaurantManagement.Modules.Identity.Migrations
                     b.Property<Guid>("OrganizationId")
                         .HasColumnType("uuid")
                         .HasColumnName("organization_id");
+
+                    b.Property<DateTime?>("ReceivedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("received_at");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone")
@@ -322,6 +402,22 @@ namespace RestaurantManagement.Modules.Identity.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("id");
 
+                    b.Property<int?>("ClientActionOffsetMinutes")
+                        .HasColumnType("integer")
+                        .HasColumnName("client_action_offset_minutes");
+
+                    b.Property<DateTime?>("ClientActionTime")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("client_action_time");
+
+                    b.Property<TimeSpan?>("ClockError")
+                        .HasColumnType("interval")
+                        .HasColumnName("clock_error");
+
+                    b.Property<DateTime?>("CorrectedActionTime")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("corrected_action_time");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at");
@@ -337,6 +433,10 @@ namespace RestaurantManagement.Modules.Identity.Migrations
                     b.Property<Guid>("OrganizationId")
                         .HasColumnType("uuid")
                         .HasColumnName("organization_id");
+
+                    b.Property<DateTime?>("ReceivedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("received_at");
 
                     b.Property<Guid>("RoleId")
                         .HasColumnType("uuid")
@@ -377,6 +477,22 @@ namespace RestaurantManagement.Modules.Identity.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("id");
 
+                    b.Property<int?>("ClientActionOffsetMinutes")
+                        .HasColumnType("integer")
+                        .HasColumnName("client_action_offset_minutes");
+
+                    b.Property<DateTime?>("ClientActionTime")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("client_action_time");
+
+                    b.Property<TimeSpan?>("ClockError")
+                        .HasColumnType("interval")
+                        .HasColumnName("clock_error");
+
+                    b.Property<DateTime?>("CorrectedActionTime")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("corrected_action_time");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at");
@@ -392,6 +508,10 @@ namespace RestaurantManagement.Modules.Identity.Migrations
                     b.Property<Guid>("OrganizationId")
                         .HasColumnType("uuid")
                         .HasColumnName("organization_id");
+
+                    b.Property<DateTime?>("ReceivedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("received_at");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone")
@@ -555,6 +675,22 @@ namespace RestaurantManagement.Modules.Identity.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("id");
 
+                    b.Property<int?>("ClientActionOffsetMinutes")
+                        .HasColumnType("integer")
+                        .HasColumnName("client_action_offset_minutes");
+
+                    b.Property<DateTime?>("ClientActionTime")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("client_action_time");
+
+                    b.Property<TimeSpan?>("ClockError")
+                        .HasColumnType("interval")
+                        .HasColumnName("clock_error");
+
+                    b.Property<DateTime?>("CorrectedActionTime")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("corrected_action_time");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at");
@@ -578,6 +714,10 @@ namespace RestaurantManagement.Modules.Identity.Migrations
                     b.Property<Guid>("OrganizationId")
                         .HasColumnType("uuid")
                         .HasColumnName("organization_id");
+
+                    b.Property<DateTime?>("ReceivedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("received_at");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone")
@@ -610,6 +750,22 @@ namespace RestaurantManagement.Modules.Identity.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("id");
 
+                    b.Property<int?>("ClientActionOffsetMinutes")
+                        .HasColumnType("integer")
+                        .HasColumnName("client_action_offset_minutes");
+
+                    b.Property<DateTime?>("ClientActionTime")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("client_action_time");
+
+                    b.Property<TimeSpan?>("ClockError")
+                        .HasColumnType("interval")
+                        .HasColumnName("clock_error");
+
+                    b.Property<DateTime?>("CorrectedActionTime")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("corrected_action_time");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at");
@@ -633,6 +789,10 @@ namespace RestaurantManagement.Modules.Identity.Migrations
                     b.Property<Guid>("OrganizationId")
                         .HasColumnType("uuid")
                         .HasColumnName("organization_id");
+
+                    b.Property<DateTime?>("ReceivedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("received_at");
 
                     b.Property<Guid>("RoleId")
                         .HasColumnType("uuid")

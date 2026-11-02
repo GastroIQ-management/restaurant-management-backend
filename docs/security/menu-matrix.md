@@ -105,6 +105,7 @@ A menu or category change carries the version the caller read. Order of answers:
 | M73 | A member without Menus Manage sends an `Idempotency-Key` on a menu create | 403; no key is stored | ✅ | `MenuIdempotencyEndpointTests.CreateMenu_MemberWithoutMenusManageSendsAKey_ReturnsForbiddenAndStoresNoKey` |
 | M74 | A menu create with a reused menu ID and a key | 409 `id.already_used`; the key is released and can run a corrected request | ✅ | `MenuIdempotencyEndpointTests.CreateMenu_ReusedMenuIdWithAKey_ReturnsConflictAndReleasesTheKey` |
 | M75 | A category create sent twice with one key | One category; the replay keeps 201 and `Location` | ✅ | `MenuIdempotencyEndpointTests.CreateMenuCategory_SameKeyTwice_CreatesOneCategoryAndReplaysCreatedWithLocation` |
+| M76 | A category created with a device time 4 hours old | The new category row stores the corrected action time, the clock error and the received time | ✅ | `MenuCategoryClientTimeEndpointTests.CreateMenuCategory_SignedInWriteFourHoursOld_StoresTheTimesOnTheNewRow` |
 
 ## Open questions (no row until decided)
 - **Categories of an unknown menu or location:** the lists answer 200 with an empty list, while

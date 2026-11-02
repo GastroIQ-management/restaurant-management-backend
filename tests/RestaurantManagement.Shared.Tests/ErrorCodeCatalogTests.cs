@@ -25,6 +25,10 @@ public class ErrorCodeCatalogTests
     [InlineData("id.already_used", 409)]
     [InlineData("idempotency_key.invalid", 400)]
     [InlineData("idempotency_key.reused", 422)]
+    [InlineData("client_time.required", 400)]
+    [InlineData("client_time.invalid", 400)]
+    [InlineData("client_time.in_future", 422)]
+    [InlineData("client_time.too_old", 422)]
     [Trait("Rule", "SH52")]
     public void Read_SharedCatalog_ListsEveryNamedCodeWithItsStatus(string value, int status)
     {

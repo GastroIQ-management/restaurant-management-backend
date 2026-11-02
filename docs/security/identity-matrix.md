@@ -171,6 +171,7 @@ accented or non-Latin characters may not fit (R6, T7; bcrypt limit, ASVS V6.2.9)
 | S10 | One device switches organization | Other devices keep their own organization | ✅ | `SessionServiceSelectOrganizationTests.RefreshTokenAsync_LaptopSelectedTrattoria_TabletStillRefreshesIntoCantina` |
 | S11 | Switching organization late in a session | The new token keeps the login time; the session still ends 30 days after login | ✅ | `SessionServiceSelectOrganizationTests.SelectOrganizationAsync_SessionStarted28DaysAgo_NewTokenKeepsTheLoginTimeAndEndsAtLoginPlus30Days` |
 | S12 | Empty organization ID; not a member, unknown, inactive or another user's organization | 400 `session.organization_required` for the empty ID; the same 403 `session.not_a_member` for all the others | ✅ | `SessionServiceSelectOrganizationTests.SelectOrganizationAsync_NoOrganizationNotAMemberOrUnknownOrganization_ThrowsTheirOwnCode` |
+| S13 | A session action (choose organization, `logout-all`, change password) without the two device-time headers | 400 `client_time.required`; every signed-in write, session actions included, needs both | ✅ | `RoleClientTimeEndpointTests.SessionAction_NoDeviceTimeHeaders_ReturnsBadRequest` |
 
 ## 7. Logout: `POST /api/v1/auth/logout` and `/logout-all`
 | ID | Case | Expected | Status | Test |
@@ -395,6 +396,7 @@ accented or non-Latin characters may not fit (R6, T7; bcrypt limit, ASVS V6.2.9)
 | T165 | `logout-all` sent twice with one key | Runs both times and stores no key, so no cookie answer is ever stored or replayed | ✅ | `IdentityIdempotencyEndpointTests.LogoutAll_SameKeyTwice_RunsBothTimesAndStoresNoKey` |
 | T166 | Invitation create sent twice with one key | One invitation and one email; identical answers | ✅ | `IdentityIdempotencyEndpointTests.CreateInvitation_SameKeyTwice_StoresOneInvitationSendsOneEmailAndAnswersTheSame` |
 | T167 | Invitation accept sent twice with one key | Joins once; the replay returns 204 | ✅ | `IdentityIdempotencyEndpointTests.AcceptInvitation_SameKeyTwice_JoinsOnceAndTheReplayAnswersTheSame` |
+| T168 | A role created with a device time 3 hours old | The new role row stores the corrected action time, the clock error and the received time | ✅ | `RoleClientTimeEndpointTests.CreateRole_SignedInWriteThreeHoursOld_StoresTheTimesOnTheNewRow` |
 
 ## 11. Schema, migration and wiring tests
 These protect the database and the app setup rather than a rule users meet. They are listed so

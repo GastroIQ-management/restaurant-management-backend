@@ -12,11 +12,13 @@ using Sentry;
 using RestaurantManagement.Shared;
 using RestaurantManagement.Shared.Auth;
 using RestaurantManagement.Shared.Data.AuditLog;
+using RestaurantManagement.Shared.Data.ClientTime;
 using RestaurantManagement.Shared.Data.Tenancy;
 using RestaurantManagement.Shared.Middleware;
 using RestaurantManagement.Shared.Options;
 using RestaurantManagement.Shared.Services.AuditLog;
 using RestaurantManagement.Shared.Services.Email;
+using RestaurantManagement.Shared.Services.ClientTime;
 using RestaurantManagement.Shared.Services.Idempotency;
 using RestaurantManagement.Shared.Services.Identity;
 using RestaurantManagement.Shared.Services.Organization;
@@ -115,7 +117,12 @@ builder.Services.AddLocalizedValidationTitle();
 // ---------------------------------------------
 // Controllers
 // ---------------------------------------------
-builder.Services.AddControllers(options => options.Filters.Add<IdempotencyKeyFilter>())
+builder.Services.AddScoped<IClientTimeContext, ClientTimeContext>();
+builder.Services.AddControllers(options =>
+    {
+        options.Filters.Add<IdempotencyKeyFilter>();
+        options.Filters.Add<ClientTimeFilter>();
+    })
     .AddJsonOptions(options =>
     {
         options.JsonSerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
@@ -174,27 +181,28 @@ builder.Services.AddScoped<ICurrentUser, ClaimsCurrentUser>();
 builder.Services.AddScoped<SelectedLocation>();
 builder.Services.AddScoped<ITenantContext, TenantContext>();
 builder.Services.AddScoped<AuditSaveChangesInterceptor>();
+builder.Services.AddScoped<ClientTimeSaveChangesInterceptor>();
 
 builder.Services.AddDbContext<IdentityDbContext>((serviceProvider, options) =>
     options.UseNpgsql(connectionString).UseSnakeCaseNamingConvention()
-        .AddInterceptors(serviceProvider.GetRequiredService<AuditSaveChangesInterceptor>()));
+        .AddInterceptors(serviceProvider.GetRequiredService<AuditSaveChangesInterceptor>(), serviceProvider.GetRequiredService<ClientTimeSaveChangesInterceptor>()));
 
 builder.Services.AddIdempotencyKeyStore<IdentityDbContext>(typeof(RestaurantManagement.Modules.Identity.Controllers.AuthController).Assembly);
 
 builder.Services.AddDbContext<MenuDbContext>((serviceProvider, options) =>
     options.UseNpgsql(connectionString).UseSnakeCaseNamingConvention()
-        .AddInterceptors(serviceProvider.GetRequiredService<AuditSaveChangesInterceptor>()));
+        .AddInterceptors(serviceProvider.GetRequiredService<AuditSaveChangesInterceptor>(), serviceProvider.GetRequiredService<ClientTimeSaveChangesInterceptor>()));
 
 builder.Services.AddIdempotencyKeyStore<MenuDbContext>(typeof(RestaurantManagement.Modules.Menu.Controllers.MenuController).Assembly);
 
 builder.Services.AddDbContext<OrganizationDbContext>((serviceProvider, options) =>
     options.UseNpgsql(connectionString).UseSnakeCaseNamingConvention()
-        .AddInterceptors(serviceProvider.GetRequiredService<AuditSaveChangesInterceptor>()));
+        .AddInterceptors(serviceProvider.GetRequiredService<AuditSaveChangesInterceptor>(), serviceProvider.GetRequiredService<ClientTimeSaveChangesInterceptor>()));
 
 builder.Services.AddIdempotencyKeyStore<OrganizationDbContext>(typeof(RestaurantManagement.Modules.Organization.Controllers.OrganizationController).Assembly);
 
 builder.Services.AddAuditLog((sp, options) => options.UseNpgsql(connectionString).UseSnakeCaseNamingConvention()
-    .AddInterceptors(sp.GetRequiredService<AuditSaveChangesInterceptor>()));
+    .AddInterceptors(sp.GetRequiredService<AuditSaveChangesInterceptor>(), sp.GetRequiredService<ClientTimeSaveChangesInterceptor>()));
 
 // ---------------------------------------------
 // Sentry for error tracking
@@ -223,6 +231,7 @@ builder.Services.AddSwaggerGen(c =>
         RestaurantManagement.Web.OpenApi.ApiVersions.IncludesRoute(version, api.RelativePath ?? string.Empty));
     c.OperationFilter<RestaurantManagement.Web.OpenApi.AppVersionHeaderOperationFilter>();
     c.OperationFilter<RestaurantManagement.Web.OpenApi.IdempotencyKeyHeaderOperationFilter>();
+    c.OperationFilter<RestaurantManagement.Web.OpenApi.ClientTimeHeadersOperationFilter>();
     c.SchemaFilter<RestaurantManagement.Web.OpenApi.VersionRequiredSchemaFilter>();
 
     // Add JWT Authentication to Swagger
@@ -309,6 +318,8 @@ builder.Services.AddScoped<RestaurantManagement.Modules.Menu.Services.IMenuCateg
 
 // Cross-Module Contracts (Shared interface, implemented by the owning module)
 builder.Services.AddScoped<IOrganizationLookup, RestaurantManagement.Modules.Organization.Services.OrganizationLookup>();
+builder.Services.AddSingleton<IBusinessDayCalculator, BusinessDayCalculator>();
+builder.Services.AddScoped<ILocationBusinessDay, RestaurantManagement.Modules.Organization.Services.LocationBusinessDay>();
 builder.Services.AddScoped<IMemberAccessLookup, RestaurantManagement.Modules.Identity.Services.Members.MemberAccessLookup>();
 builder.Services.AddScoped<IOrganizationAccessSetup, RestaurantManagement.Modules.Identity.Services.Members.OrganizationAccessSetup>();
 builder.Services.AddScoped<RestaurantManagement.Modules.Identity.Services.Members.IMemberAccessService, RestaurantManagement.Modules.Identity.Services.Members.MemberAccessService>();

@@ -91,3 +91,5 @@ These protect the app setup rather than a rule users meet.
 | WD13 | `IdempotencyKeyWiringTests.V1Document_SignedInWrites_DeclareTheOptionalIdempotencyKeyHeaderAsUuid` | Generated clients may send `Idempotency-Key` on every signed-in write |
 | WD14 | `IdempotencyKeyWiringTests.V1Document_PublicWritesSessionActionsAndReads_DoNotDeclareTheIdempotencyKeyHeader` | The header is not shown where the key is ignored |
 | WD15 | `IdempotencyKeyWiringTests.EveryEndpoint_SignedInWrite_BelongsToAModuleWithAKeyStoreOrIgnoresKeys` | No module's signed-in write silently skips the key |
+| WD16 | `ClientTimeHeadersOpenApiTests.V1Document_SignedInWrites_DeclareBothDeviceTimeHeadersAsRequiredDateTimes` | Generated clients send `X-Client-Action-Time` and `X-Client-Sent-At` on every signed-in write |
+| WD17 | `ClientTimeHeadersOpenApiTests.V1Document_PublicWritesAndReads_DoNotDeclareTheDeviceTimeHeaders` | The headers are not shown on reads and anonymous writes |

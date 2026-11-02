@@ -7,5 +7,11 @@ namespace RestaurantManagement.Shared.Data.Entities
         public DateTime UpdatedAt { get; set; }
         public Guid? CreatedByUserId { get; set; }
         public Guid? UpdatedByUserId { get; set; }
+
+        public DateTime? ClientActionTime { get; set; }
+        public int? ClientActionOffsetMinutes { get; set; }
+        public DateTime? CorrectedActionTime { get; set; }
+        public TimeSpan? ClockError { get; set; }
+        public DateTime? ReceivedAt { get; set; }
     }
 }
