@@ -317,6 +317,8 @@ builder.Services.AddScoped<RestaurantManagement.Modules.Menu.Services.IMenuCateg
 
 // Cross-Module Contracts (Shared interface, implemented by the owning module)
 builder.Services.AddScoped<IOrganizationLookup, RestaurantManagement.Modules.Organization.Services.OrganizationLookup>();
+builder.Services.AddSingleton<IBusinessDayCalculator, BusinessDayCalculator>();
+builder.Services.AddScoped<ILocationBusinessDay, RestaurantManagement.Modules.Organization.Services.LocationBusinessDay>();
 builder.Services.AddScoped<IMemberAccessLookup, RestaurantManagement.Modules.Identity.Services.Members.MemberAccessLookup>();
 builder.Services.AddScoped<IOrganizationAccessSetup, RestaurantManagement.Modules.Identity.Services.Members.OrganizationAccessSetup>();
 builder.Services.AddScoped<RestaurantManagement.Modules.Identity.Services.Members.IMemberAccessService, RestaurantManagement.Modules.Identity.Services.Members.MemberAccessService>();
