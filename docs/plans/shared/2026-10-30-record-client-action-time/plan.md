@@ -30,11 +30,11 @@ the headers.
 | T4–T6 | — | — | Migration on every table of the module (no data yet, no backfill) |
 
 ## Overall Definition of Done
-- [ ] All tasks done, tests passing
-- [ ] All Outcomes met (spec Outcomes)
-- [ ] Affected tests green after the last batch; full suite green in CI (Continuous Integration)
-- [ ] No out-of-scope changes
-- [ ] `python3 .claude/scripts/check-security-matrices.py` passes
+- [x] All tasks done, tests passing
+- [x] All Outcomes met (spec Outcomes)
+- [x] Affected tests green after the last batch; full suite green in CI (Continuous Integration)
+- [x] No out-of-scope changes
+- [x] `python3 .claude/scripts/check-security-matrices.py` passes
 
 ## Checklist
 - [x] T1 — Check the device-time headers on signed-in writes
