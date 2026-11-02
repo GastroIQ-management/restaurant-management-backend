@@ -1,6 +1,6 @@
 # Plan: Native App Refresh Token in a Header
 
-**Source:** docs/specs/identity/2026-11-02-native-app-refresh-token-header.md   **Date:** 2026-11-02   **Status:** In progress
+**Source:** docs/specs/identity/2026-11-02-native-app-refresh-token-header.md   **Date:** 2026-11-02   **Status:** Done
 **Risk:** High — auth change: the refresh token (long-lived session secret) is returned in a response body for requests from native app origins
 
 ## Summary
@@ -23,11 +23,11 @@
 | T4 | — | — | Secret kept out of Sentry (error tracking service) events |
 
 ## Overall Definition of Done
-- [ ] All tasks done, tests passing
-- [ ] All Outcomes met (spec Outcomes)
-- [ ] Affected tests green after the last batch; full suite green in CI (Continuous Integration)
-- [ ] No out-of-scope changes
-- [ ] `docs/security/identity-matrix.md` and `docs/security/web-matrix.md` rows ✅ with their tests; `python3 .claude/scripts/check-security-matrices.py` passes
+- [x] All tasks done, tests passing
+- [x] All Outcomes met (spec Outcomes)
+- [x] Affected tests green after the last batch; full suite green in CI (Continuous Integration)
+- [x] No out-of-scope changes
+- [x] `docs/security/identity-matrix.md` and `docs/security/web-matrix.md` rows ✅ with their tests; `python3 .claude/scripts/check-security-matrices.py` passes
 
 ## Checklist
 - [x] T1 — Native origins setting, checked at startup

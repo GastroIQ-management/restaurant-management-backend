@@ -72,7 +72,7 @@ for one module (rate limits on sign-in endpoints, the refresh cookie) are in tha
 | W32 | Startup with an idempotency retention that is not positive | The app refuses to start, naming `Idempotency:RetentionDays` | ✅ | `IdempotencyKeyWiringTests.Startup_NonPositiveIdempotencyRetentionDays_FailsNamingIdempotencyRetentionDays` |
 | W33 | Error report (Sentry event) of a request carrying the `X-Refresh-Token` header | The token value never leaves, whatever the route or letter case; other headers are kept | ✅ | `RefreshTokenHeaderLeakTests.SentryEvent_RequestCarriesRefreshTokenHeader_LeavesWithoutTheTokenAndKeepsOtherHeaders` |
 | W34 | Native refresh refused with a header token | No log entry and not the 401 answer holds the token (weak guard: the session service is substituted) | ✅ | `RefreshTokenHeaderLeakTests.Refresh_NativeTokenRefused_NeitherLogsNorAnswerContainTheToken` |
-| W35 | Startup with a web origin in `NativeApp:Origins` | The app refuses to start, naming `NativeApp:Origins` | ❌ | `StartupConfigurationTests.Startup_NativeAppOriginIsAWebOrigin_FailsNamingNativeAppOrigins` |
+| W35 | Startup with a web origin in `NativeApp:Origins` | The app refuses to start, naming `NativeApp:Origins` | ✅ | `StartupConfigurationTests.Startup_NativeAppOriginIsAWebOrigin_FailsNamingNativeAppOrigins` |
 
 ## 6. Wiring tests
 These protect the app setup rather than a rule users meet.
