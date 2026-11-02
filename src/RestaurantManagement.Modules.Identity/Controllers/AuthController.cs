@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using Microsoft.AspNetCore.RateLimiting;
 using RestaurantManagement.Modules.Identity.Models.Common;
 using RestaurantManagement.Modules.Identity.Models.Invitations;
@@ -8,6 +9,7 @@ using RestaurantManagement.Modules.Identity.Models.Passwords;
 using RestaurantManagement.Modules.Identity.Models.Registration;
 using RestaurantManagement.Modules.Identity.Models.Sessions;
 using RestaurantManagement.Modules.Identity.Services.Invitations;
+using RestaurantManagement.Modules.Identity.Services.NativeApps;
 using RestaurantManagement.Modules.Identity.Services.Passwords;
 using RestaurantManagement.Modules.Identity.Services.Registration;
 using RestaurantManagement.Modules.Identity.Services.Sessions;
@@ -51,21 +53,24 @@ namespace RestaurantManagement.Modules.Identity.Controllers
         [HttpPost("login")]
         [AllowAnonymous]
         [EnableRateLimiting(AuthRateLimitPolicies.Login)]
-        public async Task<ActionResult<AuthResponse>> Login([FromBody] LoginRequest request)
+        public async Task<ActionResult<AuthResponse>> Login(
+            [FromBody] LoginRequest request, [FromServices] IOptions<NativeAppOptions> native)
         {
-            var result = await _sessionService.LoginAsync(
-                request, RefreshTokenCookie.ClientOf(HttpContext), RefreshTokenCookie.Read(Request));
-            return RespondWithCookie(result);
+            var transport = new RefreshTokenTransport(HttpContext, native.Value);
+            var previousToken = transport.IsNative ? null : transport.Read();
+            var result = await _sessionService.LoginAsync(request, RefreshTokenCookie.ClientOf(HttpContext), previousToken);
+            return Ok(transport.Write(result));
         }
 
         // POST api/v1/auth/refresh
         [HttpPost("refresh")]
         [AllowAnonymous]
         [EnableRateLimiting(AuthRateLimitPolicies.Refresh)]
-        public async Task<ActionResult<AuthResponse>> Refresh()
+        public async Task<ActionResult<AuthResponse>> Refresh([FromServices] IOptions<NativeAppOptions> native)
         {
-            var result = await _sessionService.RefreshTokenAsync(RefreshTokenCookie.Read(Request));
-            return RespondWithCookie(result);
+            var transport = new RefreshTokenTransport(HttpContext, native.Value);
+            var result = await _sessionService.RefreshTokenAsync(transport.Read());
+            return Ok(transport.Write(result));
         }
 
         // POST api/v1/auth/accept-invitation
@@ -82,15 +87,17 @@ namespace RestaurantManagement.Modules.Identity.Controllers
         [HttpPost("select-organization")]
         [Authorize]
         [IgnoreIdempotencyKey]
-        public async Task<ActionResult<AuthResponse>> SelectOrganization([FromBody] SelectOrganizationRequest request)
+        public async Task<ActionResult<AuthResponse>> SelectOrganization(
+            [FromBody] SelectOrganizationRequest request, [FromServices] IOptions<NativeAppOptions> native)
         {
             var subject = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (!Guid.TryParse(subject, out var userId))
                 return Unauthorized();
 
+            var transport = new RefreshTokenTransport(HttpContext, native.Value);
             var result = await _sessionService.SelectOrganizationAsync(
-                userId, request, RefreshTokenCookie.Read(Request), RefreshTokenCookie.ClientOf(HttpContext));
-            return RespondWithCookie(result);
+                userId, request, transport.Read(), RefreshTokenCookie.ClientOf(HttpContext));
+            return Ok(transport.Write(result));
         }
 
         // POST api/v1/auth/logout
@@ -117,12 +124,6 @@ namespace RestaurantManagement.Modules.Identity.Controllers
             await _sessionService.LogoutAllAsync(userId);
             RefreshTokenCookie.Clear(Response);
             return NoContent();
-        }
-
-        private ActionResult<AuthResponse> RespondWithCookie(SessionResult result)
-        {
-            RefreshTokenCookie.Write(Response, result.RefreshToken, result.RefreshTokenExpiresAt);
-            return Ok(result.Auth);
         }
 
         // POST api/v1/auth/verify

@@ -31,7 +31,7 @@
 
 ## Checklist
 - [x] T1 — Native origins setting, checked at startup
-- [ ] T2 — Native login, refresh and choose organization
+- [x] T2 — Native login, refresh and choose organization
 - [ ] T3 — Native logout, logout-all and change password
 - [ ] T4 — Header token kept out of error reports
 

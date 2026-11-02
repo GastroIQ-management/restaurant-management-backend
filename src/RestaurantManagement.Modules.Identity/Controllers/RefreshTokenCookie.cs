@@ -4,7 +4,7 @@ using RestaurantManagement.Modules.Identity.Models.Sessions;
 
 namespace RestaurantManagement.Modules.Identity.Controllers
 {
-    // The refresh token travels only in this cookie, never in a response body.
+    // The cookie carries the refresh token for web requests; native apps use RefreshTokenTransport instead.
     internal static class RefreshTokenCookie
     {
         public const string Name = "__Secure-refresh_token";
