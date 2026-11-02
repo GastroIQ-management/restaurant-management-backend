@@ -12,6 +12,7 @@ using Sentry;
 using RestaurantManagement.Shared;
 using RestaurantManagement.Shared.Auth;
 using RestaurantManagement.Shared.Data.AuditLog;
+using RestaurantManagement.Shared.Data.ClientTime;
 using RestaurantManagement.Shared.Data.Tenancy;
 using RestaurantManagement.Shared.Middleware;
 using RestaurantManagement.Shared.Options;
@@ -180,27 +181,28 @@ builder.Services.AddScoped<ICurrentUser, ClaimsCurrentUser>();
 builder.Services.AddScoped<SelectedLocation>();
 builder.Services.AddScoped<ITenantContext, TenantContext>();
 builder.Services.AddScoped<AuditSaveChangesInterceptor>();
+builder.Services.AddScoped<ClientTimeSaveChangesInterceptor>();
 
 builder.Services.AddDbContext<IdentityDbContext>((serviceProvider, options) =>
     options.UseNpgsql(connectionString).UseSnakeCaseNamingConvention()
-        .AddInterceptors(serviceProvider.GetRequiredService<AuditSaveChangesInterceptor>()));
+        .AddInterceptors(serviceProvider.GetRequiredService<AuditSaveChangesInterceptor>(), serviceProvider.GetRequiredService<ClientTimeSaveChangesInterceptor>()));
 
 builder.Services.AddIdempotencyKeyStore<IdentityDbContext>(typeof(RestaurantManagement.Modules.Identity.Controllers.AuthController).Assembly);
 
 builder.Services.AddDbContext<MenuDbContext>((serviceProvider, options) =>
     options.UseNpgsql(connectionString).UseSnakeCaseNamingConvention()
-        .AddInterceptors(serviceProvider.GetRequiredService<AuditSaveChangesInterceptor>()));
+        .AddInterceptors(serviceProvider.GetRequiredService<AuditSaveChangesInterceptor>(), serviceProvider.GetRequiredService<ClientTimeSaveChangesInterceptor>()));
 
 builder.Services.AddIdempotencyKeyStore<MenuDbContext>(typeof(RestaurantManagement.Modules.Menu.Controllers.MenuController).Assembly);
 
 builder.Services.AddDbContext<OrganizationDbContext>((serviceProvider, options) =>
     options.UseNpgsql(connectionString).UseSnakeCaseNamingConvention()
-        .AddInterceptors(serviceProvider.GetRequiredService<AuditSaveChangesInterceptor>()));
+        .AddInterceptors(serviceProvider.GetRequiredService<AuditSaveChangesInterceptor>(), serviceProvider.GetRequiredService<ClientTimeSaveChangesInterceptor>()));
 
 builder.Services.AddIdempotencyKeyStore<OrganizationDbContext>(typeof(RestaurantManagement.Modules.Organization.Controllers.OrganizationController).Assembly);
 
 builder.Services.AddAuditLog((sp, options) => options.UseNpgsql(connectionString).UseSnakeCaseNamingConvention()
-    .AddInterceptors(sp.GetRequiredService<AuditSaveChangesInterceptor>()));
+    .AddInterceptors(sp.GetRequiredService<AuditSaveChangesInterceptor>(), sp.GetRequiredService<ClientTimeSaveChangesInterceptor>()));
 
 // ---------------------------------------------
 // Sentry for error tracking

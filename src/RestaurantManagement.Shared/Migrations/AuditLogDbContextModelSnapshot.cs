@@ -22,7 +22,7 @@ namespace RestaurantManagement.Shared.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("RestaurantManagement.Shared.Data.AuditLogEntry", b =>
+            modelBuilder.Entity("RestaurantManagement.Shared.Data.AuditLog.AuditLogEntry", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -42,6 +42,22 @@ namespace RestaurantManagement.Shared.Migrations
                     b.Property<string>("Before")
                         .HasColumnType("text")
                         .HasColumnName("before");
+
+                    b.Property<int?>("ClientActionOffsetMinutes")
+                        .HasColumnType("integer")
+                        .HasColumnName("client_action_offset_minutes");
+
+                    b.Property<DateTime?>("ClientActionTime")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("client_action_time");
+
+                    b.Property<TimeSpan?>("ClockError")
+                        .HasColumnType("interval")
+                        .HasColumnName("clock_error");
+
+                    b.Property<DateTime?>("CorrectedActionTime")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("corrected_action_time");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
@@ -78,6 +94,10 @@ namespace RestaurantManagement.Shared.Migrations
                         .HasMaxLength(500)
                         .HasColumnType("character varying(500)")
                         .HasColumnName("reason");
+
+                    b.Property<DateTime?>("ReceivedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("received_at");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone")

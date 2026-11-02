@@ -1,5 +1,3 @@
-using System.ComponentModel.DataAnnotations.Schema;
-
 namespace RestaurantManagement.Shared.Data.Entities
 {
     public abstract class BaseEntity
@@ -10,11 +8,10 @@ namespace RestaurantManagement.Shared.Data.Entities
         public Guid? CreatedByUserId { get; set; }
         public Guid? UpdatedByUserId { get; set; }
 
-        // Stub: [NotMapped] keeps the model unchanged until the migrations exist. Remove it in T2.
-        [NotMapped] public DateTime? ClientActionTime { get; set; }
-        [NotMapped] public int? ClientActionOffsetMinutes { get; set; }
-        [NotMapped] public DateTime? CorrectedActionTime { get; set; }
-        [NotMapped] public TimeSpan? ClockError { get; set; }
-        [NotMapped] public DateTime? ReceivedAt { get; set; }
+        public DateTime? ClientActionTime { get; set; }
+        public int? ClientActionOffsetMinutes { get; set; }
+        public DateTime? CorrectedActionTime { get; set; }
+        public TimeSpan? ClockError { get; set; }
+        public DateTime? ReceivedAt { get; set; }
     }
 }

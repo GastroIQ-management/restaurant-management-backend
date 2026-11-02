@@ -38,7 +38,7 @@ the headers.
 
 ## Checklist
 - [x] T1 — Check the device-time headers on signed-in writes
-- [ ] T2 — Stamp the times on every saved record
+- [x] T2 — Stamp the times on every saved record
 - [ ] T3 — Business day of a location through a Shared contract
 - [ ] T4 — Organization tables store the times
 - [ ] T5 — Identity tables store the times
