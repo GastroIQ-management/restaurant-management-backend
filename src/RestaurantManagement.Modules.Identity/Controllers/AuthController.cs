@@ -104,10 +104,11 @@ namespace RestaurantManagement.Modules.Identity.Controllers
         [HttpPost("logout")]
         [AllowAnonymous]
         [EnableRateLimiting(AuthRateLimitPolicies.Refresh)]
-        public async Task<IActionResult> Logout()
+        public async Task<IActionResult> Logout([FromServices] IOptions<NativeAppOptions> native)
         {
-            await _sessionService.LogoutAsync(RefreshTokenCookie.Read(Request));
-            RefreshTokenCookie.Clear(Response);
+            var transport = new RefreshTokenTransport(HttpContext, native.Value);
+            await _sessionService.LogoutAsync(transport.Read());
+            transport.Clear();
             return NoContent();
         }
 
@@ -115,14 +116,14 @@ namespace RestaurantManagement.Modules.Identity.Controllers
         [HttpPost("logout-all")]
         [Authorize]
         [IgnoreIdempotencyKey]
-        public async Task<IActionResult> LogoutAll()
+        public async Task<IActionResult> LogoutAll([FromServices] IOptions<NativeAppOptions> native)
         {
             var subject = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (!Guid.TryParse(subject, out var userId))
                 return Unauthorized();
 
             await _sessionService.LogoutAllAsync(userId);
-            RefreshTokenCookie.Clear(Response);
+            new RefreshTokenTransport(HttpContext, native.Value).Clear();
             return NoContent();
         }
 
@@ -172,14 +173,16 @@ namespace RestaurantManagement.Modules.Identity.Controllers
         [IgnoreIdempotencyKey]
         [EnableRateLimiting(AuthRateLimitPolicies.ChangePassword)]
         public async Task<ActionResult<MessageResponse>> ChangePassword(
-            [FromBody] ChangePasswordRequest request, [FromServices] IPasswordChangeService changeService)
+            [FromBody] ChangePasswordRequest request,
+            [FromServices] IPasswordChangeService changeService,
+            [FromServices] IOptions<NativeAppOptions> native)
         {
             var subject = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (!Guid.TryParse(subject, out var userId))
                 return Unauthorized();
 
             var response = await changeService.ChangePasswordAsync(userId, request);
-            RefreshTokenCookie.Clear(Response);
+            new RefreshTokenTransport(HttpContext, native.Value).Clear();
             return Ok(response);
         }
     }
