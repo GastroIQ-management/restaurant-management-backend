@@ -100,15 +100,18 @@ public class RefreshTokenHeaderLeakTests
         var transport = new RecordingTransport();
         options.Dsn = "https://0123456789abcdef@o0.ingest.sentry.io/1";
         options.Transport = transport;
-        options.TracesSampleRate = 1.0;
-        using var sdk = SentrySdk.Init(options);
-        var transaction = SentrySdk.StartTransaction("POST /api/v1/auth/refresh", "http.server");
+        using var client = new SentryClient(options);
+        var hub = Substitute.For<IHub>();
+        hub.When(h => h.CaptureTransaction(Arg.Any<SentryTransaction>()))
+            .Do(call => client.CaptureTransaction(call.Arg<SentryTransaction>()));
+        var context = new TransactionContext("POST /api/v1/auth/refresh", "http.server", isSampled: true);
+        var transaction = new TransactionTracer(hub, context);
         transaction.Request.Headers[headerName] = Secret;
         transaction.Request.Headers["Accept-Language"] = "pt-BR,pt;q=0.9";
 
         // Act
         transaction.Finish();
-        await SentrySdk.FlushAsync(TimeSpan.FromSeconds(10));
+        await client.FlushAsync(TimeSpan.FromSeconds(10));
 
         // Assert
         transport.Sent.Length.ShouldBeGreaterThan(0, "the transaction is sent");
