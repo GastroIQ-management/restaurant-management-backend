@@ -157,6 +157,10 @@ builder.Services.AddOptions<RestaurantManagement.Modules.Identity.Services.Invit
     .Bind(builder.Configuration.GetSection(RestaurantManagement.Modules.Identity.Services.Invitations.InvitationOptions.SectionName))
     .ValidateOnStart();
 builder.Services.AddSingleton<IValidateOptions<RestaurantManagement.Modules.Identity.Services.Invitations.InvitationOptions>, RestaurantManagement.Modules.Identity.Services.Invitations.InvitationOptionsValidator>();
+builder.Services.AddOptions<RestaurantManagement.Modules.Identity.Services.NativeApps.NativeAppOptions>()
+    .Bind(builder.Configuration.GetSection(RestaurantManagement.Modules.Identity.Services.NativeApps.NativeAppOptions.SectionName))
+    .ValidateOnStart();
+builder.Services.AddSingleton<IValidateOptions<RestaurantManagement.Modules.Identity.Services.NativeApps.NativeAppOptions>, RestaurantManagement.Modules.Identity.Services.NativeApps.NativeAppOptionsValidator>();
 builder.Services.AddOptions<IdempotencyOptions>()
     .Bind(builder.Configuration.GetSection(IdempotencyOptions.SectionName))
     .ValidateOnStart();

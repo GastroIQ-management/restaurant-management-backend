@@ -1,6 +1,6 @@
 # Plan: Native App Refresh Token in a Header
 
-**Source:** docs/specs/identity/2026-11-02-native-app-refresh-token-header.md   **Date:** 2026-11-02   **Status:** Approved
+**Source:** docs/specs/identity/2026-11-02-native-app-refresh-token-header.md   **Date:** 2026-11-02   **Status:** In progress
 **Risk:** High — auth change: the refresh token (long-lived session secret) is returned in a response body for requests from native app origins
 
 ## Summary
@@ -30,7 +30,7 @@
 - [ ] `docs/security/identity-matrix.md` and `docs/security/web-matrix.md` rows ✅ with their tests; `python3 .claude/scripts/check-security-matrices.py` passes
 
 ## Checklist
-- [ ] T1 — Native origins setting, checked at startup
+- [x] T1 — Native origins setting, checked at startup
 - [ ] T2 — Native login, refresh and choose organization
 - [ ] T3 — Native logout, logout-all and change password
 - [ ] T4 — Header token kept out of error reports
