@@ -30,13 +30,14 @@ namespace RestaurantManagement.Shared.Services.ClientTime
             var sent = Parse(sentAt);
             var received = receivedAt.ToUniversalTime();
             var clockError = sent.UtcDateTime - received.UtcDateTime;
-            var corrected = action.UtcDateTime - clockError;
+            var lead = action.UtcDateTime - received.UtcDateTime - clockError;
 
-            if (corrected > received.UtcDateTime + MaxAhead)
+            if (lead > MaxAhead)
                 throw new BusinessException(ErrorCodes.ClientTimeInFuture, _localizer["ClientTimeInFuture"].Value);
-            if (corrected < received.UtcDateTime - MaxAge)
+            if (lead < -MaxAge)
                 throw new BusinessException(ErrorCodes.ClientTimeTooOld, _localizer["ClientTimeTooOld"].Value);
 
+            var corrected = received.UtcDateTime + lead;
             return new ClientTimes(action.UtcDateTime, (int)action.Offset.TotalMinutes, corrected, clockError, received.UtcDateTime);
         }
 

@@ -103,6 +103,23 @@ public class ClientTimeValidatorTests
         thrown.StatusCode.ShouldBe(422, "a time that is understood but out of bounds is Unprocessable Content");
     }
 
+    [Theory]
+    [InlineData("9999-12-31T23:59:59Z", "0001-01-01T00:00:00Z", "client_time.in_future")]
+    [InlineData("0001-01-01T00:00:00Z", "9999-12-31T23:59:59Z", "client_time.too_old")]
+    [Trait("Rule", "SH136")]
+    public void Validate_BothHeadersReadableButFarApart_Throws422InsteadOfOverflowing(string actionTime, string sentAt, string expectedCode)
+    {
+        // Arrange
+        var sut = CreateSut();
+
+        // Act
+        var thrown = Should.Throw<BusinessException>(() => sut.Validate(actionTime, sentAt, Received));
+
+        // Assert
+        thrown.Code.ShouldBe(expectedCode, "extreme but readable dates are refused like any other out-of-bounds time");
+        thrown.StatusCode.ShouldBe(422, "extreme dates must never become a server error");
+    }
+
     // Outcomes 4 and 5: edge, bounds are inclusive
     [Theory]
     [InlineData(4)]

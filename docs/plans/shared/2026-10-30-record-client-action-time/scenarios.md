@@ -1,7 +1,7 @@
 # Scenarios: Record Client Action Time
 
 **Plan:** docs/plans/shared/2026-10-30-record-client-action-time/plan.md
-**Coverage:** 40 scenarios — 16 happy · 9 edge · 12 failure · 1 security · 2 guard
+**Coverage:** 41 scenarios — 16 happy · 9 edge · 13 failure · 1 security · 2 guard
 
 Test folders: `S` = `tests/RestaurantManagement.Shared.Tests/`, `O` = `tests/RestaurantManagement.Modules.Organization.Tests/`, `W` = `tests/RestaurantManagement.Web.Tests/`.
 
@@ -47,6 +47,7 @@ Test folders: `S` = `tests/RestaurantManagement.Shared.Tests/`, `O` = `tests/Res
 | 38 | T6 | Happy | A menu category created with a time 4 hours old stores the times on the new category row | `CreateMenuCategory_SignedInWriteFourHoursOld_StoresTheTimesOnTheNewRow` | `W/Menu/MenuCategoryClientTimeEndpointTests.cs` |
 | 39 | T7 | Happy | Every signed-in write in the OpenAPI document declares both headers as required date-times with a length limit and a purpose | `V1Document_SignedInWrites_DeclareBothDeviceTimeHeadersAsRequiredDateTimes` | `W/Web/ClientTimeHeadersOpenApiTests.cs` |
 | 40 | T7 | Guard | Reads and anonymous writes do not declare the two headers | `V1Document_PublicWritesAndReads_DoNotDeclareTheDeviceTimeHeaders` | `W/Web/ClientTimeHeadersOpenApiTests.cs` |
+| 41 | T1 | Failure | Both headers readable but far apart (year 9999 against year 0001) are refused with 422, not a server error | `Validate_BothHeadersReadableButFarApart_Throws422InsteadOfOverflowing` | `S/ClientTimeValidatorTests.cs` |
 
 ## Existing tests updated
 - `ErrorCodeCatalogTests.Read_SharedCatalog_ListsEveryNamedCodeWithItsStatus` (rule SH52): four new rows (`client_time.required` 400, `client_time.invalid` 400, `client_time.in_future` 422, `client_time.too_old` 422). Fails until T1 adds the codes.
