@@ -66,6 +66,18 @@ namespace RestaurantManagement.Shared.Utils.Exceptions
         // "idempotency_key.reused", 422
         public static ErrorCode IdempotencyKeyReused { get; } = new("idempotency_key.reused", 422);
 
+        // "client_time.required", 400
+        public static ErrorCode ClientTimeRequired { get; } = new("client_time.required", 400);
+
+        // "client_time.invalid", 400
+        public static ErrorCode ClientTimeInvalid { get; } = new("client_time.invalid", 400);
+
+        // "client_time.in_future", 422
+        public static ErrorCode ClientTimeInFuture { get; } = new("client_time.in_future", 422);
+
+        // "client_time.too_old", 422
+        public static ErrorCode ClientTimeTooOld { get; } = new("client_time.too_old", 422);
+
         // "version.conflict", 409
         public static ErrorCode VersionConflict { get; } = new("version.conflict", 409);
 

@@ -279,4 +279,16 @@
   <data name="VersionConflict" xml:space="preserve">
     <value>Cet enregistrement a été modifié par quelqu'un d'autre. Vérifiez la version actuelle et réessayez.</value>
   </data>
+  <data name="ClientTimeRequired" xml:space="preserve">
+    <value>Les en-têtes X-Client-Action-Time et X-Client-Sent-At sont obligatoires.</value>
+  </data>
+  <data name="ClientTimeInvalid" xml:space="preserve">
+    <value>Chaque en-tête d'heure de l'appareil doit être une date et heure au format RFC 3339 avec décalage.</value>
+  </data>
+  <data name="ClientTimeInFuture" xml:space="preserve">
+    <value>L'heure de l'action ne peut pas dépasser 5 minutes dans le futur.</value>
+  </data>
+  <data name="ClientTimeTooOld" xml:space="preserve">
+    <value>L'heure de l'action ne peut pas dater de plus de 7 jours.</value>
+  </data>
 </root>

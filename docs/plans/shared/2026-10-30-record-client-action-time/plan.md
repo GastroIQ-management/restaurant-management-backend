@@ -1,6 +1,6 @@
 # Plan: Record Client Action Time
 
-**Source:** docs/specs/shared/2026-10-30-record-client-action-time.md   **Date:** 2026-10-31   **Status:** Draft
+**Source:** docs/specs/shared/2026-10-30-record-client-action-time.md   **Date:** 2026-10-31   **Status:** In progress
 **Risk:** High — new Shared contract, new columns on every table of every module, and two new required headers on every signed-in write
 
 ## Summary
@@ -37,7 +37,7 @@ the headers.
 - [ ] `python3 .claude/scripts/check-security-matrices.py` passes
 
 ## Checklist
-- [ ] T1 — Check the device-time headers on signed-in writes
+- [x] T1 — Check the device-time headers on signed-in writes
 - [ ] T2 — Stamp the times on every saved record
 - [ ] T3 — Business day of a location through a Shared contract
 - [ ] T4 — Organization tables store the times

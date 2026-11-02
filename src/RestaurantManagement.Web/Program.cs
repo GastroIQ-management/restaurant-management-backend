@@ -17,6 +17,7 @@ using RestaurantManagement.Shared.Middleware;
 using RestaurantManagement.Shared.Options;
 using RestaurantManagement.Shared.Services.AuditLog;
 using RestaurantManagement.Shared.Services.Email;
+using RestaurantManagement.Shared.Services.ClientTime;
 using RestaurantManagement.Shared.Services.Idempotency;
 using RestaurantManagement.Shared.Services.Identity;
 using RestaurantManagement.Shared.Services.Organization;
@@ -115,7 +116,12 @@ builder.Services.AddLocalizedValidationTitle();
 // ---------------------------------------------
 // Controllers
 // ---------------------------------------------
-builder.Services.AddControllers(options => options.Filters.Add<IdempotencyKeyFilter>())
+builder.Services.AddScoped<IClientTimeContext, ClientTimeContext>();
+builder.Services.AddControllers(options =>
+    {
+        options.Filters.Add<IdempotencyKeyFilter>();
+        options.Filters.Add<ClientTimeFilter>();
+    })
     .AddJsonOptions(options =>
     {
         options.JsonSerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());

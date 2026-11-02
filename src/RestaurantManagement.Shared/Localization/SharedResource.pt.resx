@@ -279,4 +279,16 @@
   <data name="VersionConflict" xml:space="preserve">
     <value>Este registro foi alterado por outra pessoa. Revise a versão atual e tente novamente.</value>
   </data>
+  <data name="ClientTimeRequired" xml:space="preserve">
+    <value>Os cabeçalhos X-Client-Action-Time e X-Client-Sent-At são obrigatórios.</value>
+  </data>
+  <data name="ClientTimeInvalid" xml:space="preserve">
+    <value>Cada cabeçalho de hora do dispositivo deve ser uma data e hora no formato RFC 3339 com fuso.</value>
+  </data>
+  <data name="ClientTimeInFuture" xml:space="preserve">
+    <value>A hora da ação não pode estar mais de 5 minutos no futuro.</value>
+  </data>
+  <data name="ClientTimeTooOld" xml:space="preserve">
+    <value>A hora da ação não pode ser anterior a 7 dias.</value>
+  </data>
 </root>
