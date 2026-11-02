@@ -182,6 +182,23 @@ public class StartupConfigurationTests : IDisposable
         error.ToString().ShouldContain("Sentry:TracesSampleRate", Case.Sensitive, "the app must refuse to start when the Sentry sample rate is outside 0 to 1, and name the setting to fix");
     }
 
+    [Theory]
+    [InlineData("https://app.cantinadanonna.com.br")]
+    [InlineData("https://localhost:8100")]
+    [Trait("Rule", "T171")]
+    [Trait("Rule", "W35")]
+    public void Startup_NativeAppOriginIsAWebOrigin_FailsNamingNativeAppOrigins(string origin)
+    {
+        // Arrange
+        var factory = CreateFactory(Environments.Development, new() { ["NativeApp:Origins:0"] = origin });
+
+        // Act
+        var error = StartupFailure.Capture(factory);
+
+        // Assert
+        error.ToString().ShouldContain("NativeApp:Origins", Case.Sensitive, "the app must refuse to start when a web origin is configured as native, and name the setting to fix");
+    }
+
     // Scenario 18
     [Fact]
     [Trait("Rule", "W20")]
