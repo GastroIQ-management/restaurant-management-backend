@@ -2,7 +2,7 @@
 
 **Status:** proposed
 **Severity:** medium
-**Origin:** docs/plans/shared/2026-10-27-client-generated-ids-on-create/plan.md · B4, T7
+**Origin:** docs/workflow/plans/shared/2026-10-27-client-generated-ids-on-create/plan.md · B4, T7
 **Date:** 2026-10-28
 
 ## Problem

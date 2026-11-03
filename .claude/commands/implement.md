@@ -3,14 +3,15 @@ description: Implement an approved plan batch by batch, then review the branch (
 argument-hint: <module>/<spec-name> [branch or ticket]
 ---
 
-Plan folder: docs/plans/$ARGUMENTS/ (the first word of the arguments is the plan; an optional
+Plan folder: docs/workflow/plans/$ARGUMENTS/ (the first word of the arguments is the plan; an optional
 second word is the branch name or ticket).
 
 If no plan was given, ask me for it and stop.
 
 1. Check `scenarios.md` exists in the plan folder. If not, stop: tests come first (`/test`).
+   Exception: a plan with `**Kind:** Setup` has no tests and no `scenarios.md`; go on.
 2. Run `git status`. The spec, plan and tests were committed at their approvals (`/spec`,
-   `/plan`, `/test`). If anything is uncommitted (this feature's files, `.claude/`, `CLAUDE.md`
+   `/plan`, `/test`; a Setup plan has no tests). If anything is uncommitted (this feature's files, `.claude/`, `CLAUDE.md`
    or other work), stop and list it: I commit or stash it myself before implementing.
 3. Run `git fetch origin`. If the branch (`<type>/<spec-name>`, or the branch or ticket I gave)
    already exists, switch to it and check it contains `origin/development`

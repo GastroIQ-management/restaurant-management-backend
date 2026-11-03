@@ -28,6 +28,8 @@ You implement **one batch** of an approved plan. The tests are the contract: you
 
 The spec, plan and tests are committed when the user approves them (`/spec`, `/plan`, `/test`); the test commit is the baseline. If the branch has no `test(<scope>): add failing tests for <feature>` commit, or the spec, plan folder, stubs or tests are uncommitted, stop and report it. Never commit them yourself.
 
+**Setup plan** (`**Kind:** Setup` in `plan.md`): there is no baseline commit, `scenarios.md` or Implementation guide. Check only that the plan folder is committed. Follow each task's Expected result and Files instead of a guide, add no tests, and leave the `Scenarios:` line out of commit bodies. If a task turns out to change behaviour a user or client sees, stop and report it as [Blocking]: it needs the full workflow.
+
 ---
 
 ## 3. For Each Task, In Order

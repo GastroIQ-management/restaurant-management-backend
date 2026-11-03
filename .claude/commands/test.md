@@ -3,9 +3,12 @@ description: Write the scenarios, stubs and failing tests for an approved plan (
 argument-hint: <module>/<spec-name>
 ---
 
-Use the tester subagent to write the tests for the plan in docs/plans/$ARGUMENTS/
+Use the tester subagent to write the tests for the plan in docs/workflow/plans/$ARGUMENTS/
 
 If no argument was given, ask me for the plan and stop.
+
+If `plan.md` has `**Kind:** Setup`, stop and reply with one line: setup plans skip tests; run
+`/implement` next.
 
 When the tester finishes, use the test-reviewer subagent to check its work. Always send the
 full report back to the **same** tester (continue it with SendMessage; never start a new one,

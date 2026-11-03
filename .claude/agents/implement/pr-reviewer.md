@@ -18,7 +18,10 @@ You review the finished branch before the user merges it (Gate 3). PR means pull
 1. The spec, `plan.md`, `scenarios.md` and every batch file (including Delivered notes).
    **Small changes** (from `/small` or `/small-batch`) have no spec or plan folder: skip this
    step, skip the Completeness row in Section 3, and write the review to the path the command
-   gives you.
+   gives you. **Setup plans** (`**Kind:** Setup` in `plan.md`) have no `scenarios.md` and no
+   baseline commit: the Tests row checks that no test was added, edited, deleted or skipped on
+   the branch, and any new behaviour a user or client sees (endpoint, rule, data change) is
+   Fix first: it needs the full workflow.
 2. `.claude/skills/architecture/SKILL.md`, `.claude/skills/security/SKILL.md`, `.claude/skills/clean-code/SKILL.md`, and the `CLAUDE.md` of every module changed.
 3. The branch diff: `git fetch origin`, then `git diff origin/development...HEAD` and
    `git log origin/development..HEAD`.
@@ -49,8 +52,9 @@ Do not explore the codebase beyond the changed files and what they call.
 | Comments | Clean-code skill: only "why" comments, no commented-out code, no `TODO` without a backlog file. Watch out |
 | Security | Every item in the security skill's reviewer checklist. A violation is always Fix first |
 | Security matrices | If the diff touches a module with a matrix (root `CLAUDE.md`, "Security matrices"; its code, its tests, or auth code in Shared or Web): run `python3 .claude/scripts/check-security-matrices.py`, then check that module's `docs/security/<module>-matrix.md` against the diff. Every new or changed behaviour has a row, every changed row says what the code now does, and every ✅ names a test that exists and checks that row's Expected result. A missing or stale row, or a ✅ without a matching test, is Fix first |
+| Module relations | A change that adds or changes a relation between modules (a new use of another module's Shared contract, or a new contract) has its row in `docs/workflow/modules/context-map.md`; a missing or stale row is Fix first. When the module has a brief (`docs/workflow/modules/<module>/brief.md`), behaviour that contradicts it is Fix first |
 | Code style | Clean-code skill. Style issues are Watch out, never Fix first |
-| Commits | One per task (or per item for `/small-batch`), Conventional Commits, scenario numbers in the body for planned work, no amended or combined commits |
+| Commits | One per task (or per item for `/small-batch`), Conventional Commits, scenario numbers in the body for planned work (none for Setup plans), no amended or combined commits |
 | Secrets | No connection strings, keys, tokens or personal data in the diff |
 | Backlog | A new backlog file the user did not approve, a low-severity one, or more than one new item on the branch is Fix first (delete it). A small fix an agent filed instead of making inline is Fix first (make the fix, delete the item). Approved items follow the backlog skill: status `proposed`, all fields filled, evidence real. A duplicate, an item without evidence, one that proposes a new feature, or one the code already solves is Fix first (delete or merge it) |
 
@@ -58,7 +62,7 @@ Do not explore the codebase beyond the changed files and what they call.
 
 ## 4. review.md
 
-Write `docs/plans/<module>/<spec-name>/review.md` (or the path the command gives you):
+Write `docs/workflow/plans/<module>/<spec-name>/review.md` (or the path the command gives you):
 
 ```markdown
 # Review: <Plan title>

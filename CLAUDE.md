@@ -119,9 +119,10 @@ For a module with a matrix:
     memberships
 
 ## Workflow
-Test-first, with three human gates (⏸). Reviewer agents run automatically between steps and only
+Test-first, with three human gates (⏸), plus Gate 0 for a new module's brief. Reviewer agents run automatically between steps and only
 stop the flow when something is wrong.
 
+- `/module <module> [what it covers]` runs step 0 for a new module and stops at Gate 0.
 - `/spec <requirement>` runs step 1. `/plan <module>/<spec-name>` runs step 2 and stops at Gate 1.
 - `/test <module>/<spec-name>` runs step 3 and stops at Gate 2.
 - `/implement <module>/<spec-name> [branch or ticket]` runs steps 4–5 and stops at Gate 3.
@@ -129,10 +130,17 @@ stop the flow when something is wrong.
   `/small-batch <item; item; …>`: several small, independent items, one commit each.
 - Other commands: `/review`, `/fixbug`.
 
-1. Spec: spec-writer writes `docs/specs/<module>/<YYYY-MM-DD>-<feature>.md` (`shared/` when it
+0. Module brief, new modules only: module-designer writes `docs/workflow/modules/<module>/brief.md`
+   (business only: what the module holds, its relations, who may do what, rules, and a feature
+   map of slices by roadmap ID), adds the module to `docs/workflow/modules/context-map.md`, adds
+   slices missing from `docs/roadmap/` as proposed rows and updates the domain skill.
+   ⏸ Gate 0: the user approves the brief. On approval, the main session creates the branch
+   `docs/<YYYY-MM-DD>-<module>-module-brief` from `origin/development` and commits it. Each slice
+   then goes through steps 1–5. Existing modules get a brief only for a large change.
+1. Spec: spec-writer writes `docs/workflow/specs/<module>/<YYYY-MM-DD>-<feature>.md` (`shared/` when it
    spans modules). Stops only if it has `[Blocking]` questions. On approval, the main session
    creates the branch `<type>/<spec-name>` from `origin/development` and commits the spec.
-2. Plan: planner writes the folder `docs/plans/<module>/<spec-name>/`:
+2. Plan: planner writes the folder `docs/workflow/plans/<module>/<spec-name>/`:
    - `plan.md`: Risk, tasks, batches, Flags, overall Definition of Done and the task Checklist.
      The only file with checkboxes and Status
    - `batches/B<n>.md`: each task's details (context, files, DoD, dependencies), read only by
@@ -158,6 +166,13 @@ stop the flow when something is wrong.
    ⏸ Gate 3: the user reads the summary and review. On approval, the main session commits
    `review.md`; the user then pushes, and merges only when CI is green.
 
+Setup plans skip step 3. A plan is **Setup** when no task changes behaviour a user or client
+sees: adding or upgrading a package, build, CI or tooling configuration, or wiring with no new
+endpoint, rule or data change. Features and bug fixes are never Setup. The planner sets
+`**Kind:**` in `plan.md` and the solution architect confirms it at Gate 1; `/implement` then
+runs with no `scenarios.md` and no baseline commit. The implementer adds no tests, and the
+affected existing tests still run once after the last batch.
+
 High risk (flagged in `plan.md`; the solution architect decides what to do at Gate 1):
 new Shared contract, auth or role changes, new module, migration on a table that has data or
 with a backfill. Adding a package not already in the dependency graph is high risk. Pinning an
@@ -167,6 +182,13 @@ After Gate 2, test files are read-only: never edit, delete, skip or weaken a tes
 mechanical bug that stops a test from running as written (a wrong column name, an identifier
 typo) is fixed, without changing what it asserts, and reported. If a test's expectation looks
 wrong, stop and say why.
+
+### Docs layout
+- `docs/workflow/`: what the workflow produces. `modules/` (briefs and the context map),
+  `specs/`, `plans/` (plan, batches, scenarios and review per spec) and `reviews/` (reviews of
+  small changes and backlog fixes)
+- `docs/roadmap/`: build order and status of every slice, the only place for both
+- `docs/security/`: the security matrices, kept in step with the code
 
 ### Backlog
 Rules in `.claude/skills/backlog/SKILL.md`, read when handling a finding outside the task. Fix

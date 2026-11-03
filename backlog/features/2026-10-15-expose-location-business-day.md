@@ -1,6 +1,6 @@
 # Expose a location's business day to other modules
 
-**Found during:** docs/plans/organization/2026-10-15-organization-and-location-fields/plan.md
+**Found during:** docs/workflow/plans/organization/2026-10-15-organization-and-location-fields/plan.md
 **Date:** 2026-10-15
 
 ## Description

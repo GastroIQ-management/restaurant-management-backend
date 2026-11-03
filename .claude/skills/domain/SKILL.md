@@ -38,13 +38,16 @@ Items marked **[confirm]** are not settled yet; treat them as open, not as rules
 | Identity | User accounts, access, roles | Built |
 | Organization | Restaurant businesses, locations, settings | Built |
 | Menu | Dishes, recipes (dish ↔ ingredients), menus | In progress |
-| Inventory | Ingredients, purchase invoices, stock, low-stock alerts, waste | Planned (next) |
-| Orders | Tables, orders, bill closing | Planned |
+| Floor | Each location's dining room and its tables **[confirm]** | Phase 1 |
+| Orders | Orders, bill closing | Phase 1 |
+| Inventory | Ingredients, purchase invoices, stock, low-stock alerts, waste | Phase 2 |
 | Analytics | Sales per dish, margin per dish, demand forecast, waste detection | Planned |
 | AI Intelligence | Recommendations ("buy more chicken", "chicken will be left over — promote it"), weekly insights | Planned |
 | Staff | Employees, shifts | Planned |
 
 Build order matters: no dish without ingredients, no menu without dishes.
+Build order and status of each slice: `docs/roadmap/`. Each new module has a brief
+(`docs/workflow/modules/<module>/brief.md`); how the modules relate: `docs/workflow/modules/context-map.md`.
 Later: own point of sale with payments by PIX (Brazilian instant payment), card or cash; iFood
 (delivery platform) orders going straight into the system. Brazilian electronic fiscal receipts
 (NFC-e) are a known risk area.

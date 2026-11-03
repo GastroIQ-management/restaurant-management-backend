@@ -1,6 +1,6 @@
 # Menu: decide whether menus and categories are deactivated instead of deleted
 
-**Found during:** docs/specs/shared/2026-10-15-restrict-cascade-deletes.md
+**Found during:** docs/workflow/specs/shared/2026-10-15-restrict-cascade-deletes.md
 **Date:** 2026-10-15
 
 ## Description

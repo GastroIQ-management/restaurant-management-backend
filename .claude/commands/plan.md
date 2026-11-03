@@ -8,11 +8,11 @@ Input: $ARGUMENTS
 If no input was given, ask me for it and stop.
 
 - **Spec** (`<module>/<spec-name>`): use the planner subagent to write the plan for
-  `docs/specs/$ARGUMENTS.md`.
+  `docs/workflow/specs/$ARGUMENTS.md`.
 - **Backlog item** (a path starting with `backlog/`): check the file exists and has Problem and
   Acceptance criteria; if not, stop and tell me what is missing. Otherwise use the planner
   subagent to write the plan for that backlog item, with no spec. The planner picks the module
-  and writes the plan folder `docs/plans/<module>/<YYYY-MM-DD>-<item-name>/` (today's date, the
+  and writes the plan folder `docs/workflow/plans/<module>/<YYYY-MM-DD>-<item-name>/` (today's date, the
   backlog file name without its date and `.md`), so `/test` and `/implement` work on it as usual.
 
 Show me only the planner's final message: its backlog finding line, and the decisions I must
@@ -28,4 +28,5 @@ When I approve the plan (Gate 1), commit it:
 2. Set `**Status:**` in `plan.md` to `Approved`.
 3. Stage only the plan folder (`plan.md` and `batches/`), by path, and commit:
    `docs(<scope>): add the plan for <feature>`.
-4. Reply with one line: the commit hash and summary. Then stop.
+4. Reply with one line: the commit hash and summary, plus "next: `/implement`" when `plan.md`
+   has `**Kind:** Setup` (it skips `/test`). Then stop.
