@@ -13,6 +13,7 @@ namespace RestaurantManagement.Web.Tests;
 /// Água Verde, Trattoria do Sol has Centro. Ana owns both organizations; Maria is a member of Cantina with nothing granted.
 /// Locations are organization data, so the feed needs no location header.
 /// </summary>
+[Collection(ChangesFeedCollection.Name)]
 public class LocationChangesEndpointTests : IClassFixture<PostgresDatabaseFixture>
 {
     private const string Route = "/api/v1/locations/changes";

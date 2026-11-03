@@ -15,6 +15,7 @@ namespace RestaurantManagement.Web.Tests;
 /// and Trattoria do Sol (Centro) each have menus; Ana owns Cantina, João owns Trattoria, Bia reads Menus at Batel.
 /// Writes go through the database context, as the app's own writes do.
 /// </summary>
+[Collection(ChangesFeedCollection.Name)]
 public class MenuChangesEndpointTests : IClassFixture<PostgresDatabaseFixture>
 {
     private readonly PostgresDatabaseFixture _postgres;

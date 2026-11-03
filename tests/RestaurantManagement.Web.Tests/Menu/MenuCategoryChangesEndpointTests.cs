@@ -8,6 +8,7 @@ namespace RestaurantManagement.Web.Tests;
 /// The menu categories "changes since" feed on a real PostgreSQL database. A category belongs to the location in its own
 /// location field, like the normal per-location read. Cantina da Nonna has categories at Batel and Mercado, Trattoria do Sol at Centro.
 /// </summary>
+[Collection(ChangesFeedCollection.Name)]
 public class MenuCategoryChangesEndpointTests : IClassFixture<PostgresDatabaseFixture>
 {
     private readonly PostgresDatabaseFixture _postgres;
