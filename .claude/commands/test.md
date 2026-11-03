@@ -3,7 +3,7 @@ description: Write the scenarios, stubs and failing tests for an approved plan (
 argument-hint: <module>/<spec-name>
 ---
 
-Use the tester subagent to write the tests for the plan in docs/workflow/plans/$ARGUMENTS/
+Use the tester subagent to write the tests for the plan in docs/workflow/$ARGUMENTS/
 
 If no argument was given, ask me for the plan and stop.
 

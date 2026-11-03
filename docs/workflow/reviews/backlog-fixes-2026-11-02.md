@@ -10,7 +10,7 @@ Checks done:
 - **Tests:** no existing test edited, deleted, skipped or weakened. The branch only adds two test files.
 - **Scope and structure:** no migration, package, public endpoint or Shared contract. `RefreshTokenHeaderOperationFilter.cs` sits next to the other operation filters in `Web/OpenApi/` (7 files, under the limit of 10). The tests are in `Web.Tests/Web/`. No new folders.
 - **Security matrices:** `python3 .claude/scripts/check-security-matrices.py` passes. W36, WD18 and WD19 each name tests that exist and check that row's Expected result. The W36 test checks the exact origin, credentials and the `x-refresh-token` header, and checks that `http://localhost` is refused.
-- **Security:** the CORS origins match `NativeAppOptionsValidator`'s two exact values. The added `https://localhost` with credentials is the accepted risk recorded in spec `docs/workflow/specs/identity/2026-11-02-native-app-refresh-token-header.md` (lines 38 and 73). The web refresh cookie is `SameSite=Strict`, so a page on `https://localhost` never receives it. No secrets in the diff.
+- **Security:** the CORS origins match `NativeAppOptionsValidator`'s two exact values. The added `https://localhost` with credentials is the accepted risk recorded in spec `docs/workflow/identity/2026-11-02-native-app-refresh-token-header/spec.md` (lines 38 and 73). The web refresh cookie is `SameSite=Strict`, so a page on `https://localhost` never receives it. No secrets in the diff.
 - **Backlog:** no backlog file added or changed.
 - **Comments:** only one "why" comment, at `RefreshTokenHeaderOperationFilter.cs:9`.
 

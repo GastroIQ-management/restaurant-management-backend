@@ -1,6 +1,6 @@
 # Organization module
 
-Inferred from code; the specs in docs/workflow/specs/organization/ cover only the organization and location fields.
+Inferred from code; the specs in docs/workflow/organization/ cover only the organization and location fields.
 
 New organizations are always created on a hardcoded TRIAL plan (30 days, 1 location),
 never driven by the request body.

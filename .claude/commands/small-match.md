@@ -14,7 +14,7 @@ If no items were given, ask me for them and stop.
 3. Use the small-batch subagent with the full list of items and the branch name. It creates the
    branch from `origin/development` only after its size check keeps at least one item. If it kept
    no items, show me its message and stop: no branch was created.
-4. Use the pr-reviewer subagent on the branch. There is no plan folder: it reviews the diff
+4. Use the pr-reviewer subagent on the branch. There is no feature folder: it reviews the diff
    against the skills only, writes its review to `docs/workflow/reviews/<branch-name>.md` (with `/`
    replaced by `-`, e.g. `docs/workflow/reviews/backlog-fixes-2026-10-16.md`), and checks each commit is
    one item. It builds only; the full test suite runs in CI (Continuous Integration) on the pull

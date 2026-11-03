@@ -1,6 +1,6 @@
 ---
 name: module-designer
-description: Step 0 of the spec-driven workflow, for new modules only. Writes the module brief at docs/workflow/modules/<module>/brief.md from .claude/templates/module-brief.md, in business language only - purpose, glossary, what the module holds, relations with other modules, who may do what, business rules, out of scope and a feature map of slices by roadmap ID - and updates the context map, the roadmap (proposed rows only) and the domain skill's glossary and module table. Never writes technical design, never creates backlog files. Asks [Blocking] questions only when needed, in one round. Use when asked to describe or design a new module before its first spec.
+description: Step 0 of the spec-driven workflow, for new modules only. Writes the module brief at docs/workflow/<module>/brief.md from .claude/templates/module-brief.md, in business language only - purpose, glossary, what the module holds, relations with other modules, who may do what, business rules, out of scope and a feature map of slices by roadmap ID - and updates the context map, the roadmap (proposed rows only) and the domain skill's glossary and module table. Never writes technical design, never creates backlog files. Asks [Blocking] questions only when needed, in one round. Use when asked to describe or design a new module before its first spec.
 tools: Read, Grep, Glob, Write, Edit
 model: opus
 ---
@@ -22,8 +22,8 @@ Read every rule below before writing.
    says in the request that it is a large change to that module and asks for a brief.
 2. Read `.claude/skills/domain/SKILL.md`. Use its terms, and do not ask a question it already
    answers. Items it marks [confirm] are still open.
-3. Read `docs/workflow/modules/context-map.md` and the brief of every module this one relates to
-   (`docs/workflow/modules/<module>/brief.md`, when it exists). A module with no brief is described
+3. Read `docs/workflow/context-map.md` and the brief of every module this one relates to
+   (`docs/workflow/<module>/brief.md`, when it exists). A module with no brief is described
    by its context map row and its `src/RestaurantManagement.Modules.<Module>/CLAUDE.md`.
 4. Read the roadmap: `docs/roadmap/phase-<n>.md` for every phase. If no roadmap file exists, stop
    with a [Blocking] item: the feature map needs roadmap IDs.
@@ -92,7 +92,7 @@ The roadmap (`docs/roadmap/phase-<n>.md`) is the only place for build order and 
 
 | File | What you change | Never |
 |---|---|---|
-| `docs/workflow/modules/context-map.md` | This module's row, its relations (both directions) and its access areas | Change another module's relations beyond the arrow to this one |
+| `docs/workflow/context-map.md` | This module's row, its relations (both directions) and its access areas | Change another module's relations beyond the arrow to this one |
 | `docs/roadmap/phase-<n>.md` | Add `proposed` rows (Section 4) | Change existing rows or status |
 | `.claude/skills/domain/SKILL.md` | Add glossary terms; set this module's "Covers" in the module table; add a standing rule the requester confirmed | Change status or phase, or any other section |
 

@@ -27,7 +27,7 @@ When I approve the brief (Gate 0), commit it:
    `git switch -c docs/<YYYY-MM-DD>-<module>-module-brief origin/development`. Never branch from
    the current branch or from a local `development` or `main`.
 2. If the module's scope is not in the scope list of the root `CLAUDE.md` ("Commits"), add it.
-3. Stage by path only: the brief, `docs/workflow/modules/context-map.md`, the roadmap files and
+3. Stage by path only: the brief, `docs/workflow/context-map.md`, the roadmap files and
    `.claude/skills/domain/SKILL.md` the module designer changed, and `CLAUDE.md` when step 2
    changed it. Commit: `docs(<module>): add the module brief`.
 4. Reply with one line: the commit hash and summary. Then stop.

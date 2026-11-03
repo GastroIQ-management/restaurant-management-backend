@@ -1,7 +1,7 @@
 # Identity module
 
-Context beyond the root CLAUDE.md and the code itself. See docs/workflow/specs/identity/ and
-docs/workflow/plans/identity/ for the full reasoning.
+Context beyond the root CLAUDE.md and the code itself. See the specs and plans in
+docs/workflow/identity/ for the full reasoning.
 
 Every change here updates docs/security/identity-matrix.md in the same commit (rules in the
 root CLAUDE.md, "Security matrices"). Endpoint and database tests go in

@@ -130,17 +130,18 @@ stop the flow when something is wrong.
   `/small-batch <item; item; …>`: several small, independent items, one commit each.
 - Other commands: `/review`, `/fixbug`.
 
-0. Module brief, new modules only: module-designer writes `docs/workflow/modules/<module>/brief.md`
+0. Module brief, new modules only: module-designer writes `docs/workflow/<module>/brief.md`
    (business only: what the module holds, its relations, who may do what, rules, and a feature
-   map of slices by roadmap ID), adds the module to `docs/workflow/modules/context-map.md`, adds
+   map of slices by roadmap ID), adds the module to `docs/workflow/context-map.md`, adds
    slices missing from `docs/roadmap/` as proposed rows and updates the domain skill.
    ⏸ Gate 0: the user approves the brief. On approval, the main session creates the branch
    `docs/<YYYY-MM-DD>-<module>-module-brief` from `origin/development` and commits it. Each slice
    then goes through steps 1–5. Existing modules get a brief only for a large change.
-1. Spec: spec-writer writes `docs/workflow/specs/<module>/<YYYY-MM-DD>-<feature>.md` (`shared/` when it
-   spans modules). Stops only if it has `[Blocking]` questions. On approval, the main session
+1. Spec: spec-writer writes `docs/workflow/<module>/<spec-name>/spec.md`, where `<spec-name>` is
+   `<YYYY-MM-DD>-<feature>` (`shared/` when it spans modules). This feature folder then holds
+   everything the workflow writes for the feature. Stops only if it has `[Blocking]` questions. On approval, the main session
    creates the branch `<type>/<spec-name>` from `origin/development` and commits the spec.
-2. Plan: planner writes the folder `docs/workflow/plans/<module>/<spec-name>/`:
+2. Plan: planner writes, in the same feature folder `docs/workflow/<module>/<spec-name>/`:
    - `plan.md`: Risk, tasks, batches, Flags, overall Definition of Done and the task Checklist.
      The only file with checkboxes and Status
    - `batches/B<n>.md`: each task's details (context, files, DoD, dependencies), read only by
@@ -150,7 +151,7 @@ stop the flow when something is wrong.
    offline-capable" task that follows the architecture skill's offline checklist.
 
    ⏸ Gate 1: the solution architect approves `plan.md`, including Risk and Flags. On approval,
-   the main session sets Status to Approved and commits the plan folder.
+   the main session sets Status to Approved and commits `plan.md` and `batches/`.
 3. Tests: tester writes `scenarios.md`, stubs and failing tests for **all** batches, plus an
    Implementation guide per task in the batch files; test-reviewer checks them, and the tester
    fixes its findings once.
@@ -184,8 +185,10 @@ typo) is fixed, without changing what it asserts, and reported. If a test's expe
 wrong, stop and say why.
 
 ### Docs layout
-- `docs/workflow/`: what the workflow produces. `modules/` (briefs and the context map),
-  `specs/`, `plans/` (plan, batches, scenarios and review per spec) and `reviews/` (reviews of
+- `docs/workflow/`: what the workflow produces, one folder per module:
+  `<module>/<YYYY-MM-DD>-<feature>/` holds `spec.md`, `plan.md`, `batches/`, `scenarios.md` and
+  `review.md` (a plan made from a backlog item has no `spec.md`), and `<module>/brief.md` holds
+  the module brief. Also `context-map.md` (how the modules relate) and `reviews/` (reviews of
   small changes and backlog fixes)
 - `docs/roadmap/`: build order and status of every slice, the only place for both
 - `docs/security/`: the security matrices, kept in step with the code

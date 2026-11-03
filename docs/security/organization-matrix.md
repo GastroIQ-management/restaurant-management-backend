@@ -132,7 +132,7 @@ A location or organization change carries the version the caller read. Order of 
 
 ## 8. Business day and client times
 Other modules ask Organization for the business day of a location; an Organization write stores the client times
-(spec `docs/workflow/specs/shared/2026-10-30-record-client-action-time.md`).
+(spec `docs/workflow/shared/2026-10-30-record-client-action-time/spec.md`).
 
 | ID | Case | Expected | Status | Test |
 |---|---|---|---|---|

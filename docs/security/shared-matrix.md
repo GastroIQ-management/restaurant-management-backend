@@ -189,7 +189,7 @@ A signed-in write may carry an `Idempotency-Key` (a UUID). Same key and same req
 Every signed-in write carries `X-Client-Action-Time` (when the user acted on the device) and `X-Client-Sent-At`
 (the device clock at send time), both RFC 3339 with an offset. The server computes the clock error, corrects the
 action time, refuses a corrected time more than 5 minutes ahead or older than 7 days, and stamps the times and the
-received time on every saved record (spec `docs/workflow/specs/shared/2026-10-30-record-client-action-time.md`). SH124 is intentionally unused.
+received time on every saved record (spec `docs/workflow/shared/2026-10-30-record-client-action-time/spec.md`). SH124 is intentionally unused.
 
 | ID | Case | Expected | Status | Test |
 |---|---|---|---|---|
@@ -223,7 +223,7 @@ received time on every saved record (spec `docs/workflow/specs/shared/2026-10-30
 | SH136 | Both headers readable but far apart (for example year 9999 against year 0001) | 422 `client_time.in_future` or `client_time.too_old`, never a server error | ✅ | `ClientTimeValidatorTests.Validate_BothHeadersReadableButFarApart_Throws422InsteadOfOverflowing` |
 
 ## 12. Changes since (device catch-up)
-Offline devices read "what changed since my last sync": changed records, IDs of deleted records (tombstones, kept 14 days) and an opaque cursor, in pages (spec `docs/workflow/specs/shared/2026-11-02-changes-since-read-for-device-catch-up.md`). Menu and Organization rows for the feeds are in their own matrices.
+Offline devices read "what changed since my last sync": changed records, IDs of deleted records (tombstones, kept 14 days) and an opaque cursor, in pages (spec `docs/workflow/shared/2026-11-02-changes-since-read-for-device-catch-up/spec.md`). Menu and Organization rows for the feeds are in their own matrices.
 
 | ID | Case | Expected | Status | Test |
 |---|---|---|---|---|

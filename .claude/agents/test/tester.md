@@ -64,7 +64,7 @@ For every task, cover each spec Outcome and the task's DoD with these scenario t
 
 | File | Content |
 |---|---|
-| `docs/workflow/plans/<module>/<spec-name>/scenarios.md` | The coverage table the user approves at Gate 2 (template below) |
+| `docs/workflow/<module>/<spec-name>/scenarios.md` | The coverage table the user approves at Gate 2 (template below) |
 | Test files | In the project the testing skill assigns: module unit tests on SQLite, database and endpoint behaviour in Web.Tests on PostgreSQL. Names follow `Method_Scenario_ExpectedResult` |
 | Stubs | Empty classes, methods or models in the right module folders (architecture skill) so tests compile. Bodies throw `NotImplementedException`. No logic |
 | Batch files | An **Implementation guide** under each task (template below). Do not change any other field |
@@ -77,7 +77,7 @@ For every task, cover each spec Outcome and the task's DoD with these scenario t
 ```markdown
 # Scenarios: <Plan title>
 
-**Plan:** docs/workflow/plans/<module>/<spec-name>/plan.md
+**Plan:** docs/workflow/<module>/<spec-name>/plan.md
 **Coverage:** <N> scenarios — <n> happy · <n> edge · <n> failure · <n> security · <n> guard
 
 | # | Task | Type | Scenario (plain words) | Test name | Test file |
