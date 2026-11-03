@@ -251,7 +251,7 @@ namespace RestaurantManagement.Modules.Menu.Services
                 ?? throw new BusinessException(MenuErrorCodes.MenuNotFound, _localizer["MenuNotFound"].Value);
         }
 
-        private static MenuResponse MapToResponse(Entities.Menu menu)
+        internal static MenuResponse MapToResponse(Entities.Menu menu)
         {
             return new MenuResponse
             {

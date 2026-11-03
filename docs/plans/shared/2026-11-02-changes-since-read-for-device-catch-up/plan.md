@@ -46,7 +46,7 @@ test and an architecture rule keep future modules from shipping tenant data with
 - [x] T1 — Change cursor, page contract and error codes
 - [x] T2 — Change stamps, tombstones and change reader
 - [x] T3 — Stamp and tombstone the Menu tables
-- [ ] T4 — Menus and menu-location links changes reads
+- [x] T4 — Menus and menu-location links changes reads
 - [ ] T5 — Menu categories changes read
 - [ ] T6 — Stamp the locations table
 - [ ] T7 — Locations changes read

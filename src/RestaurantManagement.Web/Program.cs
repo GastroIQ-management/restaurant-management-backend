@@ -322,6 +322,7 @@ builder.Services.AddScoped<ILocationService, LocationService>();
 // Menu Module Services
 builder.Services.AddScoped<RestaurantManagement.Modules.Menu.Services.IMenuService, RestaurantManagement.Modules.Menu.Services.MenuService>();
 builder.Services.AddScoped<RestaurantManagement.Modules.Menu.Services.IMenuCategoryService, RestaurantManagement.Modules.Menu.Services.MenuCategoryService>();
+builder.Services.AddScoped<RestaurantManagement.Modules.Menu.Services.IMenuChangesService, RestaurantManagement.Modules.Menu.Services.MenuChangesService>();
 
 // Cross-Module Contracts (Shared interface, implemented by the owning module)
 builder.Services.AddScoped<IOrganizationLookup, RestaurantManagement.Modules.Organization.Services.OrganizationLookup>();
