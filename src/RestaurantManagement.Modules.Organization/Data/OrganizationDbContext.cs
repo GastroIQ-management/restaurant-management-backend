@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using RestaurantManagement.Modules.Organization.Entities;
+using RestaurantManagement.Shared.Data.Changes;
 using RestaurantManagement.Shared.Data.Idempotency;
 using RestaurantManagement.Shared.Data.Tenancy;
 using RestaurantManagement.Shared.Data.Versioning;
@@ -65,6 +66,7 @@ namespace RestaurantManagement.Modules.Organization.Data
             base.OnModelCreating(modelBuilder);
             modelBuilder.ApplyIdempotencyKeys("organization_idempotency_keys");
             modelBuilder.ApplyVersionTokens(Database);
+            modelBuilder.ApplyChangeTracking(Database);
             modelBuilder.ApplyTenantQueryFilters(() => _tenantContext);
         }
     }

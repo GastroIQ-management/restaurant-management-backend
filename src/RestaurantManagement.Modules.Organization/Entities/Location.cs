@@ -1,11 +1,14 @@
+using RestaurantManagement.Shared.Data.Changes;
 using RestaurantManagement.Shared.Data.Entities;
 using RestaurantManagement.Shared.Data.Versioning;
 using RestaurantManagement.Modules.Organization.Entities;
 
 namespace RestaurantManagement.Modules.Organization.Entities
 {
-    public class Location : TenantEntity, IVersionedEntity
+    public class Location : TenantEntity, IVersionedEntity, IChangeTracked
     {
+        public long ChangeStamp { get; set; }
+
         public uint Version { get; set; }
 
         public string Name { get; set; } = null!;

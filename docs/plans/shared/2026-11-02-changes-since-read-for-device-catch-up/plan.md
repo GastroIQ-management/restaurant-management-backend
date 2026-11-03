@@ -48,7 +48,7 @@ test and an architecture rule keep future modules from shipping tenant data with
 - [x] T3 — Stamp and tombstone the Menu tables
 - [x] T4 — Menus and menu-location links changes reads
 - [x] T5 — Menu categories changes read
-- [ ] T6 — Stamp the locations table
+- [x] T6 — Stamp the locations table
 - [ ] T7 — Locations changes read
 - [ ] T8 — Guard and rule: offline-capable modules keep change tracking
 

@@ -34,6 +34,11 @@ namespace RestaurantManagement.Modules.Organization.Migrations
                         .HasColumnType("text")
                         .HasColumnName("address");
 
+                    b.Property<long>("ChangeStamp")
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("bigint")
+                        .HasColumnName("change_stamp");
+
                     b.Property<string>("City")
                         .IsRequired()
                         .HasColumnType("text")
@@ -136,6 +141,9 @@ namespace RestaurantManagement.Modules.Organization.Migrations
 
                     b.HasKey("Id")
                         .HasName("pk_locations");
+
+                    b.HasIndex("OrganizationId", "ChangeStamp")
+                        .HasDatabaseName("ix_locations_organization_id_change_stamp");
 
                     b.HasIndex("OrganizationId", "Code")
                         .IsUnique()
