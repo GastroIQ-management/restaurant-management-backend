@@ -26,6 +26,23 @@ namespace RestaurantManagement.Modules.Menu.Migrations
             FOR EACH ROW EXECUTE FUNCTION menu_location_menus_tombstone();
             """;
 
+        // A linked menu's delete is reported at each location by the cascaded link deletes; a menu with no links
+        // leaves one row with no location to keep the delete on record. BEFORE, so the links are still there to check.
+        private const string MenuTombstoneTrigger = """
+            CREATE OR REPLACE FUNCTION menu_menus_tombstone() RETURNS trigger AS $$
+            BEGIN
+                IF NOT EXISTS (SELECT 1 FROM location_menus WHERE menu_id = OLD.id) THEN
+                    INSERT INTO menu_tombstones (id, organization_id, location_id, entity_type, entity_id, change_stamp, deleted_at)
+                    VALUES (gen_random_uuid(), OLD.organization_id, NULL, 'Menu', OLD.id, (pg_current_xact_id()::text)::bigint, now());
+                END IF;
+                RETURN OLD;
+            END;
+            $$ LANGUAGE plpgsql;
+
+            CREATE TRIGGER menu_menus_tombstone BEFORE DELETE ON menus
+            FOR EACH ROW EXECUTE FUNCTION menu_menus_tombstone();
+            """;
+
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -94,8 +111,7 @@ namespace RestaurantManagement.Modules.Menu.Migrations
 
             migrationBuilder.Sql(ChangeTrackingSql.TombstoneTrigger("menu", "menu_categories", "menu_tombstones", "MenuCategory", "OLD.location_id"));
             migrationBuilder.Sql(LinkTombstoneTrigger);
-            // A menu's devices learn of its delete through the link tombstones above; this row (no location) keeps the delete on record.
-            migrationBuilder.Sql(ChangeTrackingSql.TombstoneTrigger("menu", "menus", "menu_tombstones", "Menu", "NULL"));
+            migrationBuilder.Sql(MenuTombstoneTrigger);
         }
 
         /// <inheritdoc />

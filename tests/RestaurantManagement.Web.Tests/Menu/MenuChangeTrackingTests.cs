@@ -39,7 +39,7 @@ public class MenuChangeTrackingTests : IClassFixture<PostgresDatabaseFixture>
     private static Task<List<TombstoneRow>> ReadTombstonesAsync(TenantApiFactory factory)
         => factory.InOrganizationAsync<MenuDbContext, List<TombstoneRow>>(CantinaId, db =>
             db.Database.SqlQueryRaw<TombstoneRow>(
-                "SELECT entity_id AS \"EntityId\", location_id AS \"LocationId\", organization_id AS \"OrganizationId\" FROM menu_tombstones").ToListAsync());
+                "SELECT entity_id, location_id, organization_id FROM menu_tombstones").ToListAsync());
 #pragma warning restore EF1002
 
     [Theory]
@@ -113,7 +113,7 @@ public class MenuChangeTrackingTests : IClassFixture<PostgresDatabaseFixture>
         await factory.DeleteMenuAsync(TrattoriaId, MenuId(2));
         var tombstones = await factory.InOrganizationAsync<MenuDbContext, List<TombstoneRow>>(TrattoriaId, db =>
             db.Database.SqlQueryRaw<TombstoneRow>(
-                "SELECT entity_id AS \"EntityId\", location_id AS \"LocationId\", organization_id AS \"OrganizationId\" FROM menu_tombstones").ToListAsync());
+                "SELECT entity_id, location_id, organization_id FROM menu_tombstones").ToListAsync());
 
         // Assert
         tombstones.ShouldNotBeEmpty("the delete left tombstones");
