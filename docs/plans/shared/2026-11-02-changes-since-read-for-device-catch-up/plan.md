@@ -50,7 +50,7 @@ test and an architecture rule keep future modules from shipping tenant data with
 - [x] T5 — Menu categories changes read
 - [x] T6 — Stamp the locations table
 - [x] T7 — Locations changes read
-- [ ] T8 — Guard and rule: offline-capable modules keep change tracking
+- [x] T8 — Guard and rule: offline-capable modules keep change tracking
 
 ## Assumptions
 - Decided by the user (2026-11-02): a member with no Read at the header location is refused with 403 on that location's feeds (Outcome 9: the device drops that location's data); tombstones are sent only for records leaving a location the member can still read (for example a detached menu).

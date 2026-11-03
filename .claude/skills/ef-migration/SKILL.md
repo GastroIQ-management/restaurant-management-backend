@@ -38,8 +38,9 @@ Open the generated file under `src/RestaurantManagement.Modules.<Module>/Migrati
   on a table that already has rows.
 - Column names follow the existing snake_case convention.
 
-Never hand-edit a generated migration, with one exception: adding a `migrationBuilder.Sql`
-data backfill, which must be flagged in the plan (it makes the feature High risk). For
+Never hand-edit a generated migration, with two exceptions: adding a `migrationBuilder.Sql`
+data backfill, which must be flagged in the plan (it makes the feature High risk), and adding
+the `ChangeTrackingSql` stamp and tombstone triggers for change tracked tables. For
 anything else that is wrong, remove the migration, fix the model, and generate again.
 
 ## Apply it (asks the user for approval)
