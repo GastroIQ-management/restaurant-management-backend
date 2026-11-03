@@ -231,6 +231,15 @@
   <data name="PasswordChangeSucceeded" xml:space="preserve">
     <value>Password changed. Sign in again on your devices.</value>
   </data>
+  <data name="ChangeCursorInvalid" xml:space="preserve">
+    <value>The changes cursor is not valid.</value>
+  </data>
+  <data name="ChangeCursorExpired" xml:space="preserve">
+    <value>The changes cursor has expired. Reload the data in full.</value>
+  </data>
+  <data name="LocationRequired" xml:space="preserve">
+    <value>The X-Location-Id header is required.</value>
+  </data>
   <data name="IdAlreadyUsed" xml:space="preserve">
     <value>This ID is already used.</value>
   </data>

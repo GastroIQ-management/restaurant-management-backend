@@ -1,6 +1,6 @@
 # Plan: Changes-Since Read for Device Catch-Up
 
-**Source:** docs/specs/shared/2026-11-02-changes-since-read-for-device-catch-up.md   **Date:** 2026-11-02   **Status:** Draft
+**Source:** docs/specs/shared/2026-11-02-changes-since-read-for-device-catch-up.md   **Date:** 2026-11-02   **Status:** In progress
 **Risk:** High — new Shared contract, schema changes with hand-written database triggers in two migrations, new reads of tenant data
 
 ## Summary
@@ -43,7 +43,7 @@ test and an architecture rule keep future modules from shipping tenant data with
 - [ ] `python3 .claude/scripts/check-security-matrices.py` passes with the shared, menu, organization and web matrix rows ✅
 
 ## Checklist
-- [ ] T1 — Change cursor, page contract and error codes
+- [x] T1 — Change cursor, page contract and error codes
 - [ ] T2 — Change stamps, tombstones and change reader
 - [ ] T3 — Stamp and tombstone the Menu tables
 - [ ] T4 — Menus and menu-location links changes reads

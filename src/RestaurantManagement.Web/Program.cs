@@ -19,6 +19,7 @@ using RestaurantManagement.Shared.Options;
 using RestaurantManagement.Shared.Services.AuditLog;
 using RestaurantManagement.Shared.Services.Email;
 using RestaurantManagement.Shared.Services.ClientTime;
+using RestaurantManagement.Shared.Services.Changes;
 using RestaurantManagement.Shared.Services.Idempotency;
 using RestaurantManagement.Shared.Services.Identity;
 using RestaurantManagement.Shared.Services.Organization;
@@ -180,6 +181,7 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddSingleton(TimeProvider.System);
+builder.Services.AddChangeCursors();
 builder.Services.AddSingleton<ITenantScope, TenantScope>();
 builder.Services.AddScoped<ICurrentUser, ClaimsCurrentUser>();
 builder.Services.AddScoped<SelectedLocation>();
