@@ -17,3 +17,14 @@ Show me only the tester's final message: its backlog finding line, and the decis
 make with their options, or `Tests ready for Gate 2.` when there are none. Add nothing else. Then stop and wait (Gate 2).
 
 If I give changes, send them to the tester. Do not implement features.
+
+When I approve the tests (Gate 2), commit them. This is the baseline commit: tests are
+read-only from here.
+1. I must be on the feature's branch `<type>/<spec-name>`; if not, stop and tell me.
+2. `dotnet build RestaurantManagement.sln` and `python3 .claude/scripts/check-security-matrices.py`
+   must pass. If either fails, stop and show me the error.
+3. Stage only what the tester wrote, by path: `scenarios.md`, the batch files, stubs, tests and
+   security matrices. If anything else is uncommitted, leave it and tell me.
+4. Commit: `test(<scope>): add failing tests for <feature>` with `Scenarios: 1–<N>` in the body,
+   where `<N>` is the last scenario number in `scenarios.md`. Never guess it.
+5. Reply with one line: the commit hash and summary. Then stop.

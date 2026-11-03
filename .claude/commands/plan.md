@@ -20,3 +20,12 @@ make with their options, or `Plan ready.` when there are none. Add nothing else.
 
 If I give changes, send them to the planner. The planner may create only its plan folder
 (plan.md and batches/), never backlog files.
+
+When I approve the plan (Gate 1), commit it:
+1. Spec plan: I must be on the spec's branch `<type>/<spec-name>`; if not, stop and tell me.
+   Backlog plan: if I am not on `<type>/<plan-folder-name>`, run `git fetch origin`, then switch
+   to it if it exists, otherwise `git switch -c <type>/<plan-folder-name> origin/development`.
+2. Set `**Status:**` in `plan.md` to `Approved`.
+3. Stage only the plan folder (`plan.md` and `batches/`), by path, and commit:
+   `docs(<scope>): add the plan for <feature>`.
+4. Reply with one line: the commit hash and summary. Then stop.

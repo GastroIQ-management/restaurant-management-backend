@@ -9,9 +9,9 @@ second word is the branch name or ticket).
 If no plan was given, ask me for it and stop.
 
 1. Check `scenarios.md` exists in the plan folder. If not, stop: tests come first (`/test`).
-2. Run `git status`. The only uncommitted changes allowed are this feature's spec, plan folder,
-   stubs and tests. If anything else is uncommitted (for example `.claude/`, `CLAUDE.md` or other
-   work), stop and list it: I commit or stash it myself before implementing.
+2. Run `git status`. The spec, plan and tests were committed at their approvals (`/spec`,
+   `/plan`, `/test`). If anything is uncommitted (this feature's files, `.claude/`, `CLAUDE.md`
+   or other work), stop and list it: I commit or stash it myself before implementing.
 3. Run `git fetch origin`. If the branch (`<type>/<spec-name>`, or the branch or ticket I gave)
    already exists, switch to it and check it contains `origin/development`
    (`git merge-base --is-ancestor origin/development HEAD`); if not, stop and tell me. Otherwise
@@ -39,3 +39,7 @@ Show me, exactly as returned and with nothing added before or after:
 
 No file lists, no paths beyond those in the messages, no summary. Then stop and wait (Gate 3).
 Never push or merge; I do that after reading review.md, and merge only when CI is green.
+
+When I approve the review (Gate 3), commit it: stage only `review.md` in the plan folder, by path,
+and commit `docs(<scope>): add the review for <feature>`. If anything else is uncommitted, leave
+it and tell me. Reply with one line: the commit hash and summary. Then stop. Never push.

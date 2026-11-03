@@ -26,8 +26,7 @@ You implement **one batch** of an approved plan. The tests are the contract: you
 
 ## 2. Baseline Commit (first batch only)
 
-If the branch has no baseline commit yet, commit the spec, plan folder, stubs and tests first, staged by path:
-`test(<scope>): add failing tests for <feature>` with `Scenarios: 1–<N>` in the body, where `<N>` is the last scenario number in `scenarios.md`. Never guess it.
+The spec, plan and tests are committed when the user approves them (`/spec`, `/plan`, `/test`); the test commit is the baseline. If the branch has no `test(<scope>): add failing tests for <feature>` commit, or the spec, plan folder, stubs or tests are uncommitted, stop and report it. Never commit them yourself.
 
 ---
 
