@@ -138,6 +138,7 @@ The menu, link and category feeds return what changed after a cursor, plus tombs
 | MD2 | `MenuChangeTrackingTests.DeleteMenu_LinkedToTwoLocationsWithOneCategory_LeavesTombstonesAtEachLocationItLeft` | A deleted menu leaves menu and link tombstones at each location and a category tombstone at its location, cascades included |
 | MD3 | `MenuChangeTrackingTests.DetachMenu_FromOneLocation_LeavesLinkAndMenuTombstonesAtThatLocationOnly` | Detaching reports the link and the menu at that location only |
 | MD4 | `MenuChangeTrackingTests.DeleteMenu_OfTrattoria_TombstonesCarryTrattoriasOrganizationNeverCantinas` | Every tombstone carries the organization of the deleted row |
+| MD5 | `MenuUnlinkedDeleteTrackingTests.DeleteMenu_WithNoLocationLinks_LeavesOneTombstoneWithNoLocationCarryingTheMenusOrganization` | Deleting an unlinked menu leaves one tombstone with no location, carrying the menu's own organization |
 
 ## Open questions (no row until decided)
 - **Categories of an unknown menu or location:** the lists answer 200 with an empty list, while
