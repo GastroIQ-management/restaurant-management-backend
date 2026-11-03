@@ -69,3 +69,19 @@ one subfolder exists no file stays loose.
 - Inside a version, changes are additive only: new endpoints, new optional fields
 - An old version stays served at least 30 days after the next one ships (longer than the 7-day offline limit)
 - Both rules apply from launch
+
+## 7. Offline-capable modules
+The app works offline from day one (up to 7 days). Every module whose data devices create, edit or
+read offline follows this checklist; a plan for a new module or entity names each item or says why
+it does not apply.
+
+| Contract | Automatic? | What the module adds |
+|---|---|---|
+| Idempotency key on writes | Filter runs on every signed-in write | Its own key table: `ApplyIdempotencyKeys("<module>_idempotency_keys")` and its migration. An endpoint whose answer carries a token or sets a cookie gets `[IgnoreIdempotencyKey]` |
+| Client-generated IDs | No | Each create request takes a required `id`, stored as the record's ID. A primary key clash answers 409 `id.already_used`, the same whichever organization owns the ID. Rows created alongside keep server IDs |
+| Record versions (optimistic concurrency) | No | Editable entities implement `IVersionedEntity`; the DbContext calls `ApplyVersionTokens(Database)`. GET responses return `version`; updates send it in the body, deletes as `?version=`. A stale version answers 409 `version.conflict` with the current record, checked after 404 and 403 |
+| Client action time | Yes, for entities deriving from `BaseEntity` | Register the DbContext with `ClientTimeSaveChangesInterceptor` (and `AuditSaveChangesInterceptor`) in `Web/Program.cs`; the migration adds the action-time columns |
+| Changes since last read (device catch-up) | No | Planned in `docs/plans/shared/2026-11-02-changes-since-read-for-device-catch-up/`; this row gains its details when that plan ships |
+| API versions | Yes | Follow section 6: breaking changes ship as a new version, served 30 days past the next one |
+
+Data that is not offline (server history, access data) skips the checklist; the plan says so.
