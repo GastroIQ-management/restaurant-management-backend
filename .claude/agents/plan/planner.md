@@ -58,6 +58,7 @@ You turn one approved spec, or one backlog item, into a plan for a solution arch
 - **Dependencies:** a batch starts only when every task it depends on is ticked. Otherwise stop and report which one is missing.
 - **Security:** a task that touches an endpoint or tenant data has in its DoD a cross-tenant test (another organization's data returns not found) and one rejection test per role the input disallows. Flag any public endpoint, role or auth change, or raw SQL.
 - **Security matrices:** a task that changes a module with a matrix (root `CLAUDE.md`, "Security matrices") has in its DoD "`docs/security/<module>-matrix.md` rows added or changed and ✅ with their tests; `python3 .claude/scripts/check-security-matrices.py` passes", and lists the matrix under Files.
+- **Offline split:** business tasks come first. When the feature touches data that devices create, edit or read offline, the plan ends with one task, "Make <feature> offline-capable", that follows the checklist in the architecture skill ("Offline-capable modules") and names each item or says why it does not apply. No business task carries offline plumbing. Data that is never offline gets no such task; the Summary says so.
 - **Risk (whole plan):** Low = no data, contract or integration change · Medium = shared code or contracts · High = data, schema, security, or hard to undo.
 
 ---

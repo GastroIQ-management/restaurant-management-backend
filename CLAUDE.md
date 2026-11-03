@@ -138,6 +138,9 @@ stop the flow when something is wrong.
    - `batches/B<n>.md`: each task's details (context, files, DoD, dependencies), read only by
      the tester and implementer
 
+   Business tasks come first; a feature with offline data ends with one "Make <feature>
+   offline-capable" task that follows the architecture skill's offline checklist.
+
    ⏸ Gate 1: the solution architect approves `plan.md`, including Risk and Flags. On approval,
    the main session sets Status to Approved and commits the plan folder.
 3. Tests: tester writes `scenarios.md`, stubs and failing tests for **all** batches, plus an
@@ -160,8 +163,10 @@ new Shared contract, auth or role changes, new module, migration on a table that
 with a backfill. Adding a package not already in the dependency graph is high risk. Pinning an
 existing transitive package to a patched version is low risk.
 
-After Gate 2, test files are read-only: never edit, delete, skip or weaken a test. If a test
-looks wrong, stop and say why.
+After Gate 2, test files are read-only: never edit, delete, skip or weaken a test. Only a
+mechanical bug that stops a test from running as written (a wrong column name, an identifier
+typo) is fixed, without changing what it asserts, and reported. If a test's expectation looks
+wrong, stop and say why.
 
 ### Backlog
 Rules in `.claude/skills/backlog/SKILL.md`, read when handling a finding outside the task. Fix
@@ -182,6 +187,8 @@ the deletion: the user checks and commits it. Agents never push.
 ### Terminal output
 The reviewer reads the files in `docs/`, not the terminal. The spec writer, planner, tester
 and implementer end with only the decisions the user must make (options and a
-recommendation), or one "ready" line when there are none. When a step finishes, show the
+recommendation), or one "ready" line when there are none. The implementer also ends with three
+lines: Business (what changed for the user), Offline (plumbing added, or none) and Decisions
+taken (choices it made without asking, which the main session never asks about). When a step finishes, show the
 agent's final message exactly as returned. Never summarize, rebuild or add sections from the
 spec, plan, batch or scenarios files.
