@@ -34,6 +34,11 @@ namespace RestaurantManagement.Modules.Organization.Controllers
             return Ok(response);
         }
 
+        // GET api/v1/locations/changes
+        [HttpGet("changes")]
+        public Task<ActionResult<RestaurantManagement.Shared.Models.ChangesPageResponse<LocationResponse>>> GetLocationChanges([FromQuery] RestaurantManagement.Shared.Models.ChangesQuery query)
+            => throw new NotImplementedException();
+
         // POST api/v1/locations
         [HttpPost]
         public async Task<ActionResult<LocationResponse>> CreateLocation([FromBody] CreateLocationRequest request)

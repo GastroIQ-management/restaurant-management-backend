@@ -107,6 +107,38 @@ A menu or category change carries the version the caller read. Order of answers:
 | M75 | A category create sent twice with one key | One category; the replay keeps 201 and `Location` | ✅ | `MenuIdempotencyEndpointTests.CreateMenuCategory_SameKeyTwice_CreatesOneCategoryAndReplaysCreatedWithLocation` |
 | M76 | A category created with a device time 4 hours old | The new category row stores the corrected action time, the clock error and the received time | ✅ | `MenuCategoryClientTimeEndpointTests.CreateMenuCategory_SignedInWriteFourHoursOld_StoresTheTimesOnTheNewRow` |
 
+## 6. Changes since (device catch-up)
+The menu, link and category feeds return what changed after a cursor, plus tombstones of deleted records, at the header location (spec `docs/specs/shared/2026-11-02-changes-since-read-for-device-catch-up.md`).
+
+| ID | Case | Expected | Status | Test |
+|---|---|---|---|---|
+| M77 | A menus, links or categories feed called without `X-Location-Id` | 400 `location.required` | ❌ | `MenuChangesAccessEndpointTests.GetChanges_NoLocationHeader_Returns400LocationRequired` |
+| M78 | A member without Menus Read at the header location reads any menu feed | 403 `access.denied`, never records or tombstones | ❌ | `MenuChangesAccessEndpointTests.GetChanges_MemberWithoutMenusReadAtTheLocation_Returns403AccessDenied` |
+| M79 | The Owner with no stored level, and a member with Menus Read, read any menu feed | 200: Read is enough | ❌ | `MenuChangesAccessEndpointTests.GetChanges_OwnerWithNoStoredLevelOrMemberWithMenusRead_Returns200` |
+| M80 | A menu feed called with a cursor older than 14 days | 410 `changes.cursor_expired` | ❌ | `MenuChangesAccessEndpointTests.GetChanges_CursorOlderThanFourteenDays_Returns410CursorExpired` |
+| M81 | A cursor of organization A sent with an organization B token | 400 `changes.cursor_invalid` | ❌ | `MenuChangesAccessEndpointTests.GetChanges_CursorOfAnotherOrganization_Returns400CursorInvalid` |
+| M82 | First sync of the menus feed | Menus linked to the header location, a cursor, no tombstones; a menu linked only to another location is not returned | ❌ | `MenuChangesEndpointTests.GetMenuChanges_FirstSync_ReturnsOnlyMenusLinkedToTheHeaderLocationAndACursor` |
+| M83 | One of three menus edited, then a sync with the new cursor and no writes | Exactly the edited menu, then an empty result | ❌ | `MenuChangesEndpointTests.GetMenuChanges_OneOfThreeMenusEdited_ReturnsExactlyItAndThenNothing` |
+| M84 | Five menus read with page size 2 | Following the cursors returns each menu once; only the last page says no more remain | ❌ | `MenuChangesEndpointTests.GetMenuChanges_FiveMenusWithPageSizeTwo_FollowingTheCursorsReturnsEachOnce` |
+| M85 | Two overlapping writes commit in reverse order | Neither is missed by the menus feed | ❌ | `MenuChangesEndpointTests.GetMenuChanges_TwoOverlappingWritesCommitInReverseOrder_NeitherIsMissed` |
+| M86 | Another organization's menus, edits and deletes | Never returned in records or tombstones | ❌ | `MenuChangesEndpointTests.GetMenuChanges_AnotherOrganizationsMenusAndDeletes_NeverAppearForTheCaller` |
+| M87 | A menu linked to two locations is detached from one | A tombstone at that location only; the other location sees nothing | ❌ | `MenuChangesEndpointTests.GetMenuChanges_MenuDetachedFromOneOfTwoLocations_IsATombstoneOnlyAtThatLocation` |
+| M88 | A member loses Menus Read at the location, then syncs again | 403 `access.denied`, no records or tombstones | ❌ | `MenuChangesEndpointTests.GetMenuChanges_MemberLosesReadAtTheLocation_NextSyncIsRefusedWithoutRecordsOrTombstones` |
+| M89 | A menu deleted 8 days ago | Still returned as a tombstone | ❌ | `MenuChangesEndpointTests.GetMenuChanges_MenuDeletedEightDaysAgo_IsStillReturnedAsATombstone` |
+| M90 | An unchanged menu attached to the location | Returned as changed at that location | ❌ | `MenuChangesEndpointTests.GetMenuChanges_UnchangedMenuAttachedToTheLocation_IsReturnedAsChanged` |
+| M91 | A menu with a location link is deleted | The menu is a tombstone in the menus feed and its link in the links feed | ❌ | `MenuChangesEndpointTests.GetChanges_MenuDeleted_MenuAndItsLinkComeBackAsTombstonesInTheirFeeds` |
+| M92 | One of three menu-location links edited | The links feed returns exactly that link with its menu, location and active flag | ❌ | `MenuChangesEndpointTests.GetLinkChanges_OneLinkEdited_ReturnsExactlyThatLinkWithItsMenuAndLocation` |
+| M93 | One of three categories edited; categories at another location or organization also edited | Exactly the edited category of the header location; the others never appear | ❌ | `MenuCategoryChangesEndpointTests.GetCategoryChanges_OneOfThreeCategoriesEdited_ReturnsExactlyItAndNeverOtherLocationsOrOrganizations` |
+| M94 | A category deleted, and a menu with a category deleted | Both category IDs come back as tombstones | ❌ | `MenuCategoryChangesEndpointTests.GetCategoryChanges_CategoryDeletedAndMenuWithACategoryDeleted_BothComeBackAsTombstones` |
+
+## 7. Schema tests (change stamps and tombstones)
+| ID | Test | Protects |
+|---|---|---|
+| MD1 | `MenuChangeTrackingTests.Write_AnyStampedMenuTable_InsertSetsAndEditRaisesTheChangeStamp` | Menus, categories and links are stamped by the database on insert and on every edit |
+| MD2 | `MenuChangeTrackingTests.DeleteMenu_LinkedToTwoLocationsWithOneCategory_LeavesTombstonesAtEachLocationItLeft` | A deleted menu leaves menu and link tombstones at each location and a category tombstone at its location, cascades included |
+| MD3 | `MenuChangeTrackingTests.DetachMenu_FromOneLocation_LeavesLinkAndMenuTombstonesAtThatLocationOnly` | Detaching reports the link and the menu at that location only |
+| MD4 | `MenuChangeTrackingTests.DeleteMenu_OfTrattoria_TombstonesCarryTrattoriasOrganizationNeverCantinas` | Every tombstone carries the organization of the deleted row |
+
 ## Open questions (no row until decided)
 - **Categories of an unknown menu or location:** the lists answer 200 with an empty list, while
   an unknown menu elsewhere answers 404. Should these be 404 too?

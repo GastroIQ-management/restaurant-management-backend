@@ -150,6 +150,9 @@ namespace RestaurantManagement.Modules.Organization.Services
             }
         }
 
+        public Task<RestaurantManagement.Shared.Models.ChangesPageResponse<LocationResponse>> GetLocationChangesAsync(Guid userId, RestaurantManagement.Shared.Models.ChangesQuery query)
+            => throw new NotImplementedException();
+
         public async Task<List<LocationResponse>> GetLocationsAsync(Guid userId)
         {
             var organizationId = RequireOrganizationId();

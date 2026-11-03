@@ -92,6 +92,11 @@ location in a request (the location access check) is in the Shared matrix, where
 | OR59 | A location create is retried with the same ID and code | 409 `id.already_used`, not `location.code_already_used`; no second location is stored | ✅ | `LocationClientIdRetryEndpointTests.CreateLocation_RetriedWithTheSameIdAndCode_ReturnsIdConflictAndCreatesNothingNew` |
 | OR52 | A non-Owner with Locations Manage creates a location with a taken ID | 403, not 409: the Owner check comes first | ✅ | `OrganizationClientIdEndpointTests.CreateLocation_NonOwnerWithLocationsManageSendsTakenId_ReturnsForbiddenNotConflict` |
 | OR53 | Create a location with a new `id` | 200; the location is stored under that ID in the token organization and the response carries it | ✅ | `OrganizationClientIdEndpointTests.CreateLocation_NewId_StoresLocationUnderThatIdInTokenOrganization` |
+| OR79 | One of three locations edited (and another organization's location edited) | The locations feed returns exactly the edited location of the token organization, `deleted` empty; no location header needed | ❌ | `LocationChangesEndpointTests.GetLocationChanges_OneOfThreeLocationsEdited_ReturnsExactlyItAndNeverAnotherOrganizationsLocations` |
+| OR80 | A cursor of organization A sent with an organization B token | 400 `changes.cursor_invalid` | ❌ | `LocationChangesEndpointTests.GetLocationChanges_CursorOfAnotherOrganization_Returns400CursorInvalid` |
+| OR81 | A location is closed | Returned in `changed` with Status Closed, never in `deleted` | ❌ | `LocationChangesEndpointTests.GetLocationChanges_LocationClosed_ComesBackAsChangedWithStatusClosedNeverAsDeleted` |
+| OR82 | A member with no access at all reads the locations feed | 403, like the locations list (OR11) | ❌ | `LocationChangesEndpointTests.GetLocationChanges_MemberWithNoAccessAtAll_Returns403` |
+| OR83 | The locations feed called with a cursor older than 14 days | 410 `changes.cursor_expired` | ❌ | `LocationChangesEndpointTests.GetLocationChanges_CursorOlderThanFourteenDays_Returns410CursorExpired` |
 
 ## 6. Schema tests
 | ID | Test | Protects |
@@ -102,6 +107,7 @@ location in a request (the location access check) is in the Shared matrix, where
 | ORD4 | `OrganizationDeleteRulesTests.DeleteOrganization_NoLocationsAndNoSettings_IsDeleted` | An empty organization can be deleted |
 | ORD5 | `OrganizationDeleteRulesTests.Migrate_OrganizationForeignKeys_AllRestrictDeletes` | Every Organization foreign key restricts deletes |
 | ORD6 | `OrganizationDeleteRulesTests.Migrate_OrganizationTablesWithRows_NoRowAddedChangedOrRemoved` | The delete-rule migration keeps existing rows |
+| ORD7 | `LocationChangeStampTests.CloseLocation_NewLocation_IsStampedOnCreateAndStampedAgainOnCloseAndTheRowStays` | A location is stamped by the database on create and on close, and a closed location stays as a row |
 
 ## 7. Record versions (lost updates)
 A location or organization change carries the version the caller read. Order of answers: 404, then 403, then 409 `version.conflict`, then the other rules (a taken code).

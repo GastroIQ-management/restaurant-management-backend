@@ -29,6 +29,9 @@ public class ErrorCodeCatalogTests
     [InlineData("client_time.invalid", 400)]
     [InlineData("client_time.in_future", 422)]
     [InlineData("client_time.too_old", 422)]
+    [InlineData("changes.cursor_invalid", 400)]
+    [InlineData("changes.cursor_expired", 410)]
+    [InlineData("location.required", 400)]
     [Trait("Rule", "SH52")]
     public void Read_SharedCatalog_ListsEveryNamedCodeWithItsStatus(string value, int status)
     {
