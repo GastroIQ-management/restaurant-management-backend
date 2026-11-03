@@ -161,9 +161,9 @@ namespace RestaurantManagement.Modules.Organization.Services
             var organizationId = RequireOrganizationId();
             await RequireAnyAccessAsync();
 
-            var records = _orgDb.Locations.Select(l => new ChangeRow(l.Id, l.ChangeStamp));
+            var records = _orgDb.Locations.Select(l => new ChangeRow { Id = l.Id, Stamp = l.ChangeStamp });
             // Locations are closed, never deleted, so the feed has no tombstones.
-            var noTombstones = _orgDb.Locations.Where(_ => false).Select(l => new ChangeRow(l.Id, l.ChangeStamp));
+            var noTombstones = _orgDb.Locations.Where(_ => false).Select(l => new ChangeRow { Id = l.Id, Stamp = l.ChangeStamp });
 
             return await _changeReader!.ReadAsync(_orgDb, new ChangeFeedRead<LocationResponse>(
                 ChangeFeeds.Locations, organizationId, null, query, records, noTombstones,

@@ -94,11 +94,14 @@ namespace RestaurantManagement.Modules.Menu.Migrations
 
             migrationBuilder.Sql(ChangeTrackingSql.TombstoneTrigger("menu", "menu_categories", "menu_tombstones", "MenuCategory", "OLD.location_id"));
             migrationBuilder.Sql(LinkTombstoneTrigger);
+            // A menu's devices learn of its delete through the link tombstones above; this row (no location) keeps the delete on record.
+            migrationBuilder.Sql(ChangeTrackingSql.TombstoneTrigger("menu", "menus", "menu_tombstones", "Menu", "NULL"));
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.Sql("DROP TRIGGER IF EXISTS menu_menus_tombstone ON menus; DROP FUNCTION IF EXISTS menu_menus_tombstone();");
             migrationBuilder.Sql("DROP TRIGGER IF EXISTS menu_location_menus_tombstone ON location_menus; DROP FUNCTION IF EXISTS menu_location_menus_tombstone();");
             migrationBuilder.Sql("DROP TRIGGER IF EXISTS menu_menu_categories_tombstone ON menu_categories; DROP FUNCTION IF EXISTS menu_menu_categories_tombstone();");
             foreach (var table in StampedTables)

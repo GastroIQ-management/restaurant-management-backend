@@ -5,7 +5,12 @@ using RestaurantManagement.Shared.Services.Changes;
 namespace RestaurantManagement.Shared.Data.Changes
 {
     /// <summary>The ID and stamp of one record or tombstone, projected by the module from its own scoped query.</summary>
-    public sealed record ChangeRow(Guid Id, long Stamp);
+    /// <remarks>Initialized by member (not by constructor) so EF Core can filter and sort on the projected stamp in SQL.</remarks>
+    public sealed record ChangeRow
+    {
+        public Guid Id { get; init; }
+        public long Stamp { get; init; }
+    }
 
     /// <summary>
     /// One "changes since" read. <see cref="Records"/> and <see cref="Tombstones"/> are the module's queries already limited to the

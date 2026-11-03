@@ -45,7 +45,7 @@ namespace RestaurantManagement.Modules.Menu.Services
             // A menu changes when its own row or its link to this location does.
             var records = _menuDb.LocationMenus
                 .Where(l => l.LocationId == locationId)
-                .Select(l => new ChangeRow(l.MenuId, l.Menu.ChangeStamp > l.ChangeStamp ? l.Menu.ChangeStamp : l.ChangeStamp));
+                .Select(l => new ChangeRow { Id = l.MenuId, Stamp = l.Menu.ChangeStamp > l.ChangeStamp ? l.Menu.ChangeStamp : l.ChangeStamp });
 
             return await _reader.ReadAsync(_menuDb, new ChangeFeedRead<MenuResponse>(
                 ChangeFeeds.Menus, organizationId, locationId, query, records, Tombstones(organizationId, locationId, MenuType),
@@ -59,7 +59,7 @@ namespace RestaurantManagement.Modules.Menu.Services
 
             var records = _menuDb.LocationMenus
                 .Where(l => l.LocationId == locationId)
-                .Select(l => new ChangeRow(l.Id, l.ChangeStamp));
+                .Select(l => new ChangeRow { Id = l.Id, Stamp = l.ChangeStamp });
 
             return await _reader.ReadAsync(_menuDb, new ChangeFeedRead<LocationMenuResponse>(
                 ChangeFeeds.MenuLocationLinks, organizationId, locationId, query, records, Tombstones(organizationId, locationId, LinkType),
@@ -74,7 +74,7 @@ namespace RestaurantManagement.Modules.Menu.Services
             // Categories with no location are not synced.
             var records = _menuDb.MenuCategories
                 .Where(c => c.LocationId == locationId)
-                .Select(c => new ChangeRow(c.Id, c.ChangeStamp));
+                .Select(c => new ChangeRow { Id = c.Id, Stamp = c.ChangeStamp });
 
             return await _reader.ReadAsync(_menuDb, new ChangeFeedRead<MenuCategoryResponse>(
                 ChangeFeeds.MenuCategories, organizationId, locationId, query, records, Tombstones(organizationId, locationId, CategoryType),
@@ -86,7 +86,7 @@ namespace RestaurantManagement.Modules.Menu.Services
         private IQueryable<ChangeRow> Tombstones(Guid organizationId, Guid locationId, string entityType)
             => _menuDb.Set<ChangeTombstone>()
                 .Where(t => t.OrganizationId == organizationId && t.LocationId == locationId && t.EntityType == entityType)
-                .Select(t => new ChangeRow(t.EntityId, t.ChangeStamp));
+                .Select(t => new ChangeRow { Id = t.EntityId, Stamp = t.ChangeStamp });
 
         private async Task<(Guid OrganizationId, Guid LocationId)> RequireScopeAsync()
         {
