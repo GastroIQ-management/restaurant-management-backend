@@ -2,7 +2,7 @@
 
 **Status:** proposed
 **Severity:** low
-**Origin:** docs/workflow/plans/shared/2026-10-26-problem-details-with-stable-error-codes/review.md · Task T9
+**Origin:** docs/workflow/shared/2026-10-26-problem-details-with-stable-error-codes/review.md · Task T9
 **Date:** 2026-10-26
 
 ## Problem
@@ -13,7 +13,7 @@ the person is not signed in at all.
 
 ## Evidence
 - `src/RestaurantManagement.Modules.Identity/Services/Passwords/PasswordResetService.cs:147` — `InvalidRequest()` uses `ErrorCodes.Unauthorized`
-- `docs/workflow/plans/shared/2026-10-26-problem-details-with-stable-error-codes/review.md` — Watch out 2
+- `docs/workflow/shared/2026-10-26-problem-details-with-stable-error-codes/review.md` — Watch out 2
 
 ## Acceptance criteria
 - [ ] Every rejected reset answers 401 with one reset-specific code (for example `password.reset_code_invalid`) in `PasswordErrorCodes`, still the same for all rejection reasons

@@ -1,6 +1,6 @@
 ---
 name: pr-reviewer
-description: Step 5 of the spec-driven workflow. Reviews the finished branch against the spec, plan, scenarios and project skills, then writes review.md in the plan folder with a verdict, findings, what to check before merging, and a ready-to-paste pull request description. Never edits code. Use after implementation or when asked to review a branch.
+description: Step 5 of the spec-driven workflow. Reviews the finished branch against the spec, plan, scenarios and project skills, then writes review.md in the feature folder with a verdict, findings, what to check before merging, and a ready-to-paste pull request description. Never edits code. Use after implementation or when asked to review a branch.
 tools: Read, Grep, Glob, Bash, Write
 model: opus
 ---
@@ -16,7 +16,7 @@ You review the finished branch before the user merges it (Gate 3). PR means pull
 ## 1. What to Read
 
 1. The spec, `plan.md`, `scenarios.md` and every batch file (including Delivered notes).
-   **Small changes** (from `/small` or `/small-batch`) have no spec or plan folder: skip this
+   **Small changes** (from `/small` or `/small-batch`) have no spec or feature folder: skip this
    step, skip the Completeness row in Section 3, and write the review to the path the command
    gives you. **Setup plans** (`**Kind:** Setup` in `plan.md`) have no `scenarios.md` and no
    baseline commit: the Tests row checks that no test was added, edited, deleted or skipped on
@@ -52,7 +52,7 @@ Do not explore the codebase beyond the changed files and what they call.
 | Comments | Clean-code skill: only "why" comments, no commented-out code, no `TODO` without a backlog file. Watch out |
 | Security | Every item in the security skill's reviewer checklist. A violation is always Fix first |
 | Security matrices | If the diff touches a module with a matrix (root `CLAUDE.md`, "Security matrices"; its code, its tests, or auth code in Shared or Web): run `python3 .claude/scripts/check-security-matrices.py`, then check that module's `docs/security/<module>-matrix.md` against the diff. Every new or changed behaviour has a row, every changed row says what the code now does, and every ✅ names a test that exists and checks that row's Expected result. A missing or stale row, or a ✅ without a matching test, is Fix first |
-| Module relations | A change that adds or changes a relation between modules (a new use of another module's Shared contract, or a new contract) has its row in `docs/workflow/modules/context-map.md`; a missing or stale row is Fix first. When the module has a brief (`docs/workflow/modules/<module>/brief.md`), behaviour that contradicts it is Fix first |
+| Module relations | A change that adds or changes a relation between modules (a new use of another module's Shared contract, or a new contract) has its row in `docs/workflow/context-map.md`; a missing or stale row is Fix first. When the module has a brief (`docs/workflow/<module>/brief.md`), behaviour that contradicts it is Fix first |
 | Code style | Clean-code skill. Style issues are Watch out, never Fix first |
 | Commits | One per task (or per item for `/small-batch`), Conventional Commits, scenario numbers in the body for planned work (none for Setup plans), no amended or combined commits |
 | Secrets | No connection strings, keys, tokens or personal data in the diff |
@@ -62,7 +62,7 @@ Do not explore the codebase beyond the changed files and what they call.
 
 ## 4. review.md
 
-Write `docs/workflow/plans/<module>/<spec-name>/review.md` (or the path the command gives you):
+Write `docs/workflow/<module>/<spec-name>/review.md` (or the path the command gives you):
 
 ```markdown
 # Review: <Plan title>

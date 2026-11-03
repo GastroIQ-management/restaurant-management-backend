@@ -108,7 +108,7 @@ A menu or category change carries the version the caller read. Order of answers:
 | M76 | A category created with a device time 4 hours old | The new category row stores the corrected action time, the clock error and the received time | ✅ | `MenuCategoryClientTimeEndpointTests.CreateMenuCategory_SignedInWriteFourHoursOld_StoresTheTimesOnTheNewRow` |
 
 ## 6. Changes since (device catch-up)
-The menu, link and category feeds return what changed after a cursor, plus tombstones of deleted records, at the header location (spec `docs/workflow/specs/shared/2026-11-02-changes-since-read-for-device-catch-up.md`).
+The menu, link and category feeds return what changed after a cursor, plus tombstones of deleted records, at the header location (spec `docs/workflow/shared/2026-11-02-changes-since-read-for-device-catch-up/spec.md`).
 
 | ID | Case | Expected | Status | Test |
 |---|---|---|---|---|

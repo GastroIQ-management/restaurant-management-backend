@@ -3,12 +3,12 @@ description: Implement an approved plan batch by batch, then review the branch (
 argument-hint: <module>/<spec-name> [branch or ticket]
 ---
 
-Plan folder: docs/workflow/plans/$ARGUMENTS/ (the first word of the arguments is the plan; an optional
+Plan folder: docs/workflow/$ARGUMENTS/ (the first word of the arguments is the plan; an optional
 second word is the branch name or ticket).
 
 If no plan was given, ask me for it and stop.
 
-1. Check `scenarios.md` exists in the plan folder. If not, stop: tests come first (`/test`).
+1. Check `scenarios.md` exists in the feature folder. If not, stop: tests come first (`/test`).
    Exception: a plan with `**Kind:** Setup` has no tests and no `scenarios.md`; go on.
 2. Run `git status`. The spec, plan and tests were committed at their approvals (`/spec`,
    `/plan`, `/test`; a Setup plan has no tests). If anything is uncommitted (this feature's files, `.claude/`, `CLAUDE.md`
@@ -42,6 +42,6 @@ Show me, exactly as returned and with nothing added before or after:
 No file lists, no paths beyond those in the messages, no summary. Then stop and wait (Gate 3).
 Never push or merge; I do that after reading review.md, and merge only when CI is green.
 
-When I approve the review (Gate 3), commit it: stage only `review.md` in the plan folder, by path,
+When I approve the review (Gate 3), commit it: stage only `review.md` in the feature folder, by path,
 and commit `docs(<scope>): add the review for <feature>`. If anything else is uncommitted, leave
 it and tell me. Reply with one line: the commit hash and summary. Then stop. Never push.

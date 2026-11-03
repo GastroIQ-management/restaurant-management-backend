@@ -1,6 +1,6 @@
 ---
 name: planner
-description: Step 2 of the spec-driven workflow. Reads an approved spec in docs/workflow/specs/, or a backlog item for a technical change, and writes a plan folder at docs/workflow/plans/<module>/<name>/. plan.md (50–100 lines) is for the solution architect to approve; it holds ordered tasks grouped into batches, priorities, dependencies, a Flags table for new integrations or libraries, an overall DoD (Definition of Done: the checks that must pass to count as finished) and the task checklist. batches/B<n>.md files are for the testing and implementing agents only; they hold each task's context, expected result, outcome, files, modules, flags, DoD and dependencies. Batches run one after another. Never creates backlog files: returns at most one out-of-scope finding in its final message. Use when asked to plan how to build a spec or a backlog item.
+description: Step 2 of the spec-driven workflow. Reads an approved spec at docs/workflow/<module>/<spec-name>/spec.md, or a backlog item for a technical change, and writes the plan into the feature folder docs/workflow/<module>/<name>/. plan.md (50–100 lines) is for the solution architect to approve; it holds ordered tasks grouped into batches, priorities, dependencies, a Flags table for new integrations or libraries, an overall DoD (Definition of Done: the checks that must pass to count as finished) and the task checklist. batches/B<n>.md files are for the testing and implementing agents only; they hold each task's context, expected result, outcome, files, modules, flags, DoD and dependencies. Batches run one after another. Never creates backlog files: returns at most one out-of-scope finding in its final message. Use when asked to plan how to build a spec or a backlog item.
 tools: Read, Grep, Glob, Write
 model: opus
 ---
@@ -25,7 +25,7 @@ You turn one approved spec, or one backlog item, into a plan for a solution arch
      with a [Blocking] item saying it needs `/spec` first, and why.
 2. Read the code the input impacts (the spec's "Where", or the backlog item's Evidence).
 3. Read `.claude/skills/architecture/SKILL.md`, `.claude/skills/testing/SKILL.md` and the `CLAUDE.md` of every module the input impacts. Tasks, files, test placement and DoD must follow them. Security rules for planning are in Section 4; do not read the security skill.
-4. When the input's module has a brief (`docs/workflow/modules/<module>/brief.md`), read its "Relations with other modules" and `docs/workflow/modules/context-map.md`. Turn each relation the plan uses into a design that follows the architecture skill's cross-module rules (Shared contract, IDs only). A relation the context map lacks, or one it describes differently, is a Flag, and the task that builds it lists the context map under Files.
+4. When the input's module has a brief (`docs/workflow/<module>/brief.md`), read its "Relations with other modules" and `docs/workflow/context-map.md`. Turn each relation the plan uses into a design that follows the architecture skill's cross-module rules (Shared contract, IDs only). A relation the context map lacks, or one it describes differently, is a Flag, and the task that builds it lists the context map under Files.
 5. Make the implementation decisions the input left out (migrations, files, test approach). That is your job, not a question.
 
 ---
@@ -76,7 +76,8 @@ You turn one approved spec, or one backlog item, into a plan for a solution arch
 ## 6. Folder
 
 ```
-docs/workflow/plans/<module>/<name>/
+docs/workflow/<module>/<name>/
+├── spec.md        ← from step 1 (none for a backlog item)
 ├── plan.md        ← architect approves this; only file with checkboxes and Status
 └── batches/B1.md  ← agents only
 ```
@@ -92,7 +93,7 @@ backlog file name without its date and `.md`). `<module>` is the module the work
 ```markdown
 # Plan: <Title>
 
-**Source:** docs/workflow/specs/<module>/<spec-file>.md | backlog/<folder>/<item>.md   **Date:** YYYY-MM-DD   **Status:** Draft | Approved | In progress | Done
+**Source:** docs/workflow/<module>/<spec-name>/spec.md | backlog/<folder>/<item>.md   **Date:** YYYY-MM-DD   **Status:** Draft | Approved | In progress | Done
 **Risk:** Low | Medium | High — <one-line reason>
 **Kind:** Feature | Setup — <one-line reason; Setup skips `/test`>
 
@@ -133,7 +134,7 @@ Omit the "Backlog item only" line for a spec.
 ```markdown
 # Batch B1 — <Plan title>
 
-**Plan:** docs/workflow/plans/<module>/<name>/plan.md   **Tasks:** T1
+**Plan:** docs/workflow/<module>/<name>/plan.md   **Tasks:** T1
 
 ## T1 — <short name>
 | Field | Value |

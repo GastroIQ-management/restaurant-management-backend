@@ -2,14 +2,14 @@
 
 **Status:** proposed
 **Severity:** medium
-**Origin:** docs/workflow/specs/shared/2026-10-19-per-location-access-grid.md · Slice 3 of 3
+**Origin:** docs/workflow/shared/2026-10-19-per-location-access-grid/spec.md · Slice 3 of 3
 **Date:** 2026-10-19
 
 ## Problem
 Every member sees every location in lists. Lists should show only the locations (and their data) where the member has at least Read for the module.
 
 ## Evidence
-- `docs/workflow/specs/shared/2026-10-19-per-location-access-grid.md` — Current State: every member sees every location
+- `docs/workflow/shared/2026-10-19-per-location-access-grid/spec.md` — Current State: every member sees every location
 - Merged from `backlog/tech-debt/2026-10-15-no-location-owned-entities.md` (2026-10-19): the location
   query filter applies only to entities derived from `LocationEntity`, and none do. `LocationMenu`
   (required `LocationId`) and `MenuCategory` (optional `LocationId`) derive from `TenantEntity`, so
@@ -27,4 +27,4 @@ Every member sees every location in lists. Lists should show only the locations 
 - [ ] Owner still sees everything
 
 ## Related
-docs/workflow/specs/shared/2026-10-20-invite-member-and-edit-access-grid.md
+docs/workflow/shared/2026-10-20-invite-member-and-edit-access-grid/spec.md

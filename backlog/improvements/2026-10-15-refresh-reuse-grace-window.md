@@ -1,6 +1,6 @@
 # Grace window for parallel refreshes on one device
 
-**Found during:** docs/workflow/plans/identity/2026-10-15-refresh-tokens-own-table/plan.md
+**Found during:** docs/workflow/identity/2026-10-15-refresh-tokens-own-table/plan.md
 **Date:** 2026-10-15
 
 ## Description

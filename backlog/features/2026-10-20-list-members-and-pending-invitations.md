@@ -2,7 +2,7 @@
 
 **Status:** proposed
 **Severity:** medium
-**Origin:** docs/workflow/plans/shared/2026-10-20-invite-member-and-edit-access-grid/plan.md · Planning
+**Origin:** docs/workflow/shared/2026-10-20-invite-member-and-edit-access-grid/plan.md · Planning
 **Date:** 2026-10-20
 
 ## Problem
@@ -13,7 +13,7 @@ cancel, without them.
 
 ## Evidence
 - `src/RestaurantManagement.Modules.Identity/Services/Members/IMemberAccessService.cs` — `GetAccessAsync` reads a member's grid, but no endpoint exposes it
-- `docs/workflow/specs/shared/2026-10-20-invite-member-and-edit-access-grid.md` — Outcomes cover invite, accept, edit and cancel only; nothing lists members or invitations
+- `docs/workflow/shared/2026-10-20-invite-member-and-edit-access-grid/spec.md` — Outcomes cover invite, accept, edit and cancel only; nothing lists members or invitations
 
 ## Acceptance criteria
 - [ ] An authorized member lists the organization's members and pending invitations, limited to the locations where they have Members >= Read

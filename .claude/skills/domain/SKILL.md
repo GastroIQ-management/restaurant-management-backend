@@ -47,7 +47,7 @@ Items marked **[confirm]** are not settled yet; treat them as open, not as rules
 
 Build order matters: no dish without ingredients, no menu without dishes.
 Build order and status of each slice: `docs/roadmap/`. Each new module has a brief
-(`docs/workflow/modules/<module>/brief.md`); how the modules relate: `docs/workflow/modules/context-map.md`.
+(`docs/workflow/<module>/brief.md`); how the modules relate: `docs/workflow/context-map.md`.
 Later: own point of sale with payments by PIX (Brazilian instant payment), card or cash; iFood
 (delivery platform) orders going straight into the system. Brazilian electronic fiscal receipts
 (NFC-e) are a known risk area.

@@ -23,7 +23,7 @@ Scope: 3 commits (`3887999`, `e5543cc`, `ab70983`), 10 files. No plan folder (bu
 ## Watch out
 | # | File:line | Problem | Suggestion |
 |---|---|---|---|
-| 1 | `docs/workflow/specs/shared/2026-10-19-access-decisions-use-all-user-roles.md:33` | Rule 5 still names "menus today" as organization-wide, but reading one location's menus now follows Rule 1a. The decision lives only in the matrix (M3). | Add a rule like Rule 7: "Decided by the user: any role for a location, or for all locations, reads that location's menus; the full list needs a role for all locations." |
+| 1 | `docs/workflow/shared/2026-10-19-access-decisions-use-all-user-roles/spec.md:33` | Rule 5 still names "menus today" as organization-wide, but reading one location's menus now follows Rule 1a. The decision lives only in the matrix (M3). | Add a rule like Rule 7: "Decided by the user: any role for a location, or for all locations, reads that location's menus; the full list needs a role for all locations." |
 | 2 | `tests/RestaurantManagement.Web.Tests/Menu/MenuMultiRoleEndpointTests.cs:13-16` | Class summary says "The token carries Admin so the endpoint's first filter passes". No longer true for the new test, and the read endpoints have no role filter now. | Reword in the next change to this file. |
 | 3 | `tests/RestaurantManagement.Web.Tests/Menu/MenuMultiRoleEndpointTests.cs:58` | Asserts only 200 for Batel; no menu is linked to Batel, so an empty list passes. The service test `GetMenusByLocationAsync_WaiterAtBatel_ReturnsBatelMenus` covers the content. | Optional: link a menu to Batel and assert its ID in the body. |
 
@@ -35,7 +35,7 @@ Scope: 3 commits (`3887999`, `e5543cc`, `ab70983`), 10 files. No plan folder (bu
 ## Pull request description
 **fix(identity): keep one-location roles out of the access token**
 
-Problem: the access token listed every role a user holds in the organization, including roles held for one location. Permission policies such as `reports.view` read those claims, so an Admin for one location could read the whole organization's audit log. This broke spec `docs/workflow/specs/shared/2026-10-19-access-decisions-use-all-user-roles.md` Rule 5.
+Problem: the access token listed every role a user holds in the organization, including roles held for one location. Permission policies such as `reports.view` read those claims, so an Admin for one location could read the whole organization's audit log. This broke spec `docs/workflow/shared/2026-10-19-access-decisions-use-all-user-roles/spec.md` Rule 5.
 
 Changes:
 - Identity: `AccessTokenFactory` adds only role claims held for all locations (login, organization selection and refresh). Matrix L14, S5, F6 updated; new L14 tests.

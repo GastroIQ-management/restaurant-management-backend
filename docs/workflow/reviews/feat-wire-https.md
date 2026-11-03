@@ -31,7 +31,7 @@ architecture, security, clean-code and testing skills. Resolves `backlog/tech-de
 Outside Development, the API now serves HTTPS only and refuses to start without a certificate.
 `Program.cs` now calls the existing `UseHttpsOnlyOutsideDevelopment()` extension, which was
 already built and tested but not wired in. This completes rule 4 of the auth-hardening spec
-(`docs/workflow/specs/identity/auth-hardening.md`) and the code part of `backlog/tech-debt/https-wiring.md`.
+(`docs/workflow/identity/auth-hardening/spec.md`) and the code part of `backlog/tech-debt/https-wiring.md`.
 
 **What changed**
 - Web: `Program.cs` calls `builder.UseHttpsOnlyOutsideDevelopment()` right after Key Vault secrets load.
