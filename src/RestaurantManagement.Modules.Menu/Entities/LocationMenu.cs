@@ -1,12 +1,15 @@
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
+using RestaurantManagement.Shared.Data.Changes;
 using RestaurantManagement.Shared.Data.Entities;
 
 namespace RestaurantManagement.Modules.Menu.Entities
 {
     [Index(nameof(LocationId))]
-    public class LocationMenu : TenantEntity
+    public class LocationMenu : TenantEntity, IChangeTracked
     {
+        public long ChangeStamp { get; set; }
+
         public Guid LocationId { get; set; }
 
         [ForeignKey("Menu")]

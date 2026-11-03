@@ -231,6 +231,15 @@
   <data name="PasswordChangeSucceeded" xml:space="preserve">
     <value>Mot de passe modifié. Reconnectez-vous sur vos appareils.</value>
   </data>
+  <data name="ChangeCursorInvalid" xml:space="preserve">
+    <value>Le curseur de modifications n'est pas valide.</value>
+  </data>
+  <data name="ChangeCursorExpired" xml:space="preserve">
+    <value>Le curseur de modifications a expiré. Rechargez les données en entier.</value>
+  </data>
+  <data name="LocationRequired" xml:space="preserve">
+    <value>L'en-tête X-Location-Id est obligatoire.</value>
+  </data>
   <data name="IdAlreadyUsed" xml:space="preserve">
     <value>Cet identifiant est déjà utilisé.</value>
   </data>

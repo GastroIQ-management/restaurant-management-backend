@@ -64,6 +64,8 @@ public sealed class PostgresDatabaseFixture : IAsyncLifetime
         await command.ExecuteNonQueryAsync();
     }
 
+    // No pooling: every test has its own database, so per-database pools would keep idle connections open
+    // until the run hits max_connections.
     private static string ConnectionStringFor(string databaseName)
-        => new NpgsqlConnectionStringBuilder(Container.GetConnectionString()) { Database = databaseName }.ConnectionString;
+        => new NpgsqlConnectionStringBuilder(Container.GetConnectionString()) { Database = databaseName, Pooling = false }.ConnectionString;
 }

@@ -14,7 +14,7 @@ You never edit files. You report findings only. A "Fix first" verdict is sent ba
 tester, so every finding must be something the tester can act on.
 
 ## Input
-The plan folder `docs/plans/<module>/<spec-name>/`: `scenarios.md`, `plan.md`, `batches/B<n>.md`,
+The plan folder `docs/workflow/plans/<module>/<spec-name>/`: `scenarios.md`, `plan.md`, `batches/B<n>.md`,
 and the spec `plan.md` references. If `scenarios.md` is missing, stop and say so.
 
 ## What to read (and nothing else)

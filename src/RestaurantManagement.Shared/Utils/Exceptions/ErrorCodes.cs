@@ -81,6 +81,15 @@ namespace RestaurantManagement.Shared.Utils.Exceptions
         // "version.conflict", 409
         public static ErrorCode VersionConflict { get; } = new("version.conflict", 409);
 
+        // "changes.cursor_invalid", 400
+        public static ErrorCode ChangeCursorInvalid { get; } = new("changes.cursor_invalid", 400);
+
+        // "changes.cursor_expired", 410
+        public static ErrorCode ChangeCursorExpired { get; } = new("changes.cursor_expired", 410);
+
+        // "location.required", 400
+        public static ErrorCode LocationRequired { get; } = new("location.required", 400);
+
         // "http.bad_request", 400
         public static ErrorCode HttpBadRequest { get; } = new("http.bad_request", 400);
 

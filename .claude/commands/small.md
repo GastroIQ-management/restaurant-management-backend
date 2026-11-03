@@ -20,7 +20,7 @@ If no change was given, ask me for it and stop.
    It creates the branch from `origin/development` only after its size check passes. If it
    replies "Not a small change", show me its message and stop: no branch was created.
 5. Use the pr-reviewer subagent on the branch. Because there is no plan folder, it reviews
-   the diff against the skills only and writes its review to `docs/reviews/<branch-name>.md`
+   the diff against the skills only and writes its review to `docs/workflow/reviews/<branch-name>.md`
    (with `/` in the branch name replaced by `-`, for example `feat-add-dish-notes.md`). It
    builds only; the full test suite runs in CI (Continuous Integration) on the pull request.
 

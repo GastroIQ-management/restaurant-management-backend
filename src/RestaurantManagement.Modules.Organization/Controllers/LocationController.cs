@@ -7,6 +7,7 @@ using RestaurantManagement.Shared.Utils.Exceptions;
 using System.Security.Claims;
 using RestaurantManagement.Modules.Organization.Models;
 using RestaurantManagement.Modules.Organization.Services;
+using RestaurantManagement.Shared.Models;
 
 namespace RestaurantManagement.Modules.Organization.Controllers
 {
@@ -33,6 +34,11 @@ namespace RestaurantManagement.Modules.Organization.Controllers
             var response = await _locationService.GetLocationsAsync(userId);
             return Ok(response);
         }
+
+        // GET api/v1/locations/changes
+        [HttpGet("changes")]
+        public async Task<ActionResult<ChangesPageResponse<LocationResponse>>> GetLocationChanges([FromQuery] ChangesQuery query)
+            => Ok(await _locationService.GetLocationChangesAsync(GetCurrentUserId(), query));
 
         // POST api/v1/locations
         [HttpPost]

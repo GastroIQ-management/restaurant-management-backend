@@ -2,7 +2,7 @@
 
 **Status:** proposed
 **Severity:** high
-**Origin:** docs/specs/identity/auth-hardening.md · rule 4 (code wired on branch feat/wire-https)
+**Origin:** docs/workflow/specs/identity/auth-hardening.md · rule 4 (code wired on branch feat/wire-https)
 **Date:** 2026-10-16
 
 ## Problem

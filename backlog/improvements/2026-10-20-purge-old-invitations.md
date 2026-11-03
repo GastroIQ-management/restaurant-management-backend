@@ -2,7 +2,7 @@
 
 **Status:** proposed
 **Severity:** low
-**Origin:** docs/plans/shared/2026-10-20-invite-member-and-edit-access-grid/plan.md · Planning (T5)
+**Origin:** docs/workflow/plans/shared/2026-10-20-invite-member-and-edit-access-grid/plan.md · Planning (T5)
 **Date:** 2026-10-20
 
 ## Problem
@@ -11,7 +11,7 @@ cancelled. The pending email queue already removes failed rows after 7 days so r
 are not kept; invitations have no such cleanup.
 
 ## Evidence
-- `docs/plans/shared/2026-10-20-invite-member-and-edit-access-grid/batches/B4.md` — T5 stores the invitation with its email and adds no cleanup
+- `docs/workflow/plans/shared/2026-10-20-invite-member-and-edit-access-grid/batches/B4.md` — T5 stores the invitation with its email and adds no cleanup
 - `src/RestaurantManagement.Modules.Identity/Services/Registration/PendingEmailQueue.cs` — `FailedRetention` of 7 days for the queue
 
 ## Acceptance criteria

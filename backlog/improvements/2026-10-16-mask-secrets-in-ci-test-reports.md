@@ -2,7 +2,7 @@
 
 **Status:** proposed
 **Severity:** medium
-**Origin:** docs/reviews/identity-security-matrix.md · Watch out 6
+**Origin:** docs/workflow/reviews/identity-security-matrix.md · Watch out 6
 **Date:** 2026-10-16
 
 ## Problem

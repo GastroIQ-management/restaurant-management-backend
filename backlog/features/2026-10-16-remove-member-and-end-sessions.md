@@ -34,4 +34,4 @@ user on 2026-10-16:
 
 ## Related
 - backlog/features/2026-10-16-member-role-change.md (same permission and Owner protection)
-- docs/specs/identity/2026-10-20-custom-roles.md
+- docs/workflow/specs/identity/2026-10-20-custom-roles.md

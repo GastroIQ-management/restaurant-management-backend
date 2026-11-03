@@ -1,6 +1,6 @@
 # Paginate the organization and location lists
 
-**Found during:** docs/plans/organization/2026-10-15-organization-and-location-fields/scenarios.md
+**Found during:** docs/workflow/plans/organization/2026-10-15-organization-and-location-fields/scenarios.md
 **Date:** 2026-10-15
 
 ## Description

@@ -119,9 +119,10 @@ For a module with a matrix:
     memberships
 
 ## Workflow
-Test-first, with three human gates (⏸). Reviewer agents run automatically between steps and only
+Test-first, with three human gates (⏸), plus Gate 0 for a new module's brief. Reviewer agents run automatically between steps and only
 stop the flow when something is wrong.
 
+- `/module <module> [what it covers]` runs step 0 for a new module and stops at Gate 0.
 - `/spec <requirement>` runs step 1. `/plan <module>/<spec-name>` runs step 2 and stops at Gate 1.
 - `/test <module>/<spec-name>` runs step 3 and stops at Gate 2.
 - `/implement <module>/<spec-name> [branch or ticket]` runs steps 4–5 and stops at Gate 3.
@@ -129,37 +130,65 @@ stop the flow when something is wrong.
   `/small-batch <item; item; …>`: several small, independent items, one commit each.
 - Other commands: `/review`, `/fixbug`.
 
-1. Spec: spec-writer writes `docs/specs/<module>/<YYYY-MM-DD>-<feature>.md` (`shared/` when it
-   spans modules). Stops only if it has `[Blocking]` questions.
-2. Plan: planner writes the folder `docs/plans/<module>/<spec-name>/`:
+0. Module brief, new modules only: module-designer writes `docs/workflow/modules/<module>/brief.md`
+   (business only: what the module holds, its relations, who may do what, rules, and a feature
+   map of slices by roadmap ID), adds the module to `docs/workflow/modules/context-map.md`, adds
+   slices missing from `docs/roadmap/` as proposed rows and updates the domain skill.
+   ⏸ Gate 0: the user approves the brief. On approval, the main session creates the branch
+   `docs/<YYYY-MM-DD>-<module>-module-brief` from `origin/development` and commits it. Each slice
+   then goes through steps 1–5. Existing modules get a brief only for a large change.
+1. Spec: spec-writer writes `docs/workflow/specs/<module>/<YYYY-MM-DD>-<feature>.md` (`shared/` when it
+   spans modules). Stops only if it has `[Blocking]` questions. On approval, the main session
+   creates the branch `<type>/<spec-name>` from `origin/development` and commits the spec.
+2. Plan: planner writes the folder `docs/workflow/plans/<module>/<spec-name>/`:
    - `plan.md`: Risk, tasks, batches, Flags, overall Definition of Done and the task Checklist.
      The only file with checkboxes and Status
    - `batches/B<n>.md`: each task's details (context, files, DoD, dependencies), read only by
      the tester and implementer
 
-   ⏸ Gate 1: the solution architect approves `plan.md`, including Risk and Flags.
+   Business tasks come first; a feature with offline data ends with one "Make <feature>
+   offline-capable" task that follows the architecture skill's offline checklist.
+
+   ⏸ Gate 1: the solution architect approves `plan.md`, including Risk and Flags. On approval,
+   the main session sets Status to Approved and commits the plan folder.
 3. Tests: tester writes `scenarios.md`, stubs and failing tests for **all** batches, plus an
    Implementation guide per task in the batch files; test-reviewer checks them, and the tester
    fixes its findings once.
-   ⏸ Gate 2: the user approves `scenarios.md` (test coverage).
-4. Implement: implementer commits the baseline (spec, plan, stubs, tests), then one task per
-   commit, following each task's Implementation guide. Each task is committed after a green
+   ⏸ Gate 2: the user approves `scenarios.md` (test coverage). On approval, the main session
+   commits the scenarios, batch files, stubs, tests and matrices: the baseline commit.
+4. Implement: implementer commits one task per commit, following each task's Implementation guide. Each task is committed after a green
    build, without running tests. After the last task of the last batch, the implementer runs the
    affected tests once, fixes every failure and turns the matrix rows ✅. After each
    task it writes the task's Delivered note in its batch file and ticks the task in the
    `plan.md` Checklist. Batches run in order; a batch starts only when every task it depends
    on is ticked.
 5. Review: pr-reviewer reviews the branch (build only; the full suite runs in CI).
-   ⏸ Gate 3: the user reads the summary and review, then pushes, and merges only when CI is
-   green.
+   ⏸ Gate 3: the user reads the summary and review. On approval, the main session commits
+   `review.md`; the user then pushes, and merges only when CI is green.
+
+Setup plans skip step 3. A plan is **Setup** when no task changes behaviour a user or client
+sees: adding or upgrading a package, build, CI or tooling configuration, or wiring with no new
+endpoint, rule or data change. Features and bug fixes are never Setup. The planner sets
+`**Kind:**` in `plan.md` and the solution architect confirms it at Gate 1; `/implement` then
+runs with no `scenarios.md` and no baseline commit. The implementer adds no tests, and the
+affected existing tests still run once after the last batch.
 
 High risk (flagged in `plan.md`; the solution architect decides what to do at Gate 1):
 new Shared contract, auth or role changes, new module, migration on a table that has data or
 with a backfill. Adding a package not already in the dependency graph is high risk. Pinning an
 existing transitive package to a patched version is low risk.
 
-After Gate 2, test files are read-only: never edit, delete, skip or weaken a test. If a test
-looks wrong, stop and say why.
+After Gate 2, test files are read-only: never edit, delete, skip or weaken a test. Only a
+mechanical bug that stops a test from running as written (a wrong column name, an identifier
+typo) is fixed, without changing what it asserts, and reported. If a test's expectation looks
+wrong, stop and say why.
+
+### Docs layout
+- `docs/workflow/`: what the workflow produces. `modules/` (briefs and the context map),
+  `specs/`, `plans/` (plan, batches, scenarios and review per spec) and `reviews/` (reviews of
+  small changes and backlog fixes)
+- `docs/roadmap/`: build order and status of every slice, the only place for both
+- `docs/security/`: the security matrices, kept in step with the code
 
 ### Backlog
 Rules in `.claude/skills/backlog/SKILL.md`, read when handling a finding outside the task. Fix
@@ -180,6 +209,8 @@ the deletion: the user checks and commits it. Agents never push.
 ### Terminal output
 The reviewer reads the files in `docs/`, not the terminal. The spec writer, planner, tester
 and implementer end with only the decisions the user must make (options and a
-recommendation), or one "ready" line when there are none. When a step finishes, show the
+recommendation), or one "ready" line when there are none. The implementer also ends with three
+lines: Business (what changed for the user), Offline (plumbing added, or none) and Decisions
+taken (choices it made without asking, which the main session never asks about). When a step finishes, show the
 agent's final message exactly as returned. Never summarize, rebuild or add sections from the
 spec, plan, batch or scenarios files.

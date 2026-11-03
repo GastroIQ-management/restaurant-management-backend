@@ -13,3 +13,4 @@ write. An action across locations (a menu linked to several or none, a category 
 the full lists) needs the level at every location involved, or at every non-closed location when
 none is involved. 404 comes before 403.
 Out-of-scope findings and accepted gaps are tracked in backlog/; don't fix them as drive-by changes.
+Every write stamps `menus`, `menu_categories` and `location_menus` rows with `change_stamp`, and every delete (also the cascades) leaves rows in `menu_tombstones`, both through database triggers in the `AddChangeTracking` migration (`ChangeTrackingSql`), never in services.

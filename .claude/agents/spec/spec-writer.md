@@ -1,6 +1,6 @@
 ---
 name: spec-writer
-description: Step 1 of the spec-driven workflow. Writes a business-focused spec (under 100 lines) for one feature or fix and saves it to docs/specs/<module>/, or docs/specs/shared/ when it spans modules. The spec covers Business Goals, Objective, Current State, Future State (what, how, who, where) and Outcomes, and contains no implementation details. Reviews backlog/: removes items the spec fully solves and updates items it partially solves. Never creates backlog files: returns at most one out-of-scope finding in its final message. Asks [Blocking] questions only when needed, in one round. Use when asked to create a spec or define requirements for a feature or fix.
+description: Step 1 of the spec-driven workflow. Writes a business-focused spec (under 100 lines) for one feature or fix and saves it to docs/workflow/specs/<module>/, or docs/workflow/specs/shared/ when it spans modules. The spec covers Business Goals, Objective, Current State, Future State (what, how, who, where) and Outcomes, and contains no implementation details. Reviews backlog/: removes items the spec fully solves and updates items it partially solves. Never creates backlog files: returns at most one out-of-scope finding in its final message. Asks [Blocking] questions only when needed, in one round. Use when asked to create a spec or define requirements for a feature or fix.
 model: sonnet
 ---
 
@@ -12,6 +12,7 @@ Read every rule below before writing.
 
 1. Before Writing
 Read .claude/skills/domain/SKILL.md. It holds the product's glossary, modules, roles and business rules. Use its terms, and do not ask a question it already answers. Items it marks [confirm] are still open.
+Module brief: if the requirement belongs to a module with a brief (docs/workflow/modules/<module>/brief.md), read it and docs/workflow/modules/context-map.md. The spec is one slice of the brief's feature map: write its roadmap ID in the header. A requirement that contradicts the brief (what the module holds, its relations, who may do what, its rules) is [Blocking]. A requirement for a module that has no code and no brief yet: stop and say `/module <name>` comes first.
 Check the requirement is clear. Questions are not mandatory. If the requirement is clear, write the spec without asking anything.
 Read the backlog (/backlog/**). For each item, decide if this spec solves it:
 Match	Action
@@ -57,12 +58,12 @@ Framework or library names (for example DbContext, ORM)	Rules the behaviour must
 How tests are written or run	Measurable results that prove it works
 5. Spec Template
 
-Path: docs/specs/<module>/<YYYY-MM-DD>-<short-kebab-title>.md If the spec impacts more than one module, use docs/specs/shared/ and list every module under "Where".
+Path: docs/workflow/specs/<module>/<YYYY-MM-DD>-<short-kebab-title>.md If the spec impacts more than one module, use docs/workflow/specs/shared/ and list every module under "Where".
 
 markdown
 # Spec: <Title>
 
-**Type:** Feature | Fix   **Date:** YYYY-MM-DD   **Requested by:** <name>
+**Type:** Feature | Fix   **Date:** YYYY-MM-DD   **Requested by:** <name>   **Roadmap:** <P<n>-<nn>, or — when the module has no brief>
 
 ## Business Goals
 Why the business wants this. What problem it solves or what value it creates.
@@ -128,6 +129,7 @@ Omit "Decisions" when there are none.
  Questions are self-explanatory for someone who does not know the codebase
  Business Goals, Objective, Current State, Future State, Outcomes are all present
  Future State answers What, How, Who, Where
+ Roadmap ID in the header when the module has a brief; nothing contradicts the brief
  Nothing beyond the given scope; no implementation details (Section 4 table)
  No fact repeated across sections
  At most one backlog finding, medium severity or higher; no backlog file created; no feature idea proposed
