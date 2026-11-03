@@ -1,5 +1,6 @@
 using RestaurantManagement.Shared;
 using RestaurantManagement.Modules.Organization.Models;
+using RestaurantManagement.Shared.Models;
 
 namespace RestaurantManagement.Modules.Organization.Services
 {
@@ -9,6 +10,6 @@ namespace RestaurantManagement.Modules.Organization.Services
         Task DeleteLocationAsync(Guid userId, Guid locationId, uint version);
         Task<LocationResponse> CreateLocationAsync(Guid userId, CreateLocationRequest request);
         Task<List<LocationResponse>> GetLocationsAsync(Guid userId);
-        Task<RestaurantManagement.Shared.Models.ChangesPageResponse<LocationResponse>> GetLocationChangesAsync(Guid userId, RestaurantManagement.Shared.Models.ChangesQuery query);
+        Task<ChangesPageResponse<LocationResponse>> GetLocationChangesAsync(Guid userId, ChangesQuery query);
     }
 }

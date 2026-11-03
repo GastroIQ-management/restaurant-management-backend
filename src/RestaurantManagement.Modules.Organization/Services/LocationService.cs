@@ -8,9 +8,12 @@ using RestaurantManagement.Modules.Organization.Entities;
 using RestaurantManagement.Modules.Organization.Models;
 using RestaurantManagement.Shared.Auth;
 using RestaurantManagement.Shared.Utils.Exceptions;
+using RestaurantManagement.Shared.Data.Changes;
 using RestaurantManagement.Shared.Data.Tenancy;
 using RestaurantManagement.Shared.Data.Versioning;
+using RestaurantManagement.Shared.Models;
 using RestaurantManagement.Shared.Services.AuditLog;
+using RestaurantManagement.Shared.Services.Changes;
 
 namespace RestaurantManagement.Modules.Organization.Services
 {
@@ -22,6 +25,7 @@ namespace RestaurantManagement.Modules.Organization.Services
         private readonly IStringLocalizer<SharedResource> _localizer;
         private readonly IAuditLog _auditLog;
         private readonly ILogger<LocationService> _logger;
+        private readonly ChangeReader? _changeReader;
 
         public LocationService(
             OrganizationDbContext orgDb,
@@ -29,7 +33,8 @@ namespace RestaurantManagement.Modules.Organization.Services
             ITenantContext tenantContext,
             IStringLocalizer<SharedResource> localizer,
             IAuditLog auditLog,
-            ILogger<LocationService> logger)
+            ILogger<LocationService> logger,
+            ChangeReader? changeReader = null)
         {
             _orgDb = orgDb;
             _accessGuard = accessGuard;
@@ -37,6 +42,7 @@ namespace RestaurantManagement.Modules.Organization.Services
             _localizer = localizer;
             _auditLog = auditLog;
             _logger = logger;
+            _changeReader = changeReader;
         }
 
         public async Task<LocationResponse> CreateLocationAsync(Guid userId, CreateLocationRequest request)
@@ -150,8 +156,20 @@ namespace RestaurantManagement.Modules.Organization.Services
             }
         }
 
-        public Task<RestaurantManagement.Shared.Models.ChangesPageResponse<LocationResponse>> GetLocationChangesAsync(Guid userId, RestaurantManagement.Shared.Models.ChangesQuery query)
-            => throw new NotImplementedException();
+        public async Task<ChangesPageResponse<LocationResponse>> GetLocationChangesAsync(Guid userId, ChangesQuery query)
+        {
+            var organizationId = RequireOrganizationId();
+            await RequireAnyAccessAsync();
+
+            var records = _orgDb.Locations.Select(l => new ChangeRow(l.Id, l.ChangeStamp));
+            // Locations are closed, never deleted, so the feed has no tombstones.
+            var noTombstones = _orgDb.Locations.Where(_ => false).Select(l => new ChangeRow(l.Id, l.ChangeStamp));
+
+            return await _changeReader!.ReadAsync(_orgDb, new ChangeFeedRead<LocationResponse>(
+                ChangeFeeds.Locations, organizationId, null, query, records, noTombstones,
+                async (ids, ct) => (await _orgDb.Locations.Where(l => ids.Contains(l.Id)).ToListAsync(ct))
+                    .ToDictionary(l => l.Id, MapToResponse)), CancellationToken.None);
+        }
 
         public async Task<List<LocationResponse>> GetLocationsAsync(Guid userId)
         {

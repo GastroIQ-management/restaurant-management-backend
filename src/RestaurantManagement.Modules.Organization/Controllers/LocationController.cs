@@ -7,6 +7,7 @@ using RestaurantManagement.Shared.Utils.Exceptions;
 using System.Security.Claims;
 using RestaurantManagement.Modules.Organization.Models;
 using RestaurantManagement.Modules.Organization.Services;
+using RestaurantManagement.Shared.Models;
 
 namespace RestaurantManagement.Modules.Organization.Controllers
 {
@@ -36,8 +37,8 @@ namespace RestaurantManagement.Modules.Organization.Controllers
 
         // GET api/v1/locations/changes
         [HttpGet("changes")]
-        public Task<ActionResult<RestaurantManagement.Shared.Models.ChangesPageResponse<LocationResponse>>> GetLocationChanges([FromQuery] RestaurantManagement.Shared.Models.ChangesQuery query)
-            => throw new NotImplementedException();
+        public async Task<ActionResult<ChangesPageResponse<LocationResponse>>> GetLocationChanges([FromQuery] ChangesQuery query)
+            => Ok(await _locationService.GetLocationChangesAsync(GetCurrentUserId(), query));
 
         // POST api/v1/locations
         [HttpPost]
