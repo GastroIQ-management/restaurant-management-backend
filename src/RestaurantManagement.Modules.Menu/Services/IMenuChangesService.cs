@@ -9,5 +9,7 @@ namespace RestaurantManagement.Modules.Menu.Services
         Task<ChangesPageResponse<MenuResponse>> GetMenuChangesAsync(ChangesQuery query, CancellationToken cancellationToken);
 
         Task<ChangesPageResponse<LocationMenuResponse>> GetLocationLinkChangesAsync(ChangesQuery query, CancellationToken cancellationToken);
+
+        Task<ChangesPageResponse<MenuCategoryResponse>> GetMenuCategoryChangesAsync(ChangesQuery query, CancellationToken cancellationToken);
     }
 }

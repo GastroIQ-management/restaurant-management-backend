@@ -24,5 +24,10 @@ namespace RestaurantManagement.Modules.Menu.Controllers
         [Authorize]
         public async Task<ActionResult<ChangesPageResponse<LocationMenuResponse>>> GetLocationLinkChanges([FromQuery] ChangesQuery query, CancellationToken cancellationToken)
             => Ok(await _changes.GetLocationLinkChangesAsync(query, cancellationToken));
+
+        [HttpGet("menu-categories/changes")]
+        [Authorize]
+        public async Task<ActionResult<ChangesPageResponse<MenuCategoryResponse>>> GetMenuCategoryChanges([FromQuery] ChangesQuery query, CancellationToken cancellationToken)
+            => Ok(await _changes.GetMenuCategoryChangesAsync(query, cancellationToken));
     }
 }

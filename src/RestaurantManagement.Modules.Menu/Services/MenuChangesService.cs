@@ -16,6 +16,7 @@ namespace RestaurantManagement.Modules.Menu.Services
     {
         private const string MenuType = "Menu";
         private const string LinkType = "LocationMenu";
+        private const string CategoryType = "MenuCategory";
 
         private readonly MenuDbContext _menuDb;
         private readonly ChangeReader _reader;
@@ -64,6 +65,21 @@ namespace RestaurantManagement.Modules.Menu.Services
                 ChangeFeeds.MenuLocationLinks, organizationId, locationId, query, records, Tombstones(organizationId, locationId, LinkType),
                 async (ids, ct) => (await _menuDb.LocationMenus.Where(l => ids.Contains(l.Id)).ToListAsync(ct))
                     .ToDictionary(l => l.Id, ToResponse)), cancellationToken);
+        }
+
+        public async Task<ChangesPageResponse<MenuCategoryResponse>> GetMenuCategoryChangesAsync(ChangesQuery query, CancellationToken cancellationToken)
+        {
+            var (organizationId, locationId) = await RequireScopeAsync();
+
+            // Categories with no location are not synced.
+            var records = _menuDb.MenuCategories
+                .Where(c => c.LocationId == locationId)
+                .Select(c => new ChangeRow(c.Id, c.ChangeStamp));
+
+            return await _reader.ReadAsync(_menuDb, new ChangeFeedRead<MenuCategoryResponse>(
+                ChangeFeeds.MenuCategories, organizationId, locationId, query, records, Tombstones(organizationId, locationId, CategoryType),
+                async (ids, ct) => (await _menuDb.MenuCategories.Where(c => ids.Contains(c.Id)).ToListAsync(ct))
+                    .ToDictionary(c => c.Id, MenuCategoryService.MapToResponse)), cancellationToken);
         }
 
         // The tombstone table has no query filter, so organization and location are always named here.

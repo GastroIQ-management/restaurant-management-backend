@@ -187,7 +187,7 @@ namespace RestaurantManagement.Modules.Menu.Services
             return MapToResponse(stored);
         }
 
-        private static MenuCategoryResponse MapToResponse(MenuCategory category)
+        internal static MenuCategoryResponse MapToResponse(MenuCategory category)
         {
             return new MenuCategoryResponse
             {
