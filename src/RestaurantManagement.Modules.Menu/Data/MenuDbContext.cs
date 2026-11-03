@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using RestaurantManagement.Modules.Menu.Entities;
+using RestaurantManagement.Shared.Data.Changes;
 using RestaurantManagement.Shared.Data.Idempotency;
 using RestaurantManagement.Shared.Data.Tenancy;
 using RestaurantManagement.Shared.Data.Versioning;
@@ -27,6 +28,7 @@ namespace RestaurantManagement.Modules.Menu.Data
             base.OnModelCreating(modelBuilder);
             modelBuilder.ApplyIdempotencyKeys("menu_idempotency_keys");
             modelBuilder.ApplyVersionTokens(Database);
+            modelBuilder.ApplyChangeTracking(Database, "menu_tombstones");
             modelBuilder.ApplyTenantQueryFilters(() => _tenantContext);
         }
     }

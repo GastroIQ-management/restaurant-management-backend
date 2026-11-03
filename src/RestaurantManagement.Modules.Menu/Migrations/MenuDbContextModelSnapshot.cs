@@ -29,6 +29,11 @@ namespace RestaurantManagement.Modules.Menu.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("id");
 
+                    b.Property<long>("ChangeStamp")
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("bigint")
+                        .HasColumnName("change_stamp");
+
                     b.Property<int?>("ClientActionOffsetMinutes")
                         .HasColumnType("integer")
                         .HasColumnName("client_action_offset_minutes");
@@ -90,6 +95,9 @@ namespace RestaurantManagement.Modules.Menu.Migrations
                     b.HasIndex("MenuId")
                         .HasDatabaseName("ix_location_menus_menu_id");
 
+                    b.HasIndex("OrganizationId", "ChangeStamp")
+                        .HasDatabaseName("ix_location_menus_organization_id_change_stamp");
+
                     b.ToTable("location_menus", (string)null);
                 });
 
@@ -99,6 +107,11 @@ namespace RestaurantManagement.Modules.Menu.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid")
                         .HasColumnName("id");
+
+                    b.Property<long>("ChangeStamp")
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("bigint")
+                        .HasColumnName("change_stamp");
 
                     b.Property<int?>("ClientActionOffsetMinutes")
                         .HasColumnType("integer")
@@ -164,6 +177,9 @@ namespace RestaurantManagement.Modules.Menu.Migrations
                     b.HasKey("Id")
                         .HasName("pk_menus");
 
+                    b.HasIndex("OrganizationId", "ChangeStamp")
+                        .HasDatabaseName("ix_menus_organization_id_change_stamp");
+
                     b.ToTable("menus", (string)null);
                 });
 
@@ -173,6 +189,11 @@ namespace RestaurantManagement.Modules.Menu.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid")
                         .HasColumnName("id");
+
+                    b.Property<long>("ChangeStamp")
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("bigint")
+                        .HasColumnName("change_stamp");
 
                     b.Property<int?>("ClientActionOffsetMinutes")
                         .HasColumnType("integer")
@@ -248,7 +269,51 @@ namespace RestaurantManagement.Modules.Menu.Migrations
                     b.HasIndex("MenuId")
                         .HasDatabaseName("ix_menu_categories_menu_id");
 
+                    b.HasIndex("OrganizationId", "ChangeStamp")
+                        .HasDatabaseName("ix_menu_categories_organization_id_change_stamp");
+
                     b.ToTable("menu_categories", (string)null);
+                });
+
+            modelBuilder.Entity("RestaurantManagement.Shared.Data.Changes.ChangeTombstone", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<long>("ChangeStamp")
+                        .HasColumnType("bigint")
+                        .HasColumnName("change_stamp");
+
+                    b.Property<DateTime>("DeletedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("deleted_at");
+
+                    b.Property<Guid>("EntityId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("entity_id");
+
+                    b.Property<string>("EntityType")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("entity_type");
+
+                    b.Property<Guid?>("LocationId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("location_id");
+
+                    b.Property<Guid>("OrganizationId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("organization_id");
+
+                    b.HasKey("Id")
+                        .HasName("pk_menu_tombstones");
+
+                    b.HasIndex("OrganizationId", "LocationId", "EntityType", "ChangeStamp")
+                        .HasDatabaseName("ix_menu_tombstones_organization_id_location_id_entity_type_cha");
+
+                    b.ToTable("menu_tombstones", (string)null);
                 });
 
             modelBuilder.Entity("RestaurantManagement.Shared.Data.Idempotency.IdempotencyKey", b =>

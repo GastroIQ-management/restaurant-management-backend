@@ -1,11 +1,14 @@
 using System.ComponentModel.DataAnnotations;
+using RestaurantManagement.Shared.Data.Changes;
 using RestaurantManagement.Shared.Data.Entities;
 using RestaurantManagement.Shared.Data.Versioning;
 
 namespace RestaurantManagement.Modules.Menu.Entities
 {
-    public class Menu : TenantEntity, IVersionedEntity
+    public class Menu : TenantEntity, IVersionedEntity, IChangeTracked
     {
+        public long ChangeStamp { get; set; }
+
         public uint Version { get; set; }
 
         [Required, MaxLength(100)]
