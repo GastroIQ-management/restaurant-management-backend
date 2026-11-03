@@ -1,6 +1,6 @@
 # Plan: Changes-Since Read for Device Catch-Up
 
-**Source:** docs/specs/shared/2026-11-02-changes-since-read-for-device-catch-up.md   **Date:** 2026-11-02   **Status:** In progress
+**Source:** docs/specs/shared/2026-11-02-changes-since-read-for-device-catch-up.md   **Date:** 2026-11-02   **Status:** Done
 **Risk:** High — new Shared contract, schema changes with hand-written database triggers in two migrations, new reads of tenant data
 
 ## Summary
@@ -36,11 +36,11 @@ test and an architecture rule keep future modules from shipping tenant data with
 | T8 | — | — | — (changes the ef-migration skill to allow the `ChangeTrackingSql` triggers as a hand edit) |
 
 ## Overall Definition of Done
-- [ ] All tasks done, tests passing
-- [ ] All Outcomes met (spec Outcomes)
-- [ ] Affected tests green after the last batch; full suite green in CI (Continuous Integration)
-- [ ] No out-of-scope changes
-- [ ] `python3 .claude/scripts/check-security-matrices.py` passes with the shared, menu, organization and web matrix rows ✅
+- [x] All tasks done, tests passing
+- [x] All Outcomes met (spec Outcomes)
+- [x] Affected tests green after the last batch; full suite green in CI (Continuous Integration)
+- [x] No out-of-scope changes
+- [x] `python3 .claude/scripts/check-security-matrices.py` passes with the shared, menu, organization and web matrix rows ✅
 
 ## Checklist
 - [x] T1 — Change cursor, page contract and error codes
