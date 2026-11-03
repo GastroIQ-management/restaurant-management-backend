@@ -27,6 +27,9 @@ namespace RestaurantManagement.Shared.Data.Changes
             return new ChangePage(ordered.Take(pageSize).ToList(), ordered.Count > pageSize);
         }
 
+        /// <summary>True when the stamp and ID sort strictly after the position, in the order the database sorts them.</summary>
+        public static bool IsAfter(long stamp, Guid id, ChangePosition position) => Compare(stamp, id, position.Stamp, position.Id) > 0;
+
         private static int Compare(long stamp, Guid id, long otherStamp, Guid otherId)
             => stamp != otherStamp ? stamp.CompareTo(otherStamp) : GuidByteOrder.Instance.Compare(id, otherId);
 

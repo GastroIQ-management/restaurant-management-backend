@@ -1,7 +1,7 @@
 # Scenarios: Changes-Since Read for Device Catch-Up
 
 **Plan:** docs/plans/shared/2026-11-02-changes-since-read-for-device-catch-up/plan.md
-**Coverage:** 43 scenarios: 20 happy · 9 edge · 5 failure · 9 security · 0 guard
+**Coverage:** 45 scenarios (43 plus 2 added in the review fix round): 20 happy · 11 edge · 5 failure · 9 security · 0 guard
 
 A Theory (one test run with several inputs) counts as one scenario. Test names are `Class.Method`.
 
@@ -50,6 +50,8 @@ A Theory (one test run with several inputs) counts as one scenario. Test names a
 | 41 | T8 | Happy | Every tenant entity of every module is change tracked with its stamp mapped, or is on the written exclusion list with a reason | `ChangeTrackingCoverageTests.EveryTenantEntity_OfEveryModuleContext_IsChangeTrackedWithItsStampMappedOrExcludedWithAReason` | `tests/RestaurantManagement.Web.Tests/Web/ChangeTrackingCoverageTests.cs` |
 | 42 | T8 | Happy | Every module with a tracked entity exposes a changes feed | `ChangeTrackingCoverageTests.EveryModuleWithATrackedEntity_ExposesAChangesFeed` | `tests/RestaurantManagement.Web.Tests/Web/ChangeTrackingCoverageTests.cs` |
 | 43 | T8 | Happy | Every tracked table has its stamp trigger and, unless rows are never deleted, a tombstone trigger | `ChangeTrackingCoverageTests.EveryTrackedTable_HasItsStampTriggerAndATombstoneTriggerUnlessRowsAreNeverDeleted` | `tests/RestaurantManagement.Web.Tests/Web/ChangeTrackingCoverageTests.cs` |
+| 44 | T2 | Edge | A page ends before a tombstone that was never read while later records reuse earlier tombstone IDs (page size 1; tombstones M1@10, M2@11, Z@12; records M1@20, M2@21): Z is still handed out | `ChangeReaderPagingPostgresTests.ReadAsync_PageEndsBeforeAnUnreadTombstoneWhoseNeighboursWereReattached_NeverSkipsThatTombstone` | `tests/RestaurantManagement.Web.Tests/Shared/ChangeReaderPagingPostgresTests.cs` |
+| 45 | T3 | Edge | Deleting a menu with no location links leaves one tombstone with no location, carrying the menu's own organization | `MenuUnlinkedDeleteTrackingTests.DeleteMenu_WithNoLocationLinks_LeavesOneTombstoneWithNoLocationCarryingTheMenusOrganization` | `tests/RestaurantManagement.Web.Tests/Menu/MenuUnlinkedDeleteTrackingTests.cs` |
 
 ## Existing tests updated
 - `tests/RestaurantManagement.Shared.Tests/ErrorCodeCatalogTests.cs`, `Read_SharedCatalog_ListsEveryNamedCodeWithItsStatus` (rule SH52): three new rows (`changes.cursor_invalid` 400, `changes.cursor_expired` 410, `location.required` 400), forced by the three new error codes. Those rows fail until T1 adds the codes; the matrix row SH52 is set back to a red status for the same reason.
@@ -84,7 +86,7 @@ A Theory (one test run with several inputs) counts as one scenario. Test names a
 - Message keys the tests fix in the Shared resource files: `ChangeCursorInvalid`, `ChangeCursorExpired`, `LocationRequired`. The page size message uses the implementer's own catalog key (the existing completeness test checks it exists in all three languages).
 - Database names the tests read directly with SQL: column `change_stamp` on `menus`, `menu_categories`, `location_menus`, `locations`; table `menu_tombstones` with `entity_id`, `location_id`, `organization_id`, `deleted_at`. The `entity_type` value is not asserted.
 - The edit-stamp test runs an update that changes no value (`SET updated_at = updated_at`), so the stamp trigger must fire on every update statement.
-- `ChangeReader` has no test of its own: it needs a real transaction snapshot, so it is proven through the menus feed (#25 and the paging and sync scenarios), as the plan says. No `ChangeReader` stub is created.
+- (Review fix round) Scenario 44 now tests `ChangeReader` paging directly on PostgreSQL with fixed (ID, stamp) rows; the original note below stays true for the snapshot bound. `ChangeReader` has no other test of its own: it needs a real transaction snapshot, so it is proven through the menus feed (#25 and the paging and sync scenarios), as the plan says. No `ChangeReader` stub is created.
 - The controller stubs (`MenuChangesController`, `LocationController.GetLocationChanges`) and the `GetLocationChangesAsync` stub throw directly, so the new endpoint tests fail with a 500 instead of a 404. `IMenuChangesService` and `MenuChangesService` are not created as stubs; the implementer adds them.
 - The plan is Large (limit 40 scenarios); the user approved 43 so that T8 stays in this plan; scenarios that the spec lists separately (#1 and #2, #7 and #8 on the same feed) share a test where one setup proves both.
 - Writes in endpoint tests go through the database context (not the HTTP write endpoints), so the tests do not depend on versions, idempotency keys or client-time headers.

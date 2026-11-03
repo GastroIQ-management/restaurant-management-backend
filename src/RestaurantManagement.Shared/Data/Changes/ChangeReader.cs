@@ -56,14 +56,26 @@ namespace RestaurantManagement.Shared.Data.Changes
             var pageSize = read.Query.EffectivePageSize;
             var records = await ReadRowsAsync(read.Records, lower, after, pageSize, false, cancellationToken);
             var tombstones = await ReadRowsAsync(read.Tombstones, lower, after, pageSize, true, cancellationToken);
-            var page = ChangePageBuilder.Build(records, tombstones, after, pageSize);
 
-            // A source cut at pageSize + 1 may hide entries behind an ID that appeared in both, so it also means "more".
-            var hasMore = page.HasMore || records.Count > pageSize || tombstones.Count > pageSize;
+            // A source cut at pageSize + 1 says nothing about rows past its last one, so no entry past the earliest cut may be
+            // handed out: a later entry for the same ID would hide an unread one and the page would skip it.
+            var limit = EarliestCut(records.CutAt, tombstones.CutAt);
+            var page = ChangePageBuilder.Build(WithinLimit(records.Entries, limit), WithinLimit(tombstones.Entries, limit), after, pageSize);
+            var hasMore = page.HasMore || limit is not null;
             return await BuildResponseAsync(read, page, hasMore, lower, nextBound, cancellationToken);
         }
 
-        private static async Task<List<ChangeEntry>> ReadRowsAsync(IQueryable<ChangeRow> source, long lower, ChangePosition? after, int pageSize, bool isDeleted, CancellationToken cancellationToken)
+        private static ChangePosition? EarliestCut(ChangePosition? first, ChangePosition? second)
+        {
+            if (first is null || second is null)
+                return first ?? second;
+            return ChangePageBuilder.IsAfter(first.Value.Stamp, first.Value.Id, second.Value) ? second : first;
+        }
+
+        private static IEnumerable<ChangeEntry> WithinLimit(IEnumerable<ChangeEntry> entries, ChangePosition? limit)
+            => limit is { } position ? entries.Where(e => !ChangePageBuilder.IsAfter(e.Stamp, e.Id, position)) : entries;
+
+        private static async Task<(List<ChangeEntry> Entries, ChangePosition? CutAt)> ReadRowsAsync(IQueryable<ChangeRow> source, long lower, ChangePosition? after, int pageSize, bool isDeleted, CancellationToken cancellationToken)
         {
             var floor = source.Where(r => r.Stamp >= lower);
             var rows = new List<ChangeRow>();
@@ -75,8 +87,11 @@ namespace RestaurantManagement.Shared.Data.Changes
                 floor = floor.Where(r => r.Stamp > position.Stamp);
             }
 
-            rows.AddRange(await floor.OrderBy(r => r.Stamp).ThenBy(r => r.Id).Take(pageSize + 1).ToListAsync(cancellationToken));
-            return rows.Select(r => new ChangeEntry(r.Id, r.Stamp, isDeleted)).ToList();
+            var next = await floor.OrderBy(r => r.Stamp).ThenBy(r => r.Id).Take(pageSize + 1).ToListAsync(cancellationToken);
+            rows.AddRange(next);
+
+            ChangePosition? cutAt = next.Count > pageSize ? new ChangePosition(next[^1].Stamp, next[^1].Id) : null;
+            return (rows.Select(r => new ChangeEntry(r.Id, r.Stamp, isDeleted)).ToList(), cutAt);
         }
 
         private async Task<ChangesPageResponse<TItem>> BuildResponseAsync<TItem>(
