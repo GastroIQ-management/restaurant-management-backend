@@ -97,3 +97,5 @@ These protect the app setup rather than a rule users meet.
 | WD15 | `IdempotencyKeyWiringTests.EveryEndpoint_SignedInWrite_BelongsToAModuleWithAKeyStoreOrIgnoresKeys` | No module's signed-in write silently skips the key |
 | WD16 | `ClientTimeHeadersOpenApiTests.V1Document_SignedInWrites_DeclareBothDeviceTimeHeadersAsRequiredDateTimes` | Generated clients send `X-Client-Action-Time` and `X-Client-Sent-At` on every signed-in write |
 | WD17 | `ClientTimeHeadersOpenApiTests.V1Document_PublicWritesAndReads_DoNotDeclareTheDeviceTimeHeaders` | The headers are not shown on reads and anonymous writes |
+| WD18 | `RefreshTokenHeaderOpenApiTests.V1Document_RefreshSelectOrganizationAndLogout_DeclareTheOptionalRefreshTokenHeaderForNativeApps` | Generated clients may send `X-Refresh-Token` (native apps only) on refresh, select-organization and logout |
+| WD19 | `RefreshTokenHeaderOpenApiTests.V1Document_OtherOperations_DoNotDeclareTheRefreshTokenHeader` | The header is not shown on any other operation |
